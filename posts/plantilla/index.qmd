@@ -1,0 +1,26 @@
+---
+title: "Título del artículo"
+description: "Resumen breve del contenido del artículo."
+categories: [Desarrollo de software]
+draft: true
+---
+
+<!-- Copia esta carpeta con un nombre descriptivo para crear un artículo.
+Antes de publicarlo, añade date: AAAA-MM-DD, completa los metadatos
+y el contenido, y cambia draft a false. -->
+
+## Introducción
+
+<!-- Presenta el tema y el objetivo del artículo. -->
+
+## Desarrollo
+
+<!-- Explica los conceptos e incluye ejemplos cuando corresponda. -->
+
+## Conclusiones
+
+<!-- Resume los aprendizajes y posibles pasos siguientes. -->
+
+## Referencias
+
+<!-- Incluye enlaces a las fuentes utilizadas. -->

@@ -1,0 +1,20 @@
+---
+title: "Proyectos"
+description: "Portafolio de proyectos y prácticas académicas de desarrollo de software y tecnologías de la información."
+---
+
+Este portafolio reúne proyectos y prácticas académicas. Sus detalles se documentarán en próximas etapas.
+
+## Desarrollo de software
+
+- **Calculadora de Promedios en Android/Kotlin.** Proyecto académico de desarrollo móvil.
+- **Sistema de Pedidos para Cafetería en Java Swing.** Proyecto académico de aplicación de escritorio.
+
+## Hardware y redes
+
+- **Caseta de Peaje con Arduino.** Proyecto académico con Arduino.
+- **Prácticas de redes y VLAN.** Actividades académicas de redes.
+
+## Servicios en la nube y bases de datos
+
+- **Prácticas con AWS EC2 y MySQL.** Actividades académicas con estas tecnologías.

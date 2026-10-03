@@ -1,0 +1,12 @@
+---
+title: "Sobre mí"
+description: "Presentación de Miguel y del propósito de su blog y portafolio."
+---
+
+Soy Miguel. Este blog es un espacio para documentar mi aprendizaje en desarrollo de software y tecnologías de la información.
+
+## Acerca del proyecto
+
+Miguel Dev Blog también servirá como portafolio académico y profesional, reuniendo proyectos y conocimientos relacionados con la carrera.
+
+La presentación personal y los proyectos se ampliarán en las próximas etapas.

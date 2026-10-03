@@ -1,0 +1,26 @@
+project:
+  type: website
+  output-dir: _site
+
+lang: es
+
+website:
+  title: "Miguel Dev Blog"
+  description: "Blog personal sobre desarrollo de software, tecnologías de la información y proyectos académicos."
+  navbar:
+    left:
+      - href: index.qmd
+        text: Inicio
+      - href: posts/index.qmd
+        text: Artículos
+      - href: proyectos.qmd
+        text: Proyectos
+      - href: about.qmd
+        text: Sobre mí
+  page-footer: "Miguel Dev Blog · Desarrollo de software y tecnologías de la información"
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: false

@@ -1,0 +1,13 @@
+---
+title: "Artículos"
+description: "Artículos sobre desarrollo de software, tecnologías de la información y proyectos académicos."
+author: []
+toc: false
+listing:
+  contents: "**/*.qmd"
+  type: default
+  sort: "date desc"
+  categories: true
+---
+
+Aquí compartiré artículos técnicos y aprendizajes de mis proyectos. Las primeras publicaciones están en preparación.

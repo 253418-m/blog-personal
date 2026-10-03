@@ -1,0 +1,15 @@
+/* Personalizaciones mínimas sobre el tema nativo de Quarto. */
+main p,
+main li {
+  line-height: 1.7;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+a:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 3px;
+}

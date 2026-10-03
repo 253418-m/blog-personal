@@ -1,0 +1,14 @@
+---
+title: "Miguel Dev Blog"
+description: "Un espacio para compartir conocimientos de desarrollo de software, tecnologías de la información y proyectos académicos."
+---
+
+Bienvenido a mi blog de desarrollo de software y tecnologías de la información.
+
+Este espacio reunirá apuntes técnicos, aprendizajes de la carrera y proyectos académicos y profesionales.
+
+## Explora el sitio
+
+- [Artículos](posts/index.qmd): artículos y aprendizajes técnicos.
+- [Proyectos](proyectos.qmd): portafolio académico.
+- [Sobre mí](about.qmd): presentación y enfoque del portafolio.
