@@ -64,7 +64,7 @@ Más que digitalizar pedidos, PuraVida busca reducir tareas manuales, organizar 
 :::
 :::
 
-[Ver más de este proyecto →](blog.qmd){.text-link}
+[Ver más de este proyecto →](proyectos/puravida/index.qmd){.text-link}
 ::::
 
 :::::: {.credentials-section aria-labelledby="credentials-title"}
