@@ -1,0 +1,618 @@
+[
+  {
+    "objectID": "proyectos/puravida/index.html",
+    "href": "proyectos/puravida/index.html",
+    "title": "PuraVida",
+    "section": "",
+    "text": "Miguel"
+  },
+  {
+    "objectID": "proyectos/puravida/index.html#el-problema",
+    "href": "proyectos/puravida/index.html#el-problema",
+    "title": "PuraVida",
+    "section": "1. El problema",
+    "text": "1. El problema\nEl contexto documentado del portafolio identifica actividades cotidianas por organizar: publicar el menú, recibir pedidos y registrar ventas. PuraVida propone reunir esas actividades en un mismo entorno digital para una fonda local de Suchiapa, Chiapas.\nEl problema se aborda desde la coordinación de la información. El cliente necesita saber si el establecimiento está abierto y qué ofrece ese día. La encargada necesita mantener el menú y controlar qué pedidos acepta o rechaza. El proyecto no parte de cifras de ventas, tiempos medidos ni estudios de usuarios; su propósito es representar una solución tecnológica adaptada a esas tareas."
+  },
+  {
+    "objectID": "proyectos/puravida/index.html#la-propuesta",
+    "href": "proyectos/puravida/index.html#la-propuesta",
+    "title": "PuraVida",
+    "section": "2. La propuesta",
+    "text": "2. La propuesta\nLa propuesta es una aplicación web MVP: un producto con un alcance inicial delimitado. Incluye una parte pública para consultar información y una parte autenticada para realizar y gestionar operaciones.\nEl visitante puede consultar el estado abierto o cerrado, revisar el menú y registrarse. El cliente autenticado puede realizar pedidos, consultar su historial y revisar notificaciones internas. La encargada gestiona el estado, el menú, las solicitudes, las ventas manuales y la información de seguimiento.\n\nIdea clave: el alcance de PuraVida se concentra en conectar pedidos y gestión cotidiana, con reglas claras para cada actor."
+  },
+  {
+    "objectID": "proyectos/puravida/index.html#cómo-funciona",
+    "href": "proyectos/puravida/index.html#cómo-funciona",
+    "title": "PuraVida",
+    "section": "3. ¿Cómo funciona?",
+    "text": "3. ¿Cómo funciona?\nEl recorrido general del cliente es:\n\nVisitar la página pública y consultar el estado de la fonda.\nRevisar el menú del día.\nRegistrarse o iniciar sesión para poder ordenar.\nPreparar el carrito y enviar el pedido desde la aplicación.\nEsperar la revisión de la encargada.\nConsultar la aceptación o el rechazo y las notificaciones internas.\n\nSolo los clientes autenticados pueden realizar pedidos. Si la fonda está cerrada, no se permite enviarlos. Las solicitudes requieren aceptación manual; cuando se rechazan, deben incluir un motivo. Este flujo conserva la intervención de la encargada en la decisión sobre cada pedido."
+  },
+  {
+    "objectID": "proyectos/puravida/index.html#gestión-de-la-fonda",
+    "href": "proyectos/puravida/index.html#gestión-de-la-fonda",
+    "title": "PuraVida",
+    "section": "4. Gestión de la fonda",
+    "text": "4. Gestión de la fonda\nLa encargada puede cambiar el estado de apertura y editar un menú que varía diariamente. También revisa los pedidos recibidos y decide si los acepta o rechaza. Las notificaciones se muestran dentro de la aplicación; el alcance no incluye mensajes por SMS ni notificaciones push.\nLas ventas presenciales se registran manualmente. Esta función permite incorporar operaciones que no nacen de un pedido enviado desde la aplicación. El dashboard, las estadísticas y los reportes semanales PDF forman parte de las herramientas de consulta contempladas para la gestión.\nLa distinción entre ventas manuales y pedidos aceptados es importante: ambos aportan información al seguimiento, pero corresponden a recorridos de registro diferentes."
+  },
+  {
+    "objectID": "proyectos/puravida/index.html#tecnologías-utilizadas",
+    "href": "proyectos/puravida/index.html#tecnologías-utilizadas",
+    "title": "PuraVida",
+    "section": "5. Tecnologías utilizadas",
+    "text": "5. Tecnologías utilizadas\nLas tecnologías conocidas del proyecto se distribuyen así:\n\nReact: construcción de la interfaz a partir de componentes.\nVite: herramientas para desarrollar y preparar el frontend.\nJavaScript: lógica e interacción del cliente web.\nJava y Spring Boot: implementación del backend y sus operaciones.\nMySQL: persistencia de la información del proyecto.\nJWT con control por roles: autenticación y control de acceso según el actor.\n\nEl control por roles distingue las acciones del cliente y de la encargada. El uso de un token forma parte de la autenticación; las autorizaciones siguen siendo responsabilidad del backend. La elección de estas tecnologías no implica que el portafolio esté construido con ellas: el sitio que presenta el caso sigue siendo Quarto."
+  },
+  {
+    "objectID": "proyectos/puravida/index.html#arquitectura",
+    "href": "proyectos/puravida/index.html#arquitectura",
+    "title": "PuraVida",
+    "section": "6. Arquitectura",
+    "text": "6. Arquitectura\nEl frontend utiliza una organización modular por funcionalidades basada en FSD ligero. Esta organización busca agrupar responsabilidades de la interfaz de forma comprensible y mantener una separación entre las distintas funciones de la aplicación.\nEl backend se describe como una arquitectura hexagonal ligera dentro de un monolito modular. La idea es distinguir la lógica de negocio de los mecanismos que permiten recibir solicitudes y persistir información. Al ser un monolito modular, la separación de responsabilidades no exige desplegar cada módulo como un servicio independiente.\nMySQL proporciona la persistencia. El enfoque es mantener límites claros dentro de una aplicación cuyo tamaño corresponde a un MVP, sin presentar la arquitectura como un sistema empresarial de mayor alcance."
+  },
+  {
+    "objectID": "proyectos/puravida/index.html#datos-y-estadísticas",
+    "href": "proyectos/puravida/index.html#datos-y-estadísticas",
+    "title": "PuraVida",
+    "section": "7. Datos y estadísticas",
+    "text": "7. Datos y estadísticas\nLas estadísticas consolidan información de pedidos aceptados y ventas manuales. No existe una tabla persistida llamada ventas_unificadas: la consolidación se realiza mediante consultas sobre los datos correspondientes.\nEsta decisión distingue los registros que se almacenan de la información que se obtiene al consultarlos. El resumen estadístico reúne los datos necesarios para la gestión sin describirse como una tercera fuente de ventas.\nLos reportes semanales pueden descargarse en PDF. No se atribuyen métricas comerciales al proyecto; se documenta la funcionalidad de consulta y reporte incluida en su alcance."
+  },
+  {
+    "objectID": "proyectos/puravida/index.html#alcance-del-mvp",
+    "href": "proyectos/puravida/index.html#alcance-del-mvp",
+    "title": "PuraVida",
+    "section": "8. Alcance del MVP",
+    "text": "8. Alcance del MVP\nEl alcance incluido comprende:\n\nLanding pública, estado abierto o cerrado y menú del día.\nRegistro, inicio de sesión, carrito y pedidos desde la aplicación.\nAceptación o rechazo manual, con motivo en los rechazos.\nNotificaciones internas e historial de pedidos.\nRegistro manual de ventas.\nDashboard, estadísticas y reportes semanales PDF.\n\nQuedan fuera del MVP los pagos en línea, una aplicación móvil, múltiples sucursales, inventario, proveedores, fidelización, SMS, notificaciones push, reservaciones e integración con redes sociales. Esta delimitación evita confundir una posible ampliación futura con una funcionalidad incluida."
+  },
+  {
+    "objectID": "proyectos/puravida/index.html#estado-del-proyecto",
+    "href": "proyectos/puravida/index.html#estado-del-proyecto",
+    "title": "PuraVida",
+    "section": "9. Estado del proyecto",
+    "text": "9. Estado del proyecto\nLos archivos existentes del portafolio presentan PuraVida como un proyecto académico y una propuesta de aplicación web para la fonda. La información disponible documenta su propósito y alcance, pero no establece una fecha de finalización ni un estado de despliegue.\nPor tanto, este caso no lo identifica como terminado, publicado o en producción. El estado deberá actualizarse cuando exista información verificable del proyecto que permita describirlo con mayor precisión."
+  },
+  {
+    "objectID": "proyectos/puravida/index.html#aprendizajes",
+    "href": "proyectos/puravida/index.html#aprendizajes",
+    "title": "PuraVida",
+    "section": "10. Aprendizajes",
+    "text": "10. Aprendizajes\nEl caso permite trabajar la organización de requisitos a partir de actores, acciones y reglas de negocio. Separar la consulta pública de las operaciones autenticadas ayuda a relacionar la interfaz con el control por roles.\nTambién permite estudiar el modelado de datos, la distinción entre pedidos y ventas manuales, y la separación de responsabilidades entre frontend, backend y persistencia. La delimitación del MVP muestra cómo mantener una propuesta abordable sin incorporar funcionalidades ajenas a su objetivo.\nEstos aprendizajes se relacionan con las decisiones documentadas del proyecto. No implican resultados medidos en la fonda ni experiencia de operación en producción."
+  },
+  {
+    "objectID": "posts/introduccion-desarrollo-web/index.html",
+    "href": "posts/introduccion-desarrollo-web/index.html",
+    "title": "Introducción al desarrollo web moderno",
+    "section": "",
+    "text": "Miguel\n\n12 de marzo de 2026"
+  },
+  {
+    "objectID": "posts/introduccion-desarrollo-web/index.html#una-aplicación-con-responsabilidades-distintas",
+    "href": "posts/introduccion-desarrollo-web/index.html#una-aplicación-con-responsabilidades-distintas",
+    "title": "Introducción al desarrollo web moderno",
+    "section": "1. Una aplicación con responsabilidades distintas",
+    "text": "1. Una aplicación con responsabilidades distintas\nEl frontend es la parte con la que interactúa la persona: formularios, navegación, mensajes y contenido visible. Su tarea incluye presentar información con claridad y responder a acciones como escribir, seleccionar o enviar datos. También debe considerar distintos tamaños de pantalla, dispositivos de entrada y necesidades de accesibilidad.\nEl backend atiende solicitudes y aplica las reglas de la aplicación. Puede comprobar permisos, validar datos y consultar una base de datos. Aunque el navegador permita seleccionar una opción, el servidor debe verificar que esa operación sea válida. La interfaz ayuda a utilizar el sistema; las decisiones sensibles requieren controles donde se procesa la solicitud.\nEsta separación describe responsabilidades y admite implementaciones diferentes. Una página informativa puede publicarse como archivos estáticos. Otra aplicación puede generar páginas en el servidor o actualizar partes de la pantalla desde el navegador. Lo importante es entender dónde ocurre cada tarea y qué información necesita."
+  },
+  {
+    "objectID": "posts/introduccion-desarrollo-web/index.html#html-css-y-javascript-como-fundamentos",
+    "href": "posts/introduccion-desarrollo-web/index.html#html-css-y-javascript-como-fundamentos",
+    "title": "Introducción al desarrollo web moderno",
+    "section": "2. HTML, CSS y JavaScript como fundamentos",
+    "text": "2. HTML, CSS y JavaScript como fundamentos\nHTML expresa la estructura y el significado del contenido. Encabezados, párrafos, enlaces, listas y formularios permiten organizar una página de manera que pueda interpretarse tanto visualmente como mediante tecnologías de asistencia. Elegir un botón para una acción y un enlace para navegar aporta un comportamiento coherente.\nCSS controla la presentación: tipografía, colores, espaciado y distribución. Sus herramientas de diseño permiten adaptar una misma estructura a pantallas amplias y pequeñas. Un diseño responsive también considera textos largos, tamaños de letra y controles fáciles de utilizar.\nJavaScript incorpora comportamiento cuando la experiencia lo requiere. Puede gestionar eventos, actualizar contenido o solicitar información al servidor. Su presencia no sustituye una estructura semántica ni exige convertir todas las páginas en aplicaciones complejas. Primero conviene identificar la interacción necesaria y después decidir cómo implementarla."
+  },
+  {
+    "objectID": "posts/introduccion-desarrollo-web/index.html#componentes-e-interfaces-comprensibles",
+    "href": "posts/introduccion-desarrollo-web/index.html#componentes-e-interfaces-comprensibles",
+    "title": "Introducción al desarrollo web moderno",
+    "section": "3. Componentes e interfaces comprensibles",
+    "text": "3. Componentes e interfaces comprensibles\nUn componente agrupa una parte de la interfaz con una responsabilidad concreta. Puede ser una tarjeta, un formulario o una barra de navegación. La idea ayuda a mantener consistencia: si varias pantallas comparten un elemento, definir sus reglas evita resolverlo de manera distinta en cada lugar.\nLa reutilización también necesita límites. Un componente que intenta cubrir demasiadas situaciones puede terminar siendo difícil de comprender. Resulta más útil separar responsabilidades claras y documentar qué datos recibe, qué muestra y qué acciones permite. Estos criterios pueden aplicarse con HTML y CSS o con herramientas que faciliten la composición de interfaces.\n\nEstados que también forman parte del diseño\nUna interfaz debe contemplar lo que ocurre mientras carga información, cuando una consulta no devuelve resultados y cuando una operación falla. Mostrar un mensaje comprensible y permitir corregir una entrada son decisiones de diseño tan necesarias como elegir colores. Los datos de la aplicación y lo que ve la persona deben mantenerse coherentes.\n\nIdea clave: una interfaz bien organizada permite comprender tanto las acciones disponibles como el estado actual de la información."
+  },
+  {
+    "objectID": "posts/introduccion-desarrollo-web/index.html#apis-rest-y-comunicación-con-el-servidor",
+    "href": "posts/introduccion-desarrollo-web/index.html#apis-rest-y-comunicación-con-el-servidor",
+    "title": "Introducción al desarrollo web moderno",
+    "section": "4. APIs REST y comunicación con el servidor",
+    "text": "4. APIs REST y comunicación con el servidor\nUna API establece una forma de comunicación entre programas. En una API orientada a REST, los recursos suelen identificarse mediante direcciones y se utilizan métodos HTTP para expresar operaciones. Por ejemplo, GET solicita una representación y POST puede enviar datos para crear un recurso o iniciar una operación.\nEl navegador prepara una solicitud con la dirección, el método y la información necesaria. El servidor la recibe, comprueba sus condiciones y devuelve una respuesta. Esa respuesta incluye un estado HTTP y puede contener datos, frecuentemente en JSON. El frontend interpreta el resultado y actualiza la interfaz.\nUna respuesta debe comprobarse antes de asumir que la operación terminó correctamente. Los errores de validación, los permisos insuficientes y los problemas de conexión requieren tratamientos diferentes. Compartir un contrato claro sobre campos, formatos y respuestas ayuda a coordinar frontend y backend.\nLa comunicación tampoco debe exponer credenciales privadas del servidor. El código enviado al navegador puede inspeccionarse. Por eso los secretos y las comprobaciones de autorización pertenecen a los componentes que puedan protegerlos adecuadamente."
+  },
+  {
+    "objectID": "posts/introduccion-desarrollo-web/index.html#herramientas-y-buenas-prácticas-para-comenzar",
+    "href": "posts/introduccion-desarrollo-web/index.html#herramientas-y-buenas-prácticas-para-comenzar",
+    "title": "Introducción al desarrollo web moderno",
+    "section": "5. Herramientas y buenas prácticas para comenzar",
+    "text": "5. Herramientas y buenas prácticas para comenzar\nLas herramientas de desarrollo ayudan a escribir, inspeccionar y mantener el sitio. Un editor facilita trabajar con archivos; las herramientas del navegador permiten revisar estructura, estilos y solicitudes; el control de versiones registra cambios. Otros procesos pueden preparar recursos o verificar el código, según las necesidades del proyecto.\nAntes de añadir una herramienta conviene explicar qué problema resuelve. Una página pequeña no necesita todas las piezas de una aplicación grande. Mantener una estructura sencilla permite dedicar más atención al contenido, la legibilidad y el funcionamiento.\nAlgunas prácticas útiles son:\n\nUtilizar nombres que expliquen la responsabilidad de archivos y funciones.\nValidar entradas y mostrar mensajes que permitan corregirlas.\nProbar la navegación y los formularios con teclado y en pantallas pequeñas.\nMantener separados contenido, presentación y reglas de la aplicación.\nRevisar qué datos se envían y qué permisos exige cada operación.\n\nComprender estos fundamentos permite construir una base sólida y evaluar nuevas herramientas con criterio. El objetivo es que la solución responda a una necesidad concreta y que su organización pueda explicarse, revisarse y mantenerse."
+  },
+  {
+    "objectID": "posts/index.html",
+    "href": "posts/index.html",
+    "title": "Artículos y proyectos",
+    "section": "",
+    "text": "REGISTRO DE CONTENIDO\n\n\nExplora artículos, aprendizajes y proyectos sobre desarrollo, tecnología e innovación digital."
+  },
+  {
+    "objectID": "posts/index.html#introducción-al-desarrollo-web-moderno",
+    "href": "posts/index.html#introducción-al-desarrollo-web-moderno",
+    "title": "Artículos y proyectos",
+    "section": "Introducción al desarrollo web moderno",
+    "text": "Introducción al desarrollo web moderno\n\nEcosistema actual de componentes, APIs REST y buenas prácticas de desarrollo web interactivo.\n\n\n#frontend #api\n\nLeer artículo →"
+  },
+  {
+    "objectID": "posts/index.html#qué-es-la-inteligencia-artificial",
+    "href": "posts/index.html#qué-es-la-inteligencia-artificial",
+    "title": "Artículos y proyectos",
+    "section": "¿Qué es la inteligencia artificial?",
+    "text": "¿Qué es la inteligencia artificial?\n\nFundamentos de algoritmos de aprendizaje, redes neuronales y su impacto en la ingeniería digital.\n\n\n#ai #deeplearning\n\nLeer artículo →"
+  },
+  {
+    "objectID": "posts/index.html#fundamentos-de-bases-de-datos",
+    "href": "posts/index.html#fundamentos-de-bases-de-datos",
+    "title": "Artículos y proyectos",
+    "section": "Fundamentos de bases de datos",
+    "text": "Fundamentos de bases de datos\n\nModelado entidad-relación, optimización de consultas SQL y cuándo adoptar soluciones NoSQL.\n\n\n#sql #nosql\n\nLeer artículo →"
+  },
+  {
+    "objectID": "posts/index.html#introducción-a-las-redes-de-computadoras",
+    "href": "posts/index.html#introducción-a-las-redes-de-computadoras",
+    "title": "Artículos y proyectos",
+    "section": "Introducción a las redes de computadoras",
+    "text": "Introducción a las redes de computadoras\n\nModelo OSI, protocolos TCP/IP, enrutamiento básico y seguridad perimetral para estudiantes.\n\n\n#tcpip #osi\n\nLeer artículo →"
+  },
+  {
+    "objectID": "posts/index.html#git-y-github-para-estudiantes",
+    "href": "posts/index.html#git-y-github-para-estudiantes",
+    "title": "Artículos y proyectos",
+    "section": "Git y GitHub para estudiantes",
+    "text": "Git y GitHub para estudiantes\n\nControl de versiones distribuido, resolución de conflictos y flujo de trabajo colaborativo.\n\n\n#git #workflow\n\nLeer artículo →"
+  },
+  {
+    "objectID": "posts/index.html#principios-de-programación-y-arquitectura-limpia",
+    "href": "posts/index.html#principios-de-programación-y-arquitectura-limpia",
+    "title": "Artículos y proyectos",
+    "section": "Principios de programación y arquitectura limpia",
+    "text": "Principios de programación y arquitectura limpia\n\nPatrones de diseño esenciales, refactorización y escritura de código limpio y mantenible.\n\n\n#solid #patterns\n\nLeer artículo →"
+  },
+  {
+    "objectID": "posts/index.html#desarrollo-de-aplicaciones-móviles",
+    "href": "posts/index.html#desarrollo-de-aplicaciones-móviles",
+    "title": "Artículos y proyectos",
+    "section": "Desarrollo de aplicaciones móviles",
+    "text": "Desarrollo de aplicaciones móviles\n\nComparativa entre desarrollo nativo y multiplataforma, ciclo de vida y experiencia de usuario.\n\n\n#ios #android\n\nLeer artículo →"
+  },
+  {
+    "objectID": "posts/index.html#ciberseguridad-y-protección-de-datos",
+    "href": "posts/index.html#ciberseguridad-y-protección-de-datos",
+    "title": "Artículos y proyectos",
+    "section": "Ciberseguridad y protección de datos",
+    "text": "Ciberseguridad y protección de datos\n\nHigiene digital, criptografía básica y mitigación de vulnerabilidades comunes en software.\n\n\n#owasp #infosec\n\nLeer artículo →"
+  },
+  {
+    "objectID": "posts/index.html#computación-en-la-nube",
+    "href": "posts/index.html#computación-en-la-nube",
+    "title": "Artículos y proyectos",
+    "section": "Computación en la nube",
+    "text": "Computación en la nube\n\nInfraestructura como servicio, microservicios, contenedores Docker y escalabilidad elástica.\n\n\n#devops #docker\n\nLeer artículo →"
+  },
+  {
+    "objectID": "posts/index.html#cómo-funciona-una-aplicación-web-moderna",
+    "href": "posts/index.html#cómo-funciona-una-aplicación-web-moderna",
+    "title": "Artículos y proyectos",
+    "section": "Cómo funciona una aplicación web moderna",
+    "text": "Cómo funciona una aplicación web moderna\n\nDNS, renderizado web, navegadores, computación distribuida y procesamiento de aplicaciones modernas.\n\n\n#web #dns\n\nLeer artículo →"
+  },
+  {
+    "objectID": "posts/index.html#puravida",
+    "href": "posts/index.html#puravida",
+    "title": "Artículos y proyectos",
+    "section": "PuraVida",
+    "text": "PuraVida\n\nAplicación web MVP para digitalizar la operación diaria de una fonda local ubicada en Suchiapa, Chiapas.\n\n\n#react #springboot #mysql\n\nVer proyecto →"
+  },
+  {
+    "objectID": "posts/fundamentos-bases-datos/index.html",
+    "href": "posts/fundamentos-bases-datos/index.html",
+    "title": "Fundamentos de bases de datos",
+    "section": "",
+    "text": "Miguel\n\n28 de febrero de 2026"
+  },
+  {
+    "objectID": "posts/fundamentos-bases-datos/index.html#tablas-registros-y-atributos",
+    "href": "posts/fundamentos-bases-datos/index.html#tablas-registros-y-atributos",
+    "title": "Fundamentos de bases de datos",
+    "section": "1. Tablas, registros y atributos",
+    "text": "1. Tablas, registros y atributos\nEn una base de datos relacional, las tablas representan conjuntos de datos con una estructura definida. Cada fila, también llamada registro, describe un elemento; las columnas contienen sus atributos. En un ejemplo académico, una tabla de estudiantes podría guardar un identificador y un nombre. Otra tabla podría representar las asignaturas.\nCada atributo necesita un tipo de dato acorde con su significado. Las fechas, los textos y las cantidades tienen operaciones y reglas distintas. También debe decidirse qué información es obligatoria y cuándo se admite un valor ausente. Un campo vacío no siempre significa lo mismo que un texto sin caracteres o una cantidad igual a cero.\nEl gestor permite consultar y modificar los registros, pero también puede aplicar restricciones. Estas expresan condiciones como impedir valores duplicados o exigir datos obligatorios. Definirlas ayuda a proteger la coherencia incluso cuando varias partes de una aplicación escriben información."
+  },
+  {
+    "objectID": "posts/fundamentos-bases-datos/index.html#identificadores-y-modelo-entidad-relación",
+    "href": "posts/fundamentos-bases-datos/index.html#identificadores-y-modelo-entidad-relación",
+    "title": "Fundamentos de bases de datos",
+    "section": "2. Identificadores y modelo entidad-relación",
+    "text": "2. Identificadores y modelo entidad-relación\nUna clave primaria identifica cada registro de manera única. Debe distinguirlo sin ambigüedad y mantenerse estable. El nombre de una persona suele ser una elección inadecuada porque puede repetirse o cambiar. Un identificador separado facilita referirse al registro sin depender de un dato descriptivo.\nUna clave foránea vincula registros entre tablas. Por ejemplo, una inscripción puede indicar a qué estudiante y a qué asignatura corresponde. La integridad referencial ayuda a evitar referencias a elementos que no existen. También obliga a pensar qué debe ocurrir cuando se elimina o modifica un registro relacionado.\nAntes de construir tablas conviene realizar un modelo entidad-relación. Las entidades representan elementos relevantes, sus atributos describen características y las relaciones expresan cómo se conectan. La cardinalidad indica cuántos elementos pueden participar en cada lado de una relación.\n\nRelacionar sin mezclar responsabilidades\nUn estudiante puede inscribirse en varias asignaturas y una asignatura puede recibir varios estudiantes. Esa relación se representa mediante una tabla intermedia de inscripciones. Allí también pueden ubicarse atributos que pertenecen a la relación, como su estado. Así se distingue la información del estudiante de la información sobre su participación."
+  },
+  {
+    "objectID": "posts/fundamentos-bases-datos/index.html#normalización-y-reducción-de-redundancia",
+    "href": "posts/fundamentos-bases-datos/index.html#normalización-y-reducción-de-redundancia",
+    "title": "Fundamentos de bases de datos",
+    "section": "3. Normalización y reducción de redundancia",
+    "text": "3. Normalización y reducción de redundancia\nLa normalización ayuda a organizar tablas para reducir repeticiones innecesarias y problemas al modificar datos. Si el nombre de una asignatura se copia en cada inscripción, un cambio obliga a actualizar muchos registros. Si alguna actualización se omite, la misma asignatura puede quedar descrita de formas diferentes.\nSeparar la información de las asignaturas en su propia tabla permite mantener ese dato en un lugar definido. Las inscripciones conservan la referencia correspondiente. El objetivo es que cada atributo dependa de la entidad o relación a la que realmente pertenece.\nTambién conviene evitar listas de valores dentro de una sola columna cuando cada elemento necesita consultarse o relacionarse individualmente. Guardar todas las asignaturas de una persona como texto dificulta buscar inscripciones y aplicar restricciones.\nLa normalización requiere comprender las reglas del dominio. No consiste en dividir tablas sin criterio. En determinadas aplicaciones se toman decisiones de diseño adicionales por necesidades específicas, pero primero hay que poder explicar qué redundancia se introduce y cómo se conservará su consistencia.\n\nIdea clave: una base de datos bien modelada conserva el significado de la información y hace explícitas las relaciones que la aplicación necesita respetar."
+  },
+  {
+    "objectID": "posts/fundamentos-bases-datos/index.html#sql-consultas-y-desempeño",
+    "href": "posts/fundamentos-bases-datos/index.html#sql-consultas-y-desempeño",
+    "title": "Fundamentos de bases de datos",
+    "section": "4. SQL, consultas y desempeño",
+    "text": "4. SQL, consultas y desempeño\nSQL permite expresar operaciones sobre datos relacionales. Una consulta SELECT indica qué columnas se necesitan y puede incluir condiciones mediante WHERE. Las uniones, o JOIN, combinan registros relacionados. Otras instrucciones permiten insertar, actualizar o eliminar información según los permisos disponibles.\nUna consulta debe partir de una pregunta concreta. Para obtener las asignaturas de un estudiante se relacionan estudiantes, inscripciones y asignaturas. Seleccionar únicamente los campos necesarios mejora la claridad y evita transferir información que la aplicación no utiliza.\nLos índices proporcionan estructuras que pueden facilitar ciertas búsquedas. No deben añadirse sin revisar las consultas: ocupan espacio y también requieren mantenimiento cuando cambian los datos. Un plan de ejecución ayuda a observar cómo el gestor resuelve una consulta y dónde puede existir trabajo innecesario.\nLas modificaciones relacionadas pueden necesitar una transacción. Esta permite tratar varias operaciones como una unidad, de modo que se confirmen juntas o se reviertan si la operación no puede completarse. Así se evita dejar cambios parciales que incumplan las reglas previstas. El diseño de la transacción debe corresponder a una necesidad real de consistencia."
+  },
+  {
+    "objectID": "posts/fundamentos-bases-datos/index.html#nosql-y-elección-de-una-solución",
+    "href": "posts/fundamentos-bases-datos/index.html#nosql-y-elección-de-una-solución",
+    "title": "Fundamentos de bases de datos",
+    "section": "5. NoSQL y elección de una solución",
+    "text": "5. NoSQL y elección de una solución\nEl término NoSQL agrupa sistemas con modelos distintos al enfoque relacional tradicional. Algunos organizan documentos, otros pares clave-valor, grafos o familias de columnas. Cada modelo ofrece formas particulares de almacenar, consultar y relacionar información. Sus capacidades varían entre gestores.\nUn modelo documental puede resultar útil cuando la aplicación trabaja con estructuras agrupadas y de forma variable. Un grafo puede facilitar consultas centradas en conexiones. Estos ejemplos describen posibilidades; no significan que un modelo sea automáticamente mejor que otro.\nPara elegir conviene revisar:\n\nQué información se guarda y cómo cambia su estructura.\nQué relaciones y consultas necesita la aplicación.\nQué garantías de consistencia requieren sus operaciones.\nCómo se controlarán accesos, respaldos y recuperación.\nQué conocimientos tiene el equipo para mantener la solución.\n\nAprender bases de datos comienza por representar correctamente el problema. Las herramientas y el rendimiento importan, pero un modelo comprensible permite consultar datos con sentido, prevenir inconsistencias y justificar las decisiones técnicas antes de aumentar la complejidad."
+  },
+  {
+    "objectID": "posts/computacion-nube/index.html",
+    "href": "posts/computacion-nube/index.html",
+    "title": "Computación en la nube",
+    "section": "",
+    "text": "Miguel\n\n5 de febrero de 2026"
+  },
+  {
+    "objectID": "posts/computacion-nube/index.html#infraestructura-local-y-servicios-en-la-nube",
+    "href": "posts/computacion-nube/index.html#infraestructura-local-y-servicios-en-la-nube",
+    "title": "Computación en la nube",
+    "section": "1. Infraestructura local y servicios en la nube",
+    "text": "1. Infraestructura local y servicios en la nube\nEn una infraestructura local, la organización suele encargarse del equipo físico, la red y las tareas necesarias para mantenerlos operativos. En la nube, parte de esas responsabilidades se traslada al proveedor. El alcance de esa transferencia depende del servicio contratado: administrar una máquina virtual es diferente de utilizar una aplicación ya preparada.\nLa nube facilita solicitar recursos sin instalar físicamente cada servidor. Sin embargo, una aplicación alojada allí sigue dependiendo de conexiones, configuraciones y componentes que pueden fallar. La ubicación del servicio no garantiza por sí sola seguridad, disponibilidad ni rendimiento.\nTambién existen combinaciones de infraestructura local y servicios remotos. La decisión depende de las necesidades del proyecto, sus restricciones y la capacidad de administración del equipo. Comprender quién mantiene cada componente permite distribuir responsabilidades y evitar supuestos incorrectos. El proveedor puede cuidar el hardware mientras el equipo sigue siendo responsable de sus usuarios, datos y reglas de acceso."
+  },
+  {
+    "objectID": "posts/computacion-nube/index.html#iaas-paas-y-saas",
+    "href": "posts/computacion-nube/index.html#iaas-paas-y-saas",
+    "title": "Computación en la nube",
+    "section": "2. IaaS, PaaS y SaaS",
+    "text": "2. IaaS, PaaS y SaaS\nLos modelos de servicio describen cuánto administra el proveedor y cuánto conserva bajo su control quien utiliza la nube. No son tecnologías intercambiables, sino niveles distintos de responsabilidad.\n\nIaaS, infraestructura como servicio: ofrece recursos como máquinas virtuales, redes y almacenamiento. El usuario administra normalmente el sistema operativo y el software de la aplicación.\nPaaS, plataforma como servicio: proporciona un entorno para desplegar aplicaciones y delega una parte mayor de la administración de infraestructura. El equipo se concentra en código, configuración y datos.\nSaaS, software como servicio: entrega una aplicación lista para utilizar, como una herramienta de colaboración. Quien la usa gestiona cuentas y opciones disponibles, sin desplegar su código.\n\nDelegar tareas reduce algunas cargas operativas, pero también introduce restricciones propias del servicio. La comparación debe considerar compatibilidad, permisos, respaldo y capacidad de trasladar información. Tener menos acceso a la infraestructura puede ser conveniente si el objetivo principal es utilizar una función y no administrar servidores."
+  },
+  {
+    "objectID": "posts/computacion-nube/index.html#máquinas-virtuales-contenedores-y-docker",
+    "href": "posts/computacion-nube/index.html#máquinas-virtuales-contenedores-y-docker",
+    "title": "Computación en la nube",
+    "section": "3. Máquinas virtuales, contenedores y Docker",
+    "text": "3. Máquinas virtuales, contenedores y Docker\nUna máquina virtual utiliza virtualización para ejecutar un sistema operativo sobre recursos administrados por un entorno anfitrión. Permite separar entornos de ejecución y asignarles memoria, procesamiento y almacenamiento. Desde la perspectiva de una aplicación, puede funcionar como un servidor donde se instalan sus dependencias.\nLos contenedores empaquetan una aplicación con sus dependencias de ejecución, compartiendo el núcleo del sistema operativo anfitrión. Esta diferencia evita tratar un contenedor como si fuera una máquina virtual completa. El aislamiento y la configuración siguen requiriendo atención; empaquetar software no lo vuelve automáticamente seguro.\nDocker es un ejemplo de herramientas para crear imágenes y ejecutar contenedores. Una imagen describe un entorno reproducible; un contenedor es una instancia en ejecución de esa imagen. Los datos que deben sobrevivir a su eliminación necesitan una estrategia explícita de persistencia, como volúmenes o servicios externos.\nLos contenedores pueden apoyar una arquitectura de microservicios, donde varias funciones se ejecutan como servicios separados. No obstante, un monolito también puede ejecutarse en un contenedor. Adoptar microservicios introduce comunicación y coordinación adicionales; esa complejidad debe responder a una necesidad concreta."
+  },
+  {
+    "objectID": "posts/computacion-nube/index.html#escalabilidad-y-disponibilidad",
+    "href": "posts/computacion-nube/index.html#escalabilidad-y-disponibilidad",
+    "title": "Computación en la nube",
+    "section": "4. Escalabilidad y disponibilidad",
+    "text": "4. Escalabilidad y disponibilidad\nEscalar significa ajustar la capacidad para atender una carga de trabajo. La escalabilidad vertical aumenta recursos de una instancia; la horizontal agrega instancias. La elasticidad describe la capacidad de ajustar recursos conforme cambia la demanda, en ocasiones mediante reglas automatizadas.\nAgregar instancias no resuelve cualquier problema. Si todas dependen de una base de datos saturada, el límite puede permanecer. Además, almacenar sesiones o archivos únicamente dentro de una instancia complica distribuir las solicitudes. La aplicación debe diseñarse considerando dónde viven sus datos y cómo se comparten.\n\nIdea clave: la nube ofrece herramientas para aumentar capacidad y recuperarse de fallos, pero la aplicación debe estar preparada para utilizarlas correctamente.\n\nLa disponibilidad busca mantener el servicio accesible. Distribuir componentes, comprobar su estado y preparar recuperación puede reducir interrupciones, aunque también aumenta la operación necesaria. Un respaldo conserva información; una réplica ayuda a mantener otra copia disponible. Sus objetivos se relacionan, pero no son equivalentes.\nAntes de automatizar escalado conviene observar métricas como consumo de recursos y tiempos de respuesta. Esa observación permite identificar el componente que necesita atención y comprobar si el cambio mejora el comportamiento esperado."
+  },
+  {
+    "objectID": "posts/computacion-nube/index.html#consumo-proveedores-y-decisiones-responsables",
+    "href": "posts/computacion-nube/index.html#consumo-proveedores-y-decisiones-responsables",
+    "title": "Computación en la nube",
+    "section": "5. Consumo, proveedores y decisiones responsables",
+    "text": "5. Consumo, proveedores y decisiones responsables\nEl cobro bajo demanda relaciona el costo con recursos utilizados, aunque cada servicio tiene su propia forma de medir consumo. Procesamiento, almacenamiento y transferencia de datos pueden formar parte de ese cálculo. Una instancia olvidada o información acumulada sin revisión puede seguir generando consumo aunque el proyecto no esté en uso.\nPara un ejercicio académico, entender el costo comienza por identificar qué recursos se necesitan y durante cuánto tiempo. Conviene definir límites, observar el consumo y retirar recursos que ya no cumplen una función. Usar la nube tampoco implica que todo deba alojarse allí: un entorno local puede ser suficiente para desarrollar y estudiar una aplicación.\nAWS, Microsoft Azure y Google Cloud son ejemplos de proveedores de servicios en la nube. Sus catálogos incluyen distintas opciones, pero elegir una requiere revisar documentación y necesidades concretas. El nombre del proveedor no sustituye esa evaluación.\nComprender modelos de servicio, persistencia, escalabilidad y responsabilidades ayuda a formular mejores decisiones. La nube resulta más fácil de explicar cuando se parte del problema y se elige un conjunto de recursos proporcionado al alcance real del proyecto."
+  },
+  {
+    "objectID": "posts/aplicacion-web-moderna/index.html",
+    "href": "posts/aplicacion-web-moderna/index.html",
+    "title": "Cómo funciona una aplicación web moderna",
+    "section": "",
+    "text": "Miguel\n\n12 de septiembre de 2026"
+  },
+  {
+    "objectID": "posts/aplicacion-web-moderna/index.html#de-la-dirección-al-servidor",
+    "href": "posts/aplicacion-web-moderna/index.html#de-la-dirección-al-servidor",
+    "title": "Cómo funciona una aplicación web moderna",
+    "section": "1. De la dirección al servidor",
+    "text": "1. De la dirección al servidor\nUna URL identifica un recurso y contiene información para solicitarlo. En una dirección como https://ejemplo.com/catalogo, el esquema indica HTTPS, el dominio identifica el nombre del sitio y la ruta señala el recurso solicitado. También puede haber parámetros de consulta. El fragmento que aparece después de # normalmente indica una posición o estado dentro del documento y no forma parte de la solicitud HTTP enviada al servidor.\nPara comunicarse por la red, el navegador necesita localizar el destino. DNS permite consultar información asociada a un nombre de dominio, entre ella las direcciones IP que pueden servir ese sitio. El resultado puede estar almacenado temporalmente en caché; por eso no todas las visitas implican recorrer de nuevo todo el proceso de resolución.\nUn dominio tampoco equivale necesariamente a una sola computadora. La infraestructura puede distribuir solicitudes entre servidores o entregar archivos desde servicios cercanos al usuario. Esta organización no cambia la idea básica: el cliente necesita un destino accesible antes de pedir el recurso."
+  },
+  {
+    "objectID": "posts/aplicacion-web-moderna/index.html#conexión-protección-y-mensajes-http",
+    "href": "posts/aplicacion-web-moderna/index.html#conexión-protección-y-mensajes-http",
+    "title": "Cómo funciona una aplicación web moderna",
+    "section": "2. Conexión, protección y mensajes HTTP",
+    "text": "2. Conexión, protección y mensajes HTTP\nUna vez localizado el destino, se establece la comunicación necesaria. En HTTPS, TLS protege el intercambio mediante cifrado y permite verificar la identidad del servidor a partir de certificados. Esto dificulta que terceros lean o modifiquen los datos durante su tránsito. No demuestra, por sí solo, que el contenido del sitio sea confiable o que su aplicación no tenga errores.\nHTTP define cómo se expresan solicitudes y respuestas. Una solicitud incluye un método, una ruta y encabezados; puede incorporar un cuerpo. El servidor devuelve un estado, encabezados y, cuando corresponde, contenido. Solicitar una página y enviar un formulario son operaciones diferentes, aunque ambas utilicen ese mismo lenguaje de comunicación.\n\nCliente, servidor y protocolo de transporte\nEl cliente inicia una solicitud y utiliza la respuesta. El servidor recibe solicitudes y ofrece recursos o ejecuta operaciones. El transporte se encarga de mover los datos entre ambos extremos. TCP participa en muchas conexiones web; las versiones y mecanismos de transporte pueden variar. Conviene separar esas responsabilidades de las reglas de HTTP y de la presentación visual de la aplicación.\n\nIdea clave: una aplicación web funciona porque distintos componentes cooperan; cada uno resuelve una parte del recorrido de los datos."
+  },
+  {
+    "objectID": "posts/aplicacion-web-moderna/index.html#procesamiento-en-el-backend",
+    "href": "posts/aplicacion-web-moderna/index.html#procesamiento-en-el-backend",
+    "title": "Cómo funciona una aplicación web moderna",
+    "section": "3. Procesamiento en el backend",
+    "text": "3. Procesamiento en el backend\nEl servidor puede responder con archivos ya preparados o ejecutar lógica para construir la respuesta. Una API ofrece operaciones que una interfaz puede solicitar, por ejemplo consultar un catálogo o recuperar información de una cuenta. El backend interpreta la solicitud, valida los datos y comprueba los permisos antes de realizar la operación.\nCuando necesita información persistente, consulta una base de datos. Esa consulta no debe depender de que el navegador se comporte correctamente: las restricciones importantes se verifican en el servidor. La base de datos conserva registros y relaciones; el backend decide qué información puede entregar al cliente y en qué formato.\nUna aplicación distribuida reparte tareas entre distintos procesos o equipos. Puede existir separación entre servidor web, aplicación y almacenamiento, sin que sea obligatorio usar microservicios. Para un proyecto pequeño, una organización sencilla suele facilitar el seguimiento de la solicitud. Lo relevante es reconocer dónde se procesa cada paso y cómo se gestionan los errores.\nLa respuesta de una API suele contener datos estructurados. El frontend puede utilizarlos para actualizar una parte de la pantalla sin descargar nuevamente toda la página."
+  },
+  {
+    "objectID": "posts/aplicacion-web-moderna/index.html#cómo-construye-la-pantalla-el-navegador",
+    "href": "posts/aplicacion-web-moderna/index.html#cómo-construye-la-pantalla-el-navegador",
+    "title": "Cómo funciona una aplicación web moderna",
+    "section": "4. Cómo construye la pantalla el navegador",
+    "text": "4. Cómo construye la pantalla el navegador\nEl navegador interpreta el HTML y crea una representación de la estructura del documento. Procesa también el CSS para calcular la presentación: colores, tamaños, distribución y otras propiedades. Después determina la geometría de los elementos y pinta el resultado. Este recorrido explica por qué un recurso tardío puede cambiar la posición o apariencia de una página ya visible.\nJavaScript añade comportamiento. Puede reaccionar a eventos, modificar elementos del documento y solicitar datos al servidor. El frontend incluye esa interacción, además de la estructura y los estilos. Una interfaz bien organizada distingue entre esperar datos, mostrarlos y comunicar que ocurrió un error.\nEl contenido inicial puede llegar como HTML preparado por el servidor o construirse parcialmente en el navegador. También existen combinaciones de ambos enfoques. Ninguno elimina la necesidad de pensar en accesibilidad, formularios comprensibles y estados de carga. La técnica elegida debe responder a las necesidades del sitio.\nPor ejemplo, una página informativa puede ofrecer su contenido directamente, mientras que una herramienta interactiva puede necesitar solicitudes adicionales para mantener actualizados sus datos."
+  },
+  {
+    "objectID": "posts/aplicacion-web-moderna/index.html#caché-y-una-visión-completa-del-recorrido",
+    "href": "posts/aplicacion-web-moderna/index.html#caché-y-una-visión-completa-del-recorrido",
+    "title": "Cómo funciona una aplicación web moderna",
+    "section": "5. Caché y una visión completa del recorrido",
+    "text": "5. Caché y una visión completa del recorrido\nLa caché guarda temporalmente recursos o respuestas para reutilizarlos. Puede actuar en el navegador, en servicios intermedios o dentro de la infraestructura del servidor. Su utilidad depende de reglas que indiquen cuándo una copia sigue siendo válida. Reutilizar archivos estáticos es distinto de conservar información personal o datos que cambian con frecuencia.\nAl investigar un problema, conviene seguir el recorrido completo: resolución del dominio, conexión, solicitud, procesamiento, respuesta y renderizado. Una pantalla vacía puede deberse a una excepción de JavaScript; una operación rechazada puede ser una validación del backend. No todos los fallos visuales se originan en el mismo componente.\nEntender la arquitectura cliente-servidor permite hacer preguntas concretas: qué recurso se pidió, qué respondió el servidor y cómo utilizó esa respuesta la interfaz. Esa forma de observar una aplicación resulta más útil que tratarla como una sola pieza que simplemente funciona o falla."
+  },
+  {
+    "objectID": "about.html#contacto",
+    "href": "about.html#contacto",
+    "title": "Sobre mí",
+    "section": "Contacto",
+    "text": "Contacto"
+  },
+  {
+    "objectID": "about.html#áreas-de-interés-y-exploración",
+    "href": "about.html#áreas-de-interés-y-exploración",
+    "title": "Sobre mí",
+    "section": "Áreas de interés y exploración",
+    "text": "Áreas de interés y exploración\n\n\n01 Desarrollo de software\n\n\n02 Desarrollo web y arquitecturas modernas\n\n\n03 Bases de datos y modelado\n\n\n04 Redes e infraestructura\n\n\n05 IA y ciencia de datos\n\n\n06 Innovación tecnológica aplicada"
+  },
+  {
+    "objectID": "about.html#contenido",
+    "href": "about.html#contenido",
+    "title": "Sobre mí",
+    "section": "Contenido",
+    "text": "Contenido\nArtículos, proyectos y aprendizajes publicados"
+  },
+  {
+    "objectID": "index.html#puravida",
+    "href": "index.html#puravida",
+    "title": "Miguel Blog",
+    "section": "PuraVida",
+    "text": "PuraVida\nPuraVida es un proyecto de aplicación web desarrollado para una fonda local de Suchiapa, Chiapas. Surge como una propuesta para llevar las actividades del negocio a un entorno digital y contar con una herramienta adaptada a las necesidades de la fonda. El proyecto busca representar una solución tecnológica enfocada en apoyar la operación del establecimiento y ofrecer una experiencia más organizada para el negocio y sus clientes.\n\n\n01 / EL RETO\n\nUna fonda con procesos cotidianos por digitalizar\nPuraVida nace a partir de una necesidad real: organizar en un solo entorno actividades como la publicación del menú, la recepción de pedidos y el registro de ventas.\nProyecto académico\n\n\n\n02 / LA PROPUESTA\n\nLlevar la operación diaria a una plataforma web\nEl proyecto plantea una aplicación donde los clientes pueden consultar el menú y realizar pedidos, mientras la encargada administra la operación desde un mismo sistema.\nSolución propuesta\n\n\n\n03 / EL OBJETIVO\n\nUna experiencia más simple para ambos lados\nMás que digitalizar pedidos, PuraVida busca reducir tareas manuales, organizar la información del negocio y facilitar la interacción entre la fonda y sus clientes.\nImpacto esperado\n\n\n\nVer más de este proyecto →"
+  },
+  {
+    "objectID": "index.html#credentials-title",
+    "href": "index.html#credentials-title",
+    "title": "Miguel Blog",
+    "section": "Insignias y certificaciones",
+    "text": "Insignias y certificaciones\n\nCredenciales obtenidas a lo largo de mi formación que representan conocimientos y habilidades desarrolladas en distintas áreas de la tecnología."
+  },
+  {
+    "objectID": "posts/ciberseguridad-proteccion-datos/index.html",
+    "href": "posts/ciberseguridad-proteccion-datos/index.html",
+    "title": "Ciberseguridad y protección de datos",
+    "section": "",
+    "text": "Miguel\n\n10 de febrero de 2026"
+  },
+  {
+    "objectID": "posts/ciberseguridad-proteccion-datos/index.html#qué-se-protege-y-por-qué",
+    "href": "posts/ciberseguridad-proteccion-datos/index.html#qué-se-protege-y-por-qué",
+    "title": "Ciberseguridad y protección de datos",
+    "section": "1. Qué se protege y por qué",
+    "text": "1. Qué se protege y por qué\nLa confidencialidad significa que la información solo está disponible para quienes tienen autorización. La integridad busca que los datos conserven su exactitud y que sus cambios sean legítimos. La disponibilidad permite acceder al servicio cuando se necesita. Estos objetivos se relacionan, pero requieren medidas distintas: cifrar un archivo no garantiza que exista un respaldo recuperable.\nAntes de elegir controles conviene identificar qué información maneja el proyecto. No tiene el mismo impacto perder una preferencia de interfaz que exponer datos personales o permitir cambios en una cuenta ajena. Un inventario sencillo de datos, actores y operaciones ayuda a distinguir esas situaciones.\nEl principio de mínimo privilegio propone conceder únicamente los permisos necesarios. Una cuenta destinada a consultar reportes no necesita modificar usuarios. Esta separación reduce el alcance de errores y accesos indebidos. También permite explicar con claridad qué puede hacer cada rol y comprobar que el servidor aplica esas reglas."
+  },
+  {
+    "objectID": "posts/ciberseguridad-proteccion-datos/index.html#contraseñas-y-autenticación",
+    "href": "posts/ciberseguridad-proteccion-datos/index.html#contraseñas-y-autenticación",
+    "title": "Ciberseguridad y protección de datos",
+    "section": "2. Contraseñas y autenticación",
+    "text": "2. Contraseñas y autenticación\nLa autenticación verifica una identidad; la autorización determina qué acciones se permiten después. Iniciar sesión no implica tener acceso a toda la aplicación. Cada operación sensible debe comprobar los permisos de quien la solicita, incluso si la interfaz no muestra un botón para ejecutarla.\nPara el uso personal, es conveniente utilizar contraseñas largas y distintas entre servicios. Un gestor de contraseñas ayuda a organizar credenciales sin depender de la memoria. La autenticación multifactor agrega una comprobación adicional, aunque no sustituye el cuidado de los dispositivos ni la revisión de solicitudes sospechosas.\nAl desarrollar software, las contraseñas no deben almacenarse como texto legible ni con un cifrado reversible destinado a recuperarlas. Se utilizan funciones de derivación de contraseñas apropiadas, junto con un valor aleatorio por contraseña conocido como sal. Esa tarea debe apoyarse en bibliotecas mantenidas y configuraciones documentadas.\nLas sesiones también requieren atención. Cerrar sesión, gestionar su expiración y evitar que credenciales aparezcan en registros o repositorios son parte del diseño. Los mensajes de error deben informar lo necesario sin revelar información sensible sobre cuentas."
+  },
+  {
+    "objectID": "posts/ciberseguridad-proteccion-datos/index.html#cifrado-https-y-protección-de-datos",
+    "href": "posts/ciberseguridad-proteccion-datos/index.html#cifrado-https-y-protección-de-datos",
+    "title": "Ciberseguridad y protección de datos",
+    "section": "3. Cifrado, HTTPS y protección de datos",
+    "text": "3. Cifrado, HTTPS y protección de datos\nEl cifrado transforma información para que su lectura dependa de una clave. Puede proteger datos almacenados o datos que viajan por una red. Su utilidad depende de administrar correctamente esas claves: incluir una clave secreta en código público puede anular la protección esperada.\nHTTPS utiliza TLS para proteger la comunicación entre cliente y servidor y verificar la identidad del servidor mediante certificados. Ayuda a evitar que terceros lean o alteren el tráfico durante el trayecto. Sin embargo, no corrige errores de autorización ni garantiza que la aplicación trate adecuadamente la información cuando ya la recibió.\nProteger datos también significa reducir su exposición desde el inicio. Un formulario debe solicitar solo lo necesario para su propósito. Los registros de diagnóstico no deberían copiar contraseñas, tokens o datos personales completos. Los respaldos necesitan controles de acceso y una forma comprobada de recuperación.\n\nIdea clave: proteger información empieza por decidir qué datos realmente se necesitan, quién puede utilizarlos y durante cuánto tiempo deben conservarse.\n\nSeparar ambientes de prueba y datos reales evita trasladar información sensible a lugares donde los controles son más débiles. En ejercicios académicos pueden utilizarse datos de prueba claramente identificados."
+  },
+  {
+    "objectID": "posts/ciberseguridad-proteccion-datos/index.html#actualizaciones-e-ingeniería-social",
+    "href": "posts/ciberseguridad-proteccion-datos/index.html#actualizaciones-e-ingeniería-social",
+    "title": "Ciberseguridad y protección de datos",
+    "section": "4. Actualizaciones e ingeniería social",
+    "text": "4. Actualizaciones e ingeniería social\nLas actualizaciones pueden corregir errores que afectan la seguridad de sistemas operativos, aplicaciones y dependencias. Mantener un inventario de lo utilizado permite reconocer qué componentes necesitan revisión. Actualizar requiere verificar compatibilidad y funcionamiento, sin dejar versiones desatendidas por falta de organización.\nLa ingeniería social intenta influir en una persona para que entregue información o realice una acción perjudicial. Un mensaje que aparenta urgencia puede pedir una contraseña, un código de verificación o la apertura de un archivo inesperado. Revisar el contexto y confirmar la solicitud por un canal conocido ayuda a evitar decisiones precipitadas.\nAlgunas prácticas de higiene digital son:\n\nBloquear los dispositivos cuando no se están utilizando.\nRevisar permisos y accesos que ya no son necesarios.\nMantener respaldos separados y comprobar su recuperación.\nCompartir información únicamente mediante canales adecuados.\n\nEstas medidas funcionan mejor cuando son fáciles de cumplir y están incorporadas al trabajo cotidiano. Una política confusa que nadie comprende difícilmente produce una protección consistente."
+  },
+  {
+    "objectID": "posts/ciberseguridad-proteccion-datos/index.html#seguridad-en-aplicaciones-web",
+    "href": "posts/ciberseguridad-proteccion-datos/index.html#seguridad-en-aplicaciones-web",
+    "title": "Ciberseguridad y protección de datos",
+    "section": "5. Seguridad en aplicaciones web",
+    "text": "5. Seguridad en aplicaciones web\nLas aplicaciones web deben considerar problemas como inyección, errores de control de acceso y exposición de información sensible. Para prevenir inyección en consultas se utilizan parámetros, evitando construir instrucciones con entradas sin tratar. La validación de datos comprueba formato y reglas del negocio, pero debe complementarse con controles adecuados en cada contexto.\nCuando se muestra información proporcionada por usuarios, es necesario manejarla de acuerdo con el lugar donde aparece. El tratamiento de una entrada en una consulta no es el mismo que su presentación en una página. Las bibliotecas y los frameworks ofrecen mecanismos útiles, pero necesitan emplearse correctamente.\nOWASP reúne recursos educativos sobre seguridad de aplicaciones y sirve como referencia general para conocer riesgos y prácticas defensivas. Sus materiales ayudan a formular preguntas de revisión; utilizarlos no equivale a demostrar que un sistema está libre de vulnerabilidades.\nLa protección debe revisarse durante todo el desarrollo. Definir permisos, manejar secretos, comprobar errores y planificar recuperación permite construir una base más sólida. La seguridad es una responsabilidad continua, apoyada en controles comprensibles y verificables."
+  },
+  {
+    "objectID": "posts/desarrollo-aplicaciones-moviles/index.html",
+    "href": "posts/desarrollo-aplicaciones-moviles/index.html",
+    "title": "Desarrollo de aplicaciones móviles",
+    "section": "",
+    "text": "Miguel\n\n16 de febrero de 2026"
+  },
+  {
+    "objectID": "posts/desarrollo-aplicaciones-moviles/index.html#un-entorno-con-características-propias",
+    "href": "posts/desarrollo-aplicaciones-moviles/index.html#un-entorno-con-características-propias",
+    "title": "Desarrollo de aplicaciones móviles",
+    "section": "1. Un entorno con características propias",
+    "text": "1. Un entorno con características propias\nAndroid e iOS son plataformas móviles con sus propios sistemas de permisos, herramientas de desarrollo y convenciones de interfaz. Ambas ofrecen capacidades como cámara, ubicación, almacenamiento y notificaciones, pero el acceso a ellas depende de las reglas del sistema. Una aplicación debe solicitar los permisos necesarios y explicar su propósito, en lugar de asumir que todas las funciones estarán disponibles.\nLa variedad de dispositivos también influye en el diseño. Cambian la resolución, el tamaño de pantalla, la orientación y los recursos de hardware. Una interfaz que se ve bien en un teléfono concreto puede resultar incómoda en otro. Por eso conviene trabajar con distribuciones adaptables y probar diferentes condiciones desde las primeras etapas.\nEl contexto móvil exige administrar recursos con cuidado. Descargar datos innecesarios o ejecutar trabajo continuo puede afectar la batería y la experiencia. Una primera decisión útil consiste en definir qué tareas necesita resolver la aplicación y qué información requiere cada una. Ese alcance orienta las decisiones técnicas posteriores."
+  },
+  {
+    "objectID": "posts/desarrollo-aplicaciones-moviles/index.html#desarrollo-nativo-y-multiplataforma",
+    "href": "posts/desarrollo-aplicaciones-moviles/index.html#desarrollo-nativo-y-multiplataforma",
+    "title": "Desarrollo de aplicaciones móviles",
+    "section": "2. Desarrollo nativo y multiplataforma",
+    "text": "2. Desarrollo nativo y multiplataforma\nEl desarrollo nativo utiliza herramientas y tecnologías propias de cada plataforma. En Android, por ejemplo, Kotlin y Jetpack Compose permiten construir aplicaciones e interfaces dentro de su ecosistema. En iOS, Swift y SwiftUI son ejemplos equivalentes. Este enfoque facilita trabajar directamente con las capacidades y convenciones del sistema, aunque mantener versiones para plataformas diferentes puede requerir esfuerzos separados.\nEl desarrollo multiplataforma busca compartir una parte del código entre varios sistemas. Según la tecnología elegida, se pueden compartir la lógica, las interfaces o ambas. Esto no elimina las diferencias: permisos, integración con servicios del dispositivo y distribución pueden seguir necesitando ajustes específicos.\nNinguna alternativa es adecuada para todos los proyectos. La elección depende del equipo, las funciones requeridas, las plataformas objetivo y el tiempo disponible para mantener el producto. En un proyecto académico resulta útil justificar esa elección con necesidades concretas. Aprender una herramienta tiene más sentido cuando se entiende qué problemas resuelve y qué responsabilidades siguen presentes."
+  },
+  {
+    "objectID": "posts/desarrollo-aplicaciones-moviles/index.html#interfaz-experiencia-y-navegación",
+    "href": "posts/desarrollo-aplicaciones-moviles/index.html#interfaz-experiencia-y-navegación",
+    "title": "Desarrollo de aplicaciones móviles",
+    "section": "3. Interfaz, experiencia y navegación",
+    "text": "3. Interfaz, experiencia y navegación\nLa interfaz organiza los elementos que una persona ve y toca; la experiencia de usuario incluye todo el recorrido para completar una tarea. Un formulario puede ser visualmente atractivo y, aun así, resultar difícil de usar si oculta errores o exige demasiados pasos. Conviene priorizar acciones claras, textos comprensibles y respuestas visibles ante cada interacción.\nEn una aplicación de notas, por ejemplo, crear, editar y consultar una nota deberían tener recorridos previsibles. La navegación debe indicar dónde está la persona, cómo regresar y qué ocurre con sus cambios. Añadir pantallas sin un propósito definido aumenta la confusión y hace más difícil probar el flujo completo.\nTambién es necesario contemplar situaciones habituales:\n\nCarga de información y ausencia de resultados.\nErrores de conexión con una forma de reintentar.\nTamaños de texto accesibles y controles fáciles de tocar.\nConfirmación antes de acciones que eliminan información.\n\n\nIdea clave: una buena experiencia móvil conserva el contexto de la persona y permite continuar una tarea después de una interrupción."
+  },
+  {
+    "objectID": "posts/desarrollo-aplicaciones-moviles/index.html#ciclo-de-vida-y-persistencia-de-datos",
+    "href": "posts/desarrollo-aplicaciones-moviles/index.html#ciclo-de-vida-y-persistencia-de-datos",
+    "title": "Desarrollo de aplicaciones móviles",
+    "section": "4. Ciclo de vida y persistencia de datos",
+    "text": "4. Ciclo de vida y persistencia de datos\nUna aplicación no permanece activa de manera indefinida. Puede pasar a segundo plano cuando se recibe una llamada, cambia la aplicación abierta o se bloquea el dispositivo. El sistema también puede finalizar su proceso para recuperar recursos. El ciclo de vida describe esas transiciones y permite decidir cuándo iniciar, pausar o liberar trabajo.\nGuardar información únicamente en variables de memoria es insuficiente para datos que deben sobrevivir al cierre. La persistencia local permite conservar preferencias, registros o información necesaria para trabajar sin conexión. Según el tipo de dato, pueden utilizarse mecanismos de configuración, archivos o una base de datos local.\nDebe distinguirse entre el estado temporal de una pantalla y los datos duraderos del usuario. La posición de desplazamiento no tiene el mismo significado que una nota guardada. Definir esa diferencia evita tanto perder información importante como almacenar detalles innecesarios.\nSi existe un servidor, aparece otra responsabilidad: sincronizar. Una operación puede quedar pendiente por falta de conexión, y los datos locales pueden diferir de los remotos. La aplicación necesita mostrar esa situación y establecer cómo confirmar cambios. Nunca debe presentar una operación como completada si todavía no tiene evidencia suficiente."
+  },
+  {
+    "objectID": "posts/desarrollo-aplicaciones-moviles/index.html#pruebas-y-distribución-básica",
+    "href": "posts/desarrollo-aplicaciones-moviles/index.html#pruebas-y-distribución-básica",
+    "title": "Desarrollo de aplicaciones móviles",
+    "section": "5. Pruebas y distribución básica",
+    "text": "5. Pruebas y distribución básica\nLas pruebas deben abarcar la lógica y el comportamiento de la interfaz. Una prueba de lógica puede verificar una validación; una prueba del recorrido comprueba que sea posible abrir un formulario, completarlo y observar el resultado. También conviene revisar permisos rechazados, conexión intermitente, rotación y retorno desde segundo plano.\nLos emuladores permiten explorar diferentes configuraciones sin disponer de todos los dispositivos. Los equipos físicos ayudan a observar interacción táctil, rendimiento y funciones de hardware en condiciones concretas. Ambos recursos se complementan: probar en un solo entorno deja escenarios sin revisar.\nLa distribución incluye preparar una versión identificable, firmarla y entregarla por un canal apropiado. Las tiendas de aplicaciones y los canales de pruebas tienen requisitos propios; publicar requiere revisar esos requisitos y describir honestamente las funciones y el uso de datos. Una versión de prueba debe distinguirse de una versión destinada al público.\nDesarrollar una aplicación móvil significa coordinar plataforma, interfaz, datos y mantenimiento. Para comenzar, un alcance pequeño con navegación clara y persistencia bien definida permite aprender estas relaciones sin acumular funciones difíciles de sostener."
+  },
+  {
+    "objectID": "posts/git-github-estudiantes/index.html",
+    "href": "posts/git-github-estudiantes/index.html",
+    "title": "Git y GitHub para estudiantes",
+    "section": "",
+    "text": "Miguel\n\n20 de febrero de 2026"
+  },
+  {
+    "objectID": "posts/git-github-estudiantes/index.html#git-y-el-repositorio",
+    "href": "posts/git-github-estudiantes/index.html#git-y-el-repositorio",
+    "title": "Git y GitHub para estudiantes",
+    "section": "1. Git y el repositorio",
+    "text": "1. Git y el repositorio\nGit es un sistema de control de versiones distribuido. Un repositorio local contiene el historial del proyecto, de modo que muchas operaciones pueden realizarse sin conexión a Internet. GitHub es una plataforma que aloja repositorios y ofrece herramientas para organizar la colaboración; Git puede utilizarse sin GitHub y también con otros servicios.\nEl repositorio no es únicamente una carpeta de archivos. Además del contenido que editamos, conserva información sobre cambios y relaciones entre versiones. Cuando clonamos un repositorio obtenemos una copia de trabajo y su historial disponible. Esto permite examinar cómo se llegó a un estado, comparar modificaciones y recuperar versiones registradas.\nPara empezar conviene distinguir tres espacios: los archivos del directorio de trabajo, el área de preparación y el historial confirmado. Editar un archivo no lo incorpora automáticamente a un commit. Primero elegimos qué cambios preparar; después los registramos. Esta separación permite revisar una modificación antes de guardarla en el historial y evitar que una entrega mezcle tareas sin relación."
+  },
+  {
+    "objectID": "posts/git-github-estudiantes/index.html#commits-que-expliquen-los-cambios",
+    "href": "posts/git-github-estudiantes/index.html#commits-que-expliquen-los-cambios",
+    "title": "Git y GitHub para estudiantes",
+    "section": "2. Commits que expliquen los cambios",
+    "text": "2. Commits que expliquen los cambios\nUn commit registra un estado del proyecto y lo conecta con su historial anterior. Incluye información del autor y un mensaje que debe explicar la modificación. Un buen commit reúne cambios relacionados: corregir una validación o añadir una sección concreta resulta más comprensible que registrar de golpe todas las modificaciones de varios días.\nUn recorrido breve para guardar un archivo puede ser:\ngit status\ngit add archivo.qmd\ngit commit -m \"Aclara la introducción del artículo\"\ngit status muestra el estado de la copia de trabajo. git add prepara el contenido indicado y git commit registra lo preparado. El nombre del archivo del ejemplo debe sustituirse por un archivo real del proyecto; estos comandos explican el proceso y no necesitan ejecutarse para leer el artículo.\nAntes de confirmar, revisa qué archivos se incluirán. Los archivos generados o temporales pueden excluirse mediante .gitignore, cuando corresponde. No deben agregarse contraseñas, claves o archivos privados. El historial conserva versiones, por lo que quitar un secreto de la versión actual no basta para retirarlo de commits anteriores."
+  },
+  {
+    "objectID": "posts/git-github-estudiantes/index.html#ramas-e-integración-del-trabajo",
+    "href": "posts/git-github-estudiantes/index.html#ramas-e-integración-del-trabajo",
+    "title": "Git y GitHub para estudiantes",
+    "section": "3. Ramas e integración del trabajo",
+    "text": "3. Ramas e integración del trabajo\nUna rama, o branch, identifica una línea de desarrollo dentro del repositorio. Permite trabajar en una modificación sin incorporarla inmediatamente a la rama compartida. No implica duplicar manualmente toda la carpeta ni crear un proyecto independiente.\nPara crear una rama y pasar a ella pueden utilizarse:\ngit branch mejora-documentacion\ngit switch mejora-documentacion\nLas modificaciones se registran en la rama actual. Cuando están listas, pueden integrarse mediante un merge, que combina historias de desarrollo. En algunos casos la integración avanza directamente hasta el trabajo nuevo; en otros, Git necesita combinar cambios de ambas líneas. La documentación oficial de Git sobre ramas e integración describe estas situaciones.\nEn un equipo pequeño basta acordar una rama compartida y utilizar ramas de trabajo con nombres comprensibles. Crear muchas ramas sin propósito añade confusión. También conviene integrar avances con frecuencia razonable: cuanto más se separan las modificaciones, más contexto necesita el equipo para revisar cómo encajan."
+  },
+  {
+    "objectID": "posts/git-github-estudiantes/index.html#github-y-la-colaboración",
+    "href": "posts/git-github-estudiantes/index.html#github-y-la-colaboración",
+    "title": "Git y GitHub para estudiantes",
+    "section": "4. GitHub y la colaboración",
+    "text": "4. GitHub y la colaboración\nEl repositorio remoto funciona como un punto de intercambio entre las copias del equipo. git push envía commits al remoto; git pull obtiene cambios y los integra según la configuración y las opciones utilizadas. Guardar un commit local no significa que los demás ya puedan verlo, y subir archivos no reemplaza la necesidad de revisar el trabajo.\nUna solicitud de cambios, o pull request, permite proponer una integración en GitHub. Allí pueden describirse la tarea, los archivos afectados y la forma de verificar el resultado. Los comentarios ayudan a discutir decisiones antes de incorporarlas a la rama compartida. Esta revisión también sirve en trabajos académicos para explicar contribuciones y detectar errores de interpretación.\nUn flujo sencillo puede organizarse así:\n\nAcordar una tarea concreta y quién la realizará.\nActualizar la copia local antes de comenzar.\nCrear una rama y hacer cambios pequeños.\nRevisar y confirmar los archivos necesarios.\nSubir la rama y abrir una solicitud de cambios.\nRevisar el resultado, integrarlo y actualizar las demás copias.\n\nLa herramienta no decide cómo distribuir tareas. El equipo debe comunicar cambios que afecten archivos compartidos, respetar convenciones y evitar sobrescribir aportes sin revisar."
+  },
+  {
+    "objectID": "posts/git-github-estudiantes/index.html#conflictos-y-hábitos-para-mantener-el-historial",
+    "href": "posts/git-github-estudiantes/index.html#conflictos-y-hábitos-para-mantener-el-historial",
+    "title": "Git y GitHub para estudiantes",
+    "section": "5. Conflictos y hábitos para mantener el historial",
+    "text": "5. Conflictos y hábitos para mantener el historial\nUn conflicto aparece cuando Git no puede decidir automáticamente cómo combinar ciertos cambios. Puede ocurrir si dos ramas modifican la misma zona de un archivo de maneras distintas. No significa que el proyecto se perdió: requiere que una persona interprete las versiones y prepare el contenido correcto.\nPara resolverlo, se revisan los archivos señalados, se elige o combina el contenido y se retiran las marcas de conflicto. Después debe comprobarse que el resultado funciona, prepararlo y completar la integración. Aceptar una versión entera sin leerla puede descartar cambios necesarios del compañero.\n\nIdea clave: un historial útil explica decisiones; los commits pequeños, las ramas con propósito y la revisión compartida facilitan entenderlas.\n\nGit no sustituye la comunicación ni garantiza que una aplicación sea correcta. Su aporte es conservar cambios y ofrecer mecanismos para integrarlos con trazabilidad. Para un primer proyecto académico, dominar estado, preparación, commit, rama e intercambio remoto suele ser suficiente. Con esos hábitos, cada entrega deja de ser una carpeta aislada y se convierte en una etapa identificable del mismo trabajo."
+  },
+  {
+    "objectID": "posts/inteligencia-artificial/index.html",
+    "href": "posts/inteligencia-artificial/index.html",
+    "title": "¿Qué es la inteligencia artificial?",
+    "section": "",
+    "text": "Miguel\n\n8 de marzo de 2026"
+  },
+  {
+    "objectID": "posts/inteligencia-artificial/index.html#ia-aprendizaje-automático-y-aprendizaje-profundo",
+    "href": "posts/inteligencia-artificial/index.html#ia-aprendizaje-automático-y-aprendizaje-profundo",
+    "title": "¿Qué es la inteligencia artificial?",
+    "section": "1. IA, aprendizaje automático y aprendizaje profundo",
+    "text": "1. IA, aprendizaje automático y aprendizaje profundo\nLa inteligencia artificial es un campo que estudia sistemas capaces de realizar tareas asociadas con capacidades como reconocer patrones, razonar, planificar o utilizar lenguaje. Incluye enfoques diferentes. Algunos trabajan con reglas y conocimiento expresado explícitamente; otros ajustan su comportamiento a partir de datos.\nEl aprendizaje automático, también llamado machine learning, pertenece a este campo. En lugar de programar cada condición de una respuesta, se construye un modelo que aprende relaciones a partir de ejemplos. Esto no significa que deje de necesitar decisiones humanas: alguien define el problema, selecciona datos y decide cómo evaluar el resultado.\nEl aprendizaje profundo, o deep learning, es una familia de técnicas de aprendizaje automático basada en redes neuronales con varias capas. Es útil para determinadas tareas, pero no es la única forma de desarrollar un sistema de IA. Elegir un enfoque requiere considerar los datos disponibles, la complejidad del problema y las restricciones del proyecto."
+  },
+  {
+    "objectID": "posts/inteligencia-artificial/index.html#los-datos-y-el-proceso-de-entrenamiento",
+    "href": "posts/inteligencia-artificial/index.html#los-datos-y-el-proceso-de-entrenamiento",
+    "title": "¿Qué es la inteligencia artificial?",
+    "section": "2. Los datos y el proceso de entrenamiento",
+    "text": "2. Los datos y el proceso de entrenamiento\nEntrenar un modelo consiste en ajustar sus parámetros mediante un procedimiento que busca mejorar su desempeño en una tarea. El objetivo depende del problema. Un sistema puede aprender a clasificar mensajes, estimar una cantidad o descubrir agrupaciones entre ejemplos.\nEn el aprendizaje supervisado, los ejemplos incluyen una respuesta esperada. En el no supervisado, se explora la estructura de datos sin esas etiquetas. El aprendizaje por refuerzo utiliza señales de recompensa para aprender decisiones mediante interacción con un entorno. Son categorías generales, y un sistema puede combinar técnicas.\nLos datos necesitan preparación. Hay que revisar registros incompletos, inconsistencias, errores de etiquetado y si los ejemplos representan la situación en la que se utilizará el modelo. Una colección grande no garantiza calidad. Si ciertos casos quedan fuera, el resultado puede funcionar peor precisamente donde más se necesita.\n\nAprender ejemplos y generalizar\nPara evaluar el aprendizaje se reservan datos que no se utilizan para ajustar el modelo. Así se observa su comportamiento frente a ejemplos distintos. Memorizar el conjunto de entrenamiento puede producir resultados aparentemente buenos sin aprender relaciones útiles para casos nuevos. Evitar esta confusión es parte central del trabajo técnico."
+  },
+  {
+    "objectID": "posts/inteligencia-artificial/index.html#redes-neuronales-a-nivel-conceptual",
+    "href": "posts/inteligencia-artificial/index.html#redes-neuronales-a-nivel-conceptual",
+    "title": "¿Qué es la inteligencia artificial?",
+    "section": "3. Redes neuronales a nivel conceptual",
+    "text": "3. Redes neuronales a nivel conceptual\nUna red neuronal procesa datos mediante capas de unidades conectadas. Cada unidad combina valores de entrada usando parámetros y aplica una transformación. El resultado pasa a otras unidades hasta producir la salida del modelo. Estas operaciones permiten representar relaciones que pueden ser difíciles de expresar mediante reglas sencillas.\nDurante el entrenamiento se compara la salida con el objetivo mediante una función de pérdida. Un procedimiento de optimización modifica los parámetros para reducir ese error. En muchas redes se calculan gradientes que indican cómo influyen los parámetros en la pérdida. La explicación conceptual no implica que todas las arquitecturas trabajen exactamente igual.\nDistintas estructuras se adaptan a datos diferentes. Las imágenes, las secuencias y el lenguaje plantean necesidades particulares. También cambian el objetivo de entrenamiento y la manera de utilizar el modelo después. Una red que clasifica una imagen y un sistema que genera texto pueden compartir fundamentos matemáticos, pero sus comportamientos y criterios de evaluación son distintos.\n\nIdea clave: un resultado convincente debe evaluarse frente a la tarea y los datos; la apariencia de inteligencia no demuestra que la respuesta sea correcta."
+  },
+  {
+    "objectID": "posts/inteligencia-artificial/index.html#aplicaciones-dentro-de-la-ingeniería-digital",
+    "href": "posts/inteligencia-artificial/index.html#aplicaciones-dentro-de-la-ingeniería-digital",
+    "title": "¿Qué es la inteligencia artificial?",
+    "section": "4. Aplicaciones dentro de la ingeniería digital",
+    "text": "4. Aplicaciones dentro de la ingeniería digital\nLa IA puede apoyar procesos que implican reconocer relaciones en información. En una aplicación, un clasificador podría organizar mensajes por tema. Un sistema de recomendación puede ordenar opciones según señales de interacción. Una herramienta de visión puede identificar características de una imagen, mientras que otra procesa voz o texto.\nIntegrar un modelo en software requiere más que ejecutar una predicción. Es necesario preparar la entrada, manejar respuestas inesperadas y decidir cómo se presenta el resultado. También hay que establecer qué ocurre cuando el servicio falla o cuando la confianza disponible no basta para tomar una decisión.\nLa evaluación debe ajustarse a la tarea. Un modelo de clasificación puede estudiarse mediante los tipos de aciertos y errores que produce. En una herramienta generativa también interesa comprobar fidelidad, pertinencia y consistencia. La selección de métricas y ejemplos depende de lo que significa una respuesta útil en ese contexto."
+  },
+  {
+    "objectID": "posts/inteligencia-artificial/index.html#limitaciones-y-uso-responsable",
+    "href": "posts/inteligencia-artificial/index.html#limitaciones-y-uso-responsable",
+    "title": "¿Qué es la inteligencia artificial?",
+    "section": "5. Limitaciones y uso responsable",
+    "text": "5. Limitaciones y uso responsable\nUn modelo puede equivocarse cuando recibe datos distintos a los que conoció durante el entrenamiento. También puede reproducir sesgos presentes en la información utilizada. Las respuestas de un sistema generativo pueden contener afirmaciones incorrectas aunque estén redactadas con fluidez. Por eso sus resultados necesitan revisión cuando se utilizan para explicar hechos o apoyar decisiones.\nEl uso responsable comienza por definir límites claros. Se debe considerar qué datos se recopilan, quién puede acceder a ellos y si es necesario utilizarlos. La información personal o confidencial exige cuidado durante la preparación de datos y la integración del servicio.\nAl revisar una solución conviene preguntar:\n\n¿Qué tarea específica resuelve y qué queda fuera de su alcance?\n¿Con qué ejemplos se evaluó y cuáles siguen sin estar representados?\n¿Qué consecuencias tendría una respuesta equivocada?\n¿Puede una persona revisar o corregir el resultado?\n¿Se informa con claridad cuándo interviene un sistema automatizado?\n\nEstudiar inteligencia artificial implica aprender técnicas y también reconocer sus límites. Una base sólida permite construir soluciones útiles, documentar sus condiciones de uso y mantener el juicio humano en las decisiones que lo requieren."
+  },
+  {
+    "objectID": "posts/introduccion-redes/index.html",
+    "href": "posts/introduccion-redes/index.html",
+    "title": "Introducción a las redes de computadoras",
+    "section": "",
+    "text": "Miguel\n\n25 de febrero de 2026"
+  },
+  {
+    "objectID": "posts/introduccion-redes/index.html#qué-es-una-red-y-cómo-se-organiza",
+    "href": "posts/introduccion-redes/index.html#qué-es-una-red-y-cómo-se-organiza",
+    "title": "Introducción a las redes de computadoras",
+    "section": "1. Qué es una red y cómo se organiza",
+    "text": "1. Qué es una red y cómo se organiza\nUna red conecta dispositivos para intercambiar datos y compartir recursos. Los participantes pueden ser computadoras, teléfonos, impresoras o servidores. La conexión puede usar cables, fibra óptica o enlaces inalámbricos; sobre esos medios funcionan protocolos que establecen cómo identificar a los destinatarios y transportar mensajes.\nUna LAN, o red de área local, reúne equipos en un entorno limitado, como una casa o un laboratorio. Una WLAN es una red local inalámbrica. Una WAN conecta redes a mayor distancia, por ejemplo entre distintas sedes. Internet resulta de la interconexión de muchas redes administradas por organizaciones diferentes; no es un único equipo central que almacena toda la información.\nEntre los dispositivos básicos están la interfaz de red del equipo, el switch, el router y el punto de acceso inalámbrico. En un entorno doméstico, una misma caja puede reunir varias de estas funciones. Distinguir el aparato físico de sus funciones ayuda a entender por qué puede haber conexión Wi-Fi y, aun así, faltar acceso a Internet."
+  },
+  {
+    "objectID": "posts/introduccion-redes/index.html#los-modelos-osi-y-tcpip",
+    "href": "posts/introduccion-redes/index.html#los-modelos-osi-y-tcpip",
+    "title": "Introducción a las redes de computadoras",
+    "section": "2. Los modelos OSI y TCP/IP",
+    "text": "2. Los modelos OSI y TCP/IP\nEl modelo OSI organiza la comunicación en siete capas. Es una referencia conceptual para estudiar responsabilidades y localizar fallas; no exige que cada programa tenga siete módulos separados.\n\nFísica: transmisión de señales sobre el medio.\nEnlace de datos: intercambio de tramas dentro de un enlace o segmento local.\nRed: direccionamiento y recorrido de paquetes entre redes.\nTransporte: comunicación entre procesos, con las características del protocolo utilizado.\nSesión: organización de las sesiones de comunicación.\nPresentación: representación de los datos que intercambian las aplicaciones.\nAplicación: servicios de comunicación utilizados por programas, como DNS y HTTP.\n\nLa familia TCP/IP reúne protocolos que hacen posible la comunicación en Internet. Su modelo suele describirse con capas de acceso a la red, Internet, transporte y aplicación. La correspondencia con OSI sirve como orientación, pero ambos modelos no son idénticos.\nIP permite direccionar y enviar paquetes entre redes. TCP proporciona un flujo de bytes ordenado y mecanismos para recuperar datos perdidos durante una conexión; UDP ofrece datagramas sin esas garantías incorporadas. Elegir un transporte depende de las necesidades de la aplicación. Ninguno sustituye la responsabilidad del programa de interpretar los datos recibidos. La referencia de capas de Cloudflare sitúa IP en red, TCP y UDP en transporte, y DNS y HTTP en aplicación."
+  },
+  {
+    "objectID": "posts/introduccion-redes/index.html#direcciones-ip-switches-y-routers",
+    "href": "posts/introduccion-redes/index.html#direcciones-ip-switches-y-routers",
+    "title": "Introducción a las redes de computadoras",
+    "section": "3. Direcciones IP, switches y routers",
+    "text": "3. Direcciones IP, switches y routers\nUna dirección IP identifica una interfaz dentro de una red y permite indicar origen y destino. IPv4 e IPv6 son versiones diferentes del protocolo, con formatos de dirección distintos. El prefijo de red permite determinar qué parte corresponde a la red y qué destinos pueden considerarse locales según la configuración.\nEn una red Ethernet sencilla, un switch aprende direcciones MAC y utiliza esa información para reenviar tramas hacia los puertos adecuados. Un router conecta redes IP diferentes y decide el siguiente salto para cada paquete a partir de su tabla de rutas. Existen equipos con funciones combinadas, pero esta separación resulta útil al comenzar.\nLa puerta de enlace predeterminada es el destino al que un equipo envía tráfico cuando no dispone de una ruta más específica. Si una computadora necesita acceder a otra red, normalmente entrega el paquete a esa puerta de enlace. Configurar una IP sin una máscara o prefijo adecuado puede impedir la comunicación incluso si el cable funciona."
+  },
+  {
+    "objectID": "posts/introduccion-redes/index.html#enrutamiento-y-resolución-de-nombres",
+    "href": "posts/introduccion-redes/index.html#enrutamiento-y-resolución-de-nombres",
+    "title": "Introducción a las redes de computadoras",
+    "section": "4. Enrutamiento y resolución de nombres",
+    "text": "4. Enrutamiento y resolución de nombres\nEl enrutamiento consiste en seleccionar por dónde continuar hacia una red de destino. Cada router toma una decisión local; no necesita conocer el recorrido completo de cada conexión. Las rutas pueden configurarse manualmente o aprenderse mediante protocolos de enrutamiento. Para una introducción basta comprender destino, siguiente salto e interfaz de salida.\nDNS permite consultar información asociada a nombres de dominio, incluyendo direcciones IP. Es más cómodo recordar un nombre que una dirección numérica, y el nombre puede mantenerse cuando cambia la infraestructura del servicio. Sin embargo, DNS no establece la conexión con la aplicación: ayuda a obtener información necesaria para hacerlo.\nUn diagnóstico básico puede comprobar primero el enlace, después la configuración IP, luego el acceso a la puerta de enlace y finalmente la resolución de nombres. Que un nombre no se resuelva no demuestra que toda la red esté caída. Seguir un orden evita cambiar configuraciones al azar y permite explicar con precisión dónde falla la comunicación."
+  },
+  {
+    "objectID": "posts/introduccion-redes/index.html#seguridad-básica-y-una-visión-completa",
+    "href": "posts/introduccion-redes/index.html#seguridad-básica-y-una-visión-completa",
+    "title": "Introducción a las redes de computadoras",
+    "section": "5. Seguridad básica y una visión completa",
+    "text": "5. Seguridad básica y una visión completa\nUna red requiere controles tanto en su perímetro como en sus equipos. El firewall aplica reglas para permitir o bloquear tráfico según criterios configurados. La segmentación separa grupos de dispositivos y limita comunicaciones que no necesitan existir. En una red inalámbrica, también importan la protección del acceso y la administración de sus credenciales.\nActualizar equipos, restringir interfaces de administración y retirar servicios innecesarios reduce oportunidades de acceso indebido. El cifrado protege comunicaciones compatibles con él, pero no corrige permisos excesivos ni equipos comprometidos. La seguridad perimetral debe acompañarse de controles dentro de la red.\n\nIdea clave: comprender una red significa distinguir el medio, el direccionamiento, el transporte y la aplicación, porque cada nivel puede fallar o necesitar protección por razones diferentes.\n\nComo cierre, una práctica útil es dibujar una red pequeña e indicar qué hace cada dispositivo. Después puede seguirse una consulta desde una computadora hasta un servicio remoto: conexión local, puerta de enlace, resolución DNS y comunicación con el servidor. Ese recorrido convierte una colección de términos en un sistema comprensible."
+  },
+  {
+    "objectID": "posts/programacion-arquitectura-limpia/index.html",
+    "href": "posts/programacion-arquitectura-limpia/index.html",
+    "title": "Principios de programación y arquitectura limpia",
+    "section": "",
+    "text": "Miguel\n\n18 de febrero de 2026"
+  },
+  {
+    "objectID": "posts/programacion-arquitectura-limpia/index.html#responsabilidades-funciones-y-nombres",
+    "href": "posts/programacion-arquitectura-limpia/index.html#responsabilidades-funciones-y-nombres",
+    "title": "Principios de programación y arquitectura limpia",
+    "section": "1. Responsabilidades, funciones y nombres",
+    "text": "1. Responsabilidades, funciones y nombres\nSeparar responsabilidades significa distinguir qué propósito cumple cada parte del programa. Una función que calcula un importe no debería necesitar conocer cómo dibujar un botón. Del mismo modo, una regla del negocio puede expresarse sin depender de detalles de una pantalla. Esta separación permite revisar y cambiar una responsabilidad con menos efectos sobre las demás.\nLas funciones y los módulos pequeños ayudan cuando tienen una tarea coherente. Pequeño no significa cumplir una cantidad fija de líneas: importa que sea posible resumir su intención y entender sus entradas, su resultado y sus efectos. Dividir cada operación trivial en otro archivo puede dificultar la lectura tanto como concentrar todo en una sola función.\nLos nombres aportan contexto. calcularTotalPedido explica más que procesar, siempre que describa realmente lo que hace la función. También conviene conservar un vocabulario consistente para los mismos conceptos. Si pedido y orden representan la misma entidad, alternarlos sin criterio obliga al lector a resolver una ambigüedad innecesaria.\nLos comentarios resultan útiles para explicar una decisión o una restricción que el código no revela. Repetir literalmente una instrucción añade ruido; explicar por qué existe una regla ayuda a conservarla durante una modificación."
+  },
+  {
+    "objectID": "posts/programacion-arquitectura-limpia/index.html#acoplamiento-cohesión-y-solid",
+    "href": "posts/programacion-arquitectura-limpia/index.html#acoplamiento-cohesión-y-solid",
+    "title": "Principios de programación y arquitectura limpia",
+    "section": "2. Acoplamiento, cohesión y SOLID",
+    "text": "2. Acoplamiento, cohesión y SOLID\nLa cohesión expresa cuánto se relacionan las responsabilidades dentro de un módulo. Un módulo cohesivo reúne elementos que participan en un mismo propósito. El acoplamiento describe las dependencias entre partes: cuando una modificación pequeña obliga a cambiar muchos lugares, puede existir una dependencia demasiado fuerte o mal organizada.\nSOLID agrupa cinco principios de diseño orientado a objetos que ayudan a examinar esas relaciones:\n\nResponsabilidad única: agrupar lo que cambia por la misma razón y separar responsabilidades distintas.\nAbierto/cerrado: favorecer extensiones sin tener que modificar continuamente partes estables.\nSustitución de Liskov: las implementaciones sustituibles deben respetar las expectativas del contrato que comparten.\nSegregación de interfaces: evitar obligar a un consumidor a depender de operaciones que no necesita.\nInversión de dependencias: hacer que las políticas relevantes dependan de abstracciones adecuadas, en lugar de detalles concretos.\n\nEstos principios no exigen crear una interfaz por cada clase ni anticipar todas las funcionalidades posibles. Por ejemplo, si una regla de cálculo recibe datos ya preparados, puede probarse sin conectarse a una base de datos. La separación aporta una ventaja concreta. En cambio, inventar varias capas alrededor de un cálculo trivial puede añadir más trabajo que claridad."
+  },
+  {
+    "objectID": "posts/programacion-arquitectura-limpia/index.html#capas-y-patrones-con-un-propósito",
+    "href": "posts/programacion-arquitectura-limpia/index.html#capas-y-patrones-con-un-propósito",
+    "title": "Principios de programación y arquitectura limpia",
+    "section": "3. Capas y patrones con un propósito",
+    "text": "3. Capas y patrones con un propósito\nUna arquitectura por capas básica puede distinguir presentación, lógica de aplicación y acceso a datos. La presentación recibe entradas y muestra resultados; la lógica coordina tareas y aplica reglas; el acceso a datos se ocupa de guardar y consultar información. Los límites deben facilitar que cada parte cumpla su función con dependencias explícitas.\nClean Architecture propone proteger las reglas centrales frente a detalles externos mediante una dirección controlada de las dependencias. Puede ser útil cuando existen reglas que deben mantenerse aunque cambie una interfaz o una tecnología. No constituye una regla universal: un script breve, un sitio estático o una aplicación pequeña pueden requerir una organización mucho más sencilla.\nLos patrones de diseño describen soluciones recurrentes, pero deben responder a una necesidad reconocible. Estrategia permite intercambiar formas de realizar una operación bajo un contrato común. Adaptador ayuda a presentar una interfaz compatible para una dependencia existente. Un repositorio puede concentrar operaciones de persistencia, aunque añadirlo sin una necesidad real solo introduce otro recorrido para seguir el código.\nAntes de aplicar un patrón conviene describir el problema en palabras sencillas. Si esa explicación no existe, probablemente sea temprano para añadir la abstracción."
+  },
+  {
+    "objectID": "posts/programacion-arquitectura-limpia/index.html#refactorizar-sin-cambiar-el-comportamiento",
+    "href": "posts/programacion-arquitectura-limpia/index.html#refactorizar-sin-cambiar-el-comportamiento",
+    "title": "Principios de programación y arquitectura limpia",
+    "section": "4. Refactorizar sin cambiar el comportamiento",
+    "text": "4. Refactorizar sin cambiar el comportamiento\nRefactorizar consiste en mejorar la estructura interna manteniendo el comportamiento observable. Renombrar una variable, extraer una función o retirar duplicación pueden ser refactorizaciones. Añadir una nueva regla funcional es otro tipo de cambio, aunque se realice durante la misma sesión de trabajo. La definición de refactorización de Martin Fowler destaca las transformaciones pequeñas que conservan el comportamiento.\nUn proceso prudente empieza por comprender qué hace el código y cómo comprobarlo. Después se elige una mejora concreta, se aplica y se verifica el resultado. Separar cambios estructurales de nuevas funcionalidades facilita detectar qué provocó un problema y revisar la intención de cada modificación.\nLas pruebas existentes aportan una red de comprobación, pero su presencia no elimina la necesidad de revisar los casos importantes. Si todavía no hay pruebas, puede ser útil documentar entradas y resultados esperados antes de reorganizar una parte delicada. No hace falta reescribir todo el proyecto para mejorar un nombre o extraer una responsabilidad bien delimitada."
+  },
+  {
+    "objectID": "posts/programacion-arquitectura-limpia/index.html#mantenibilidad-y-decisiones-proporcionadas",
+    "href": "posts/programacion-arquitectura-limpia/index.html#mantenibilidad-y-decisiones-proporcionadas",
+    "title": "Principios de programación y arquitectura limpia",
+    "section": "5. Mantenibilidad y decisiones proporcionadas",
+    "text": "5. Mantenibilidad y decisiones proporcionadas\nLa mantenibilidad se aprecia al realizar cambios: cuánto contexto necesitamos, qué partes deben tocarse y qué tan fácil es comprobar el resultado. Una estructura entendible permite localizar responsabilidades, mientras que las dependencias ocultas obligan a investigar el sistema completo para resolver una tarea pequeña.\n\nIdea clave: una buena organización hace visibles las responsabilidades y mantiene cada decisión técnica en proporción al problema que resuelve.\n\nPara revisar un módulo, conviene preguntar si sus nombres explican la intención, si mezcla responsabilidades y si puede comprenderse sin perseguir demasiados archivos. También ayuda identificar reglas repetidas y dependencias que dificultan las pruebas. Estas preguntas producen mejoras concretas sin necesitar una arquitectura nueva para cada aplicación.\nEl objetivo final es que otra persona, o quien retome el proyecto más adelante, pueda entender por qué existe cada parte. Empezar con funciones claras, módulos coherentes y cambios pequeños proporciona una base sólida. Las capas y los patrones pueden incorporarse cuando el crecimiento del sistema revele una necesidad que esas herramientas resuelvan de forma visible."
+  }
+]

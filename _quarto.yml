@@ -1,6 +1,6 @@
 ﻿project:
   type: website
-  output-dir: _site
+  output-dir: docs
 lang: es
 website:
   title: "Miguel Dev Blog"

@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Miguel">
+<meta name="description" content="Fundamentos de algoritmos de aprendizaje, redes neuronales y su impacto en la ingeniería digital.">
+
+<title>¿Qué es la inteligencia artificial? – Miguel Dev Blog</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e5b689ac20990dee548ff1536b6ef6e5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed article-page quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Miguel Molina</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Buscar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Navegación de palanca" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts/index.html"> 
+<span class="menu-text">Contenido</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">Sobre mí</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><h1 class="title display-7">¿Qué es la inteligencia artificial?</h1></header>
+
+<header id="title-block-header">
+
+<p class="author">Miguel</p>
+
+<p class="date">8 de marzo de 2026</p>
+</header>
+
+
+<div class="article-detail">
+<div class="article-header">
+<p><a href="../../posts/index.html" class="article-back">← Volver a todo el contenido</a></p>
+<div class="article-kicker">
+<p>INTELIGENCIA ARTIFICIAL</p>
+</div>
+<section id="qué-es-la-inteligencia-artificial" class="level1">
+<h1>¿Qué es la inteligencia artificial?</h1>
+<div class="article-lead">
+<p>Fundamentos de algoritmos de aprendizaje, redes neuronales y su impacto en la ingeniería digital.</p>
+</div>
+<div class="article-meta">
+<p>Miguel<br>
+08 Mar 2026 · 7 min</p>
+</div>
+</section>
+</div>
+<hr>
+<div class="article-body">
+<div class="article-intro">
+<p>La inteligencia artificial aparece en herramientas que reconocen imágenes, recomiendan contenido, procesan lenguaje o ayudan a identificar patrones. Sin embargo, esas aplicaciones no utilizan necesariamente el mismo método ni resuelven los mismos problemas. Comprender sus fundamentos permite distinguir capacidades concretas de expectativas demasiado amplias. Para un estudiante de tecnologías de la información, la pregunta inicial puede ser práctica: qué tarea realiza el sistema, qué información necesita y cómo se comprueba que sus resultados son útiles. A partir de ahí se puede estudiar su funcionamiento con mayor claridad.</p>
+</div>
+<section id="ia-aprendizaje-automático-y-aprendizaje-profundo" class="level2">
+<h2 data-anchor-id="ia-aprendizaje-automático-y-aprendizaje-profundo">1. IA, aprendizaje automático y aprendizaje profundo</h2>
+<p>La <strong>inteligencia artificial</strong> es un campo que estudia sistemas capaces de realizar tareas asociadas con capacidades como reconocer patrones, razonar, planificar o utilizar lenguaje. Incluye enfoques diferentes. Algunos trabajan con reglas y conocimiento expresado explícitamente; otros ajustan su comportamiento a partir de datos.</p>
+<p>El <strong>aprendizaje automático</strong>, también llamado <em>machine learning</em>, pertenece a este campo. En lugar de programar cada condición de una respuesta, se construye un modelo que aprende relaciones a partir de ejemplos. Esto no significa que deje de necesitar decisiones humanas: alguien define el problema, selecciona datos y decide cómo evaluar el resultado.</p>
+<p>El <strong>aprendizaje profundo</strong>, o <em>deep learning</em>, es una familia de técnicas de aprendizaje automático basada en redes neuronales con varias capas. Es útil para determinadas tareas, pero no es la única forma de desarrollar un sistema de IA. Elegir un enfoque requiere considerar los datos disponibles, la complejidad del problema y las restricciones del proyecto.</p>
+</section>
+<section id="los-datos-y-el-proceso-de-entrenamiento" class="level2">
+<h2 data-anchor-id="los-datos-y-el-proceso-de-entrenamiento">2. Los datos y el proceso de entrenamiento</h2>
+<p>Entrenar un modelo consiste en ajustar sus parámetros mediante un procedimiento que busca mejorar su desempeño en una tarea. El objetivo depende del problema. Un sistema puede aprender a clasificar mensajes, estimar una cantidad o descubrir agrupaciones entre ejemplos.</p>
+<p>En el aprendizaje <strong>supervisado</strong>, los ejemplos incluyen una respuesta esperada. En el <strong>no supervisado</strong>, se explora la estructura de datos sin esas etiquetas. El aprendizaje <strong>por refuerzo</strong> utiliza señales de recompensa para aprender decisiones mediante interacción con un entorno. Son categorías generales, y un sistema puede combinar técnicas.</p>
+<p>Los datos necesitan preparación. Hay que revisar registros incompletos, inconsistencias, errores de etiquetado y si los ejemplos representan la situación en la que se utilizará el modelo. Una colección grande no garantiza calidad. Si ciertos casos quedan fuera, el resultado puede funcionar peor precisamente donde más se necesita.</p>
+<section id="aprender-ejemplos-y-generalizar" class="level3">
+<h3 data-anchor-id="aprender-ejemplos-y-generalizar">Aprender ejemplos y generalizar</h3>
+<p>Para evaluar el aprendizaje se reservan datos que no se utilizan para ajustar el modelo. Así se observa su comportamiento frente a ejemplos distintos. Memorizar el conjunto de entrenamiento puede producir resultados aparentemente buenos sin aprender relaciones útiles para casos nuevos. Evitar esta confusión es parte central del trabajo técnico.</p>
+</section>
+</section>
+<section id="redes-neuronales-a-nivel-conceptual" class="level2">
+<h2 data-anchor-id="redes-neuronales-a-nivel-conceptual">3. Redes neuronales a nivel conceptual</h2>
+<p>Una red neuronal procesa datos mediante capas de unidades conectadas. Cada unidad combina valores de entrada usando parámetros y aplica una transformación. El resultado pasa a otras unidades hasta producir la salida del modelo. Estas operaciones permiten representar relaciones que pueden ser difíciles de expresar mediante reglas sencillas.</p>
+<p>Durante el entrenamiento se compara la salida con el objetivo mediante una función de pérdida. Un procedimiento de optimización modifica los parámetros para reducir ese error. En muchas redes se calculan gradientes que indican cómo influyen los parámetros en la pérdida. La explicación conceptual no implica que todas las arquitecturas trabajen exactamente igual.</p>
+<p>Distintas estructuras se adaptan a datos diferentes. Las imágenes, las secuencias y el lenguaje plantean necesidades particulares. También cambian el objetivo de entrenamiento y la manera de utilizar el modelo después. Una red que clasifica una imagen y un sistema que genera texto pueden compartir fundamentos matemáticos, pero sus comportamientos y criterios de evaluación son distintos.</p>
+<blockquote class="blockquote">
+<p><strong>Idea clave:</strong> un resultado convincente debe evaluarse frente a la tarea y los datos; la apariencia de inteligencia no demuestra que la respuesta sea correcta.</p>
+</blockquote>
+</section>
+<section id="aplicaciones-dentro-de-la-ingeniería-digital" class="level2">
+<h2 data-anchor-id="aplicaciones-dentro-de-la-ingeniería-digital">4. Aplicaciones dentro de la ingeniería digital</h2>
+<p>La IA puede apoyar procesos que implican reconocer relaciones en información. En una aplicación, un clasificador podría organizar mensajes por tema. Un sistema de recomendación puede ordenar opciones según señales de interacción. Una herramienta de visión puede identificar características de una imagen, mientras que otra procesa voz o texto.</p>
+<p>Integrar un modelo en software requiere más que ejecutar una predicción. Es necesario preparar la entrada, manejar respuestas inesperadas y decidir cómo se presenta el resultado. También hay que establecer qué ocurre cuando el servicio falla o cuando la confianza disponible no basta para tomar una decisión.</p>
+<p>La evaluación debe ajustarse a la tarea. Un modelo de clasificación puede estudiarse mediante los tipos de aciertos y errores que produce. En una herramienta generativa también interesa comprobar fidelidad, pertinencia y consistencia. La selección de métricas y ejemplos depende de lo que significa una respuesta útil en ese contexto.</p>
+</section>
+<section id="limitaciones-y-uso-responsable" class="level2">
+<h2 data-anchor-id="limitaciones-y-uso-responsable">5. Limitaciones y uso responsable</h2>
+<p>Un modelo puede equivocarse cuando recibe datos distintos a los que conoció durante el entrenamiento. También puede reproducir sesgos presentes en la información utilizada. Las respuestas de un sistema generativo pueden contener afirmaciones incorrectas aunque estén redactadas con fluidez. Por eso sus resultados necesitan revisión cuando se utilizan para explicar hechos o apoyar decisiones.</p>
+<p>El uso responsable comienza por definir límites claros. Se debe considerar qué datos se recopilan, quién puede acceder a ellos y si es necesario utilizarlos. La información personal o confidencial exige cuidado durante la preparación de datos y la integración del servicio.</p>
+<p>Al revisar una solución conviene preguntar:</p>
+<ul>
+<li>¿Qué tarea específica resuelve y qué queda fuera de su alcance?</li>
+<li>¿Con qué ejemplos se evaluó y cuáles siguen sin estar representados?</li>
+<li>¿Qué consecuencias tendría una respuesta equivocada?</li>
+<li>¿Puede una persona revisar o corregir el resultado?</li>
+<li>¿Se informa con claridad cuándo interviene un sistema automatizado?</li>
+</ul>
+<p>Estudiar inteligencia artificial implica aprender técnicas y también reconocer sus límites. Una base sólida permite construir soluciones útiles, documentar sus condiciones de uso y mantener el juicio humano en las decisiones que lo requieren.</p>
+</section>
+</div>
+<div class="article-tags">
+<p>#ai · #deeplearning</p>
+</div>
+<div class="article-navigation">
+<div class="article-navigation-item">
+<p><a href="../../posts/introduccion-desarrollo-web/index.html">← Artículo anterior: Introducción al desarrollo web moderno</a></p>
+</div>
+<div class="article-navigation-item article-navigation-next">
+<p><a href="../../posts/fundamentos-bases-datos/index.html">Siguiente artículo: Fundamentos de bases de datos →</a></p>
+</div>
+</div>
+</div>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p><strong>Miguel Dev Blog</strong> · Blog &amp; Portafolio</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="../../index.html">
+<p>Inicio</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../posts/index.html">
+<p>Contenido</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../about.html">
+<p>Sobre mí</p>
+</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

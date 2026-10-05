@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Miguel">
+<meta name="description" content="Infraestructura como servicio, microservicios, contenedores Docker y escalabilidad elástica.">
+
+<title>Computación en la nube – Miguel Dev Blog</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e5b689ac20990dee548ff1536b6ef6e5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed article-page quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Miguel Molina</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Buscar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Navegación de palanca" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts/index.html"> 
+<span class="menu-text">Contenido</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">Sobre mí</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><h1 class="title display-7">Computación en la nube</h1></header>
+
+<header id="title-block-header">
+
+<p class="author">Miguel</p>
+
+<p class="date">5 de febrero de 2026</p>
+</header>
+
+
+<div class="article-detail">
+<div class="article-header">
+<p><a href="../../posts/index.html" class="article-back">← Volver a todo el contenido</a></p>
+<div class="article-kicker">
+<p>CLOUD COMPUTING</p>
+</div>
+<section id="computación-en-la-nube" class="level1">
+<h1>Computación en la nube</h1>
+<div class="article-lead">
+<p>Infraestructura como servicio, microservicios, contenedores Docker y escalabilidad elástica.</p>
+</div>
+<div class="article-meta">
+<p>Miguel<br>
+05 Feb 2026 · 8 min</p>
+</div>
+</section>
+</div>
+<hr>
+<div class="article-body">
+<div class="article-intro">
+<p>La computación en la nube permite utilizar recursos de procesamiento, almacenamiento y software mediante servicios accesibles por red. En lugar de adquirir y administrar toda la infraestructura física, una organización puede solicitar recursos a un proveedor y ajustar su uso según las necesidades. Esto cambia la forma de desplegar aplicaciones, pero no elimina las responsabilidades técnicas. Todavía es necesario organizar datos, configurar permisos, observar el funcionamiento y controlar los recursos consumidos. Para entender la nube conviene separar sus modelos de servicio de las tecnologías que pueden utilizarse dentro de ellos.</p>
+</div>
+<section id="infraestructura-local-y-servicios-en-la-nube" class="level2">
+<h2 data-anchor-id="infraestructura-local-y-servicios-en-la-nube">1. Infraestructura local y servicios en la nube</h2>
+<p>En una infraestructura local, la organización suele encargarse del equipo físico, la red y las tareas necesarias para mantenerlos operativos. En la nube, parte de esas responsabilidades se traslada al proveedor. El alcance de esa transferencia depende del servicio contratado: administrar una máquina virtual es diferente de utilizar una aplicación ya preparada.</p>
+<p>La nube facilita solicitar recursos sin instalar físicamente cada servidor. Sin embargo, una aplicación alojada allí sigue dependiendo de conexiones, configuraciones y componentes que pueden fallar. La ubicación del servicio no garantiza por sí sola seguridad, disponibilidad ni rendimiento.</p>
+<p>También existen combinaciones de infraestructura local y servicios remotos. La decisión depende de las necesidades del proyecto, sus restricciones y la capacidad de administración del equipo. Comprender quién mantiene cada componente permite distribuir responsabilidades y evitar supuestos incorrectos. El proveedor puede cuidar el hardware mientras el equipo sigue siendo responsable de sus usuarios, datos y reglas de acceso.</p>
+</section>
+<section id="iaas-paas-y-saas" class="level2">
+<h2 data-anchor-id="iaas-paas-y-saas">2. IaaS, PaaS y SaaS</h2>
+<p>Los modelos de servicio describen cuánto administra el proveedor y cuánto conserva bajo su control quien utiliza la nube. No son tecnologías intercambiables, sino niveles distintos de responsabilidad.</p>
+<ul>
+<li><strong>IaaS, infraestructura como servicio:</strong> ofrece recursos como máquinas virtuales, redes y almacenamiento. El usuario administra normalmente el sistema operativo y el software de la aplicación.</li>
+<li><strong>PaaS, plataforma como servicio:</strong> proporciona un entorno para desplegar aplicaciones y delega una parte mayor de la administración de infraestructura. El equipo se concentra en código, configuración y datos.</li>
+<li><strong>SaaS, software como servicio:</strong> entrega una aplicación lista para utilizar, como una herramienta de colaboración. Quien la usa gestiona cuentas y opciones disponibles, sin desplegar su código.</li>
+</ul>
+<p>Delegar tareas reduce algunas cargas operativas, pero también introduce restricciones propias del servicio. La comparación debe considerar compatibilidad, permisos, respaldo y capacidad de trasladar información. Tener menos acceso a la infraestructura puede ser conveniente si el objetivo principal es utilizar una función y no administrar servidores.</p>
+</section>
+<section id="máquinas-virtuales-contenedores-y-docker" class="level2">
+<h2 data-anchor-id="máquinas-virtuales-contenedores-y-docker">3. Máquinas virtuales, contenedores y Docker</h2>
+<p>Una máquina virtual utiliza virtualización para ejecutar un sistema operativo sobre recursos administrados por un entorno anfitrión. Permite separar entornos de ejecución y asignarles memoria, procesamiento y almacenamiento. Desde la perspectiva de una aplicación, puede funcionar como un servidor donde se instalan sus dependencias.</p>
+<p>Los contenedores empaquetan una aplicación con sus dependencias de ejecución, compartiendo el núcleo del sistema operativo anfitrión. Esta diferencia evita tratar un contenedor como si fuera una máquina virtual completa. El aislamiento y la configuración siguen requiriendo atención; empaquetar software no lo vuelve automáticamente seguro.</p>
+<p>Docker es un ejemplo de herramientas para crear imágenes y ejecutar contenedores. Una imagen describe un entorno reproducible; un contenedor es una instancia en ejecución de esa imagen. Los datos que deben sobrevivir a su eliminación necesitan una estrategia explícita de persistencia, como volúmenes o servicios externos.</p>
+<p>Los contenedores pueden apoyar una arquitectura de microservicios, donde varias funciones se ejecutan como servicios separados. No obstante, un monolito también puede ejecutarse en un contenedor. Adoptar microservicios introduce comunicación y coordinación adicionales; esa complejidad debe responder a una necesidad concreta.</p>
+</section>
+<section id="escalabilidad-y-disponibilidad" class="level2">
+<h2 data-anchor-id="escalabilidad-y-disponibilidad">4. Escalabilidad y disponibilidad</h2>
+<p>Escalar significa ajustar la capacidad para atender una carga de trabajo. La escalabilidad vertical aumenta recursos de una instancia; la horizontal agrega instancias. La elasticidad describe la capacidad de ajustar recursos conforme cambia la demanda, en ocasiones mediante reglas automatizadas.</p>
+<p>Agregar instancias no resuelve cualquier problema. Si todas dependen de una base de datos saturada, el límite puede permanecer. Además, almacenar sesiones o archivos únicamente dentro de una instancia complica distribuir las solicitudes. La aplicación debe diseñarse considerando dónde viven sus datos y cómo se comparten.</p>
+<blockquote class="blockquote">
+<p><strong>Idea clave:</strong> la nube ofrece herramientas para aumentar capacidad y recuperarse de fallos, pero la aplicación debe estar preparada para utilizarlas correctamente.</p>
+</blockquote>
+<p>La disponibilidad busca mantener el servicio accesible. Distribuir componentes, comprobar su estado y preparar recuperación puede reducir interrupciones, aunque también aumenta la operación necesaria. Un respaldo conserva información; una réplica ayuda a mantener otra copia disponible. Sus objetivos se relacionan, pero no son equivalentes.</p>
+<p>Antes de automatizar escalado conviene observar métricas como consumo de recursos y tiempos de respuesta. Esa observación permite identificar el componente que necesita atención y comprobar si el cambio mejora el comportamiento esperado.</p>
+</section>
+<section id="consumo-proveedores-y-decisiones-responsables" class="level2">
+<h2 data-anchor-id="consumo-proveedores-y-decisiones-responsables">5. Consumo, proveedores y decisiones responsables</h2>
+<p>El cobro bajo demanda relaciona el costo con recursos utilizados, aunque cada servicio tiene su propia forma de medir consumo. Procesamiento, almacenamiento y transferencia de datos pueden formar parte de ese cálculo. Una instancia olvidada o información acumulada sin revisión puede seguir generando consumo aunque el proyecto no esté en uso.</p>
+<p>Para un ejercicio académico, entender el costo comienza por identificar qué recursos se necesitan y durante cuánto tiempo. Conviene definir límites, observar el consumo y retirar recursos que ya no cumplen una función. Usar la nube tampoco implica que todo deba alojarse allí: un entorno local puede ser suficiente para desarrollar y estudiar una aplicación.</p>
+<p>AWS, Microsoft Azure y Google Cloud son ejemplos de proveedores de servicios en la nube. Sus catálogos incluyen distintas opciones, pero elegir una requiere revisar documentación y necesidades concretas. El nombre del proveedor no sustituye esa evaluación.</p>
+<p>Comprender modelos de servicio, persistencia, escalabilidad y responsabilidades ayuda a formular mejores decisiones. La nube resulta más fácil de explicar cuando se parte del problema y se elige un conjunto de recursos proporcionado al alcance real del proyecto.</p>
+</section>
+</div>
+<div class="article-tags">
+<p>#devops · #docker</p>
+</div>
+<div class="article-navigation">
+<div class="article-navigation-item">
+<p><a href="../../posts/ciberseguridad-proteccion-datos/index.html">← Artículo anterior: Ciberseguridad y protección de datos</a></p>
+</div>
+<div class="article-navigation-item article-navigation-next">
+<p><a href="../../posts/aplicacion-web-moderna/index.html">Siguiente artículo: Cómo funciona una aplicación web moderna →</a></p>
+</div>
+</div>
+</div>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p><strong>Miguel Dev Blog</strong> · Blog &amp; Portafolio</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="../../index.html">
+<p>Inicio</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../posts/index.html">
+<p>Contenido</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../about.html">
+<p>Sobre mí</p>
+</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
