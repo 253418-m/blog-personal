@@ -1,0 +1,111 @@
+---
+title: "Introducción a las redes de computadoras"
+description: "Modelo OSI, protocolos TCP/IP, enrutamiento básico y seguridad perimetral para estudiantes."
+author: Miguel
+date: 2026-02-25
+categories: [Redes]
+body-classes: article-page
+title-block-style: none
+toc: false
+---
+
+:::::: {.article-detail}
+
+::::: {.article-header}
+
+[← Volver a todo el contenido](../index.qmd){.article-back}
+
+::: {.article-kicker}
+REDES
+:::
+
+# Introducción a las redes de computadoras
+
+::: {.article-lead}
+Modelo OSI, protocolos TCP/IP, enrutamiento básico y seguridad perimetral para estudiantes.
+:::
+
+::: {.article-meta}
+Miguel  
+25 Feb 2026 · 5 min
+:::
+
+:::::
+
+---
+
+:::: {.article-body}
+
+::: {.article-intro}
+Cuando una computadora abre una página, comparte un archivo o consulta un servicio, necesita comunicarse con otros equipos. Esa comunicación parece inmediata, pero depende de medios físicos, dispositivos y reglas que coordinan el envío de información. Estudiar redes permite reconocer esas piezas y distinguir problemas diferentes: una falla del cable no se resuelve como un nombre de dominio incorrecto. Para comenzar, conviene seguir el recorrido de los datos y comprender qué responsabilidad tiene cada elemento, antes de memorizar comandos de configuración.
+:::
+
+## 1. Qué es una red y cómo se organiza
+
+Una red conecta dispositivos para intercambiar datos y compartir recursos. Los participantes pueden ser computadoras, teléfonos, impresoras o servidores. La conexión puede usar cables, fibra óptica o enlaces inalámbricos; sobre esos medios funcionan protocolos que establecen cómo identificar a los destinatarios y transportar mensajes.
+
+Una LAN, o red de área local, reúne equipos en un entorno limitado, como una casa o un laboratorio. Una WLAN es una red local inalámbrica. Una WAN conecta redes a mayor distancia, por ejemplo entre distintas sedes. Internet resulta de la interconexión de muchas redes administradas por organizaciones diferentes; no es un único equipo central que almacena toda la información.
+
+Entre los dispositivos básicos están la interfaz de red del equipo, el switch, el router y el punto de acceso inalámbrico. En un entorno doméstico, una misma caja puede reunir varias de estas funciones. Distinguir el aparato físico de sus funciones ayuda a entender por qué puede haber conexión Wi-Fi y, aun así, faltar acceso a Internet.
+
+## 2. Los modelos OSI y TCP/IP
+
+El modelo OSI organiza la comunicación en siete capas. Es una referencia conceptual para estudiar responsabilidades y localizar fallas; no exige que cada programa tenga siete módulos separados.
+
+1. **Física:** transmisión de señales sobre el medio.
+2. **Enlace de datos:** intercambio de tramas dentro de un enlace o segmento local.
+3. **Red:** direccionamiento y recorrido de paquetes entre redes.
+4. **Transporte:** comunicación entre procesos, con las características del protocolo utilizado.
+5. **Sesión:** organización de las sesiones de comunicación.
+6. **Presentación:** representación de los datos que intercambian las aplicaciones.
+7. **Aplicación:** servicios de comunicación utilizados por programas, como DNS y HTTP.
+
+La familia TCP/IP reúne protocolos que hacen posible la comunicación en Internet. Su modelo suele describirse con capas de acceso a la red, Internet, transporte y aplicación. La correspondencia con OSI sirve como orientación, pero ambos modelos no son idénticos.
+
+IP permite direccionar y enviar paquetes entre redes. TCP proporciona un flujo de bytes ordenado y mecanismos para recuperar datos perdidos durante una conexión; UDP ofrece datagramas sin esas garantías incorporadas. Elegir un transporte depende de las necesidades de la aplicación. Ninguno sustituye la responsabilidad del programa de interpretar los datos recibidos. La [referencia de capas de Cloudflare](https://developers.cloudflare.com/fundamentals/reference/network-layers/) sitúa IP en red, TCP y UDP en transporte, y DNS y HTTP en aplicación.
+
+## 3. Direcciones IP, switches y routers
+
+Una dirección IP identifica una interfaz dentro de una red y permite indicar origen y destino. IPv4 e IPv6 son versiones diferentes del protocolo, con formatos de dirección distintos. El prefijo de red permite determinar qué parte corresponde a la red y qué destinos pueden considerarse locales según la configuración.
+
+En una red Ethernet sencilla, un switch aprende direcciones MAC y utiliza esa información para reenviar tramas hacia los puertos adecuados. Un router conecta redes IP diferentes y decide el siguiente salto para cada paquete a partir de su tabla de rutas. Existen equipos con funciones combinadas, pero esta separación resulta útil al comenzar.
+
+La puerta de enlace predeterminada es el destino al que un equipo envía tráfico cuando no dispone de una ruta más específica. Si una computadora necesita acceder a otra red, normalmente entrega el paquete a esa puerta de enlace. Configurar una IP sin una máscara o prefijo adecuado puede impedir la comunicación incluso si el cable funciona.
+
+## 4. Enrutamiento y resolución de nombres
+
+El enrutamiento consiste en seleccionar por dónde continuar hacia una red de destino. Cada router toma una decisión local; no necesita conocer el recorrido completo de cada conexión. Las rutas pueden configurarse manualmente o aprenderse mediante protocolos de enrutamiento. Para una introducción basta comprender destino, siguiente salto e interfaz de salida.
+
+DNS permite consultar información asociada a nombres de dominio, incluyendo direcciones IP. Es más cómodo recordar un nombre que una dirección numérica, y el nombre puede mantenerse cuando cambia la infraestructura del servicio. Sin embargo, DNS no establece la conexión con la aplicación: ayuda a obtener información necesaria para hacerlo.
+
+Un diagnóstico básico puede comprobar primero el enlace, después la configuración IP, luego el acceso a la puerta de enlace y finalmente la resolución de nombres. Que un nombre no se resuelva no demuestra que toda la red esté caída. Seguir un orden evita cambiar configuraciones al azar y permite explicar con precisión dónde falla la comunicación.
+
+## 5. Seguridad básica y una visión completa
+
+Una red requiere controles tanto en su perímetro como en sus equipos. El firewall aplica reglas para permitir o bloquear tráfico según criterios configurados. La segmentación separa grupos de dispositivos y limita comunicaciones que no necesitan existir. En una red inalámbrica, también importan la protección del acceso y la administración de sus credenciales.
+
+Actualizar equipos, restringir interfaces de administración y retirar servicios innecesarios reduce oportunidades de acceso indebido. El cifrado protege comunicaciones compatibles con él, pero no corrige permisos excesivos ni equipos comprometidos. La seguridad perimetral debe acompañarse de controles dentro de la red.
+
+> **Idea clave:** comprender una red significa distinguir el medio, el direccionamiento, el transporte y la aplicación, porque cada nivel puede fallar o necesitar protección por razones diferentes.
+
+Como cierre, una práctica útil es dibujar una red pequeña e indicar qué hace cada dispositivo. Después puede seguirse una consulta desde una computadora hasta un servicio remoto: conexión local, puerta de enlace, resolución DNS y comunicación con el servidor. Ese recorrido convierte una colección de términos en un sistema comprensible.
+
+::::
+
+::: {.article-tags}
+#tcpip · #osi
+:::
+
+:::: {.article-navigation}
+
+::: {.article-navigation-item}
+[← Artículo anterior: Fundamentos de bases de datos](../fundamentos-bases-datos/index.qmd)
+:::
+
+::: {.article-navigation-item .article-navigation-next}
+[Siguiente artículo: Git y GitHub para estudiantes →](../git-github-estudiantes/index.qmd)
+:::
+
+::::
+
+::::::

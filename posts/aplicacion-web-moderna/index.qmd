@@ -1,0 +1,101 @@
+---
+title: "Cómo funciona una aplicación web moderna"
+description: "DNS, renderizado web, navegadores, computación distribuida y procesamiento de aplicaciones modernas."
+author: Miguel
+date: 2026-09-12
+categories: [Desarrollo web]
+title-block-style: none
+body-classes: article-page
+toc: false
+---
+
+:::::: {.article-detail}
+
+::::: {.article-header}
+[← Volver a todo el contenido](../index.qmd){.article-back}
+
+::: {.article-kicker}
+DESARROLLO WEB
+:::
+
+# Cómo funciona una aplicación web moderna
+
+::: {.article-lead}
+DNS, renderizado web, navegadores, computación distribuida y procesamiento de aplicaciones modernas.
+:::
+
+::: {.article-meta}
+Miguel  
+12 Sep 2026 · 8 min
+:::
+:::::
+
+---
+
+:::: {.article-body}
+
+::: {.article-intro}
+Abrir una aplicación web parece una acción inmediata: escribimos una dirección y aparece una interfaz. Sin embargo, participan el navegador, la red y uno o varios servicios. Comprender ese recorrido permite distinguir problemas de conexión, de presentación y de procesamiento. También ayuda a entender por qué una pantalla puede mostrarse antes de que todos sus datos estén disponibles. Sigamos el viaje de una solicitud, desde la URL hasta el contenido que vemos.
+:::
+
+## 1. De la dirección al servidor
+
+Una URL identifica un recurso y contiene información para solicitarlo. En una dirección como `https://ejemplo.com/catalogo`, el esquema indica HTTPS, el dominio identifica el nombre del sitio y la ruta señala el recurso solicitado. También puede haber parámetros de consulta. El fragmento que aparece después de `#` normalmente indica una posición o estado dentro del documento y no forma parte de la solicitud HTTP enviada al servidor.
+
+Para comunicarse por la red, el navegador necesita localizar el destino. DNS permite consultar información asociada a un nombre de dominio, entre ella las direcciones IP que pueden servir ese sitio. El resultado puede estar almacenado temporalmente en caché; por eso no todas las visitas implican recorrer de nuevo todo el proceso de resolución.
+
+Un dominio tampoco equivale necesariamente a una sola computadora. La infraestructura puede distribuir solicitudes entre servidores o entregar archivos desde servicios cercanos al usuario. Esta organización no cambia la idea básica: el cliente necesita un destino accesible antes de pedir el recurso.
+
+## 2. Conexión, protección y mensajes HTTP
+
+Una vez localizado el destino, se establece la comunicación necesaria. En HTTPS, TLS protege el intercambio mediante cifrado y permite verificar la identidad del servidor a partir de certificados. Esto dificulta que terceros lean o modifiquen los datos durante su tránsito. No demuestra, por sí solo, que el contenido del sitio sea confiable o que su aplicación no tenga errores.
+
+HTTP define cómo se expresan solicitudes y respuestas. Una solicitud incluye un método, una ruta y encabezados; puede incorporar un cuerpo. El servidor devuelve un estado, encabezados y, cuando corresponde, contenido. Solicitar una página y enviar un formulario son operaciones diferentes, aunque ambas utilicen ese mismo lenguaje de comunicación.
+
+### Cliente, servidor y protocolo de transporte
+
+El cliente inicia una solicitud y utiliza la respuesta. El servidor recibe solicitudes y ofrece recursos o ejecuta operaciones. El transporte se encarga de mover los datos entre ambos extremos. TCP participa en muchas conexiones web; las versiones y mecanismos de transporte pueden variar. Conviene separar esas responsabilidades de las reglas de HTTP y de la presentación visual de la aplicación.
+
+> **Idea clave:** una aplicación web funciona porque distintos componentes cooperan; cada uno resuelve una parte del recorrido de los datos.
+
+## 3. Procesamiento en el backend
+
+El servidor puede responder con archivos ya preparados o ejecutar lógica para construir la respuesta. Una API ofrece operaciones que una interfaz puede solicitar, por ejemplo consultar un catálogo o recuperar información de una cuenta. El backend interpreta la solicitud, valida los datos y comprueba los permisos antes de realizar la operación.
+
+Cuando necesita información persistente, consulta una base de datos. Esa consulta no debe depender de que el navegador se comporte correctamente: las restricciones importantes se verifican en el servidor. La base de datos conserva registros y relaciones; el backend decide qué información puede entregar al cliente y en qué formato.
+
+Una aplicación distribuida reparte tareas entre distintos procesos o equipos. Puede existir separación entre servidor web, aplicación y almacenamiento, sin que sea obligatorio usar microservicios. Para un proyecto pequeño, una organización sencilla suele facilitar el seguimiento de la solicitud. Lo relevante es reconocer dónde se procesa cada paso y cómo se gestionan los errores.
+
+La respuesta de una API suele contener datos estructurados. El frontend puede utilizarlos para actualizar una parte de la pantalla sin descargar nuevamente toda la página.
+
+## 4. Cómo construye la pantalla el navegador
+
+El navegador interpreta el HTML y crea una representación de la estructura del documento. Procesa también el CSS para calcular la presentación: colores, tamaños, distribución y otras propiedades. Después determina la geometría de los elementos y pinta el resultado. Este recorrido explica por qué un recurso tardío puede cambiar la posición o apariencia de una página ya visible.
+
+JavaScript añade comportamiento. Puede reaccionar a eventos, modificar elementos del documento y solicitar datos al servidor. El frontend incluye esa interacción, además de la estructura y los estilos. Una interfaz bien organizada distingue entre esperar datos, mostrarlos y comunicar que ocurrió un error.
+
+El contenido inicial puede llegar como HTML preparado por el servidor o construirse parcialmente en el navegador. También existen combinaciones de ambos enfoques. Ninguno elimina la necesidad de pensar en accesibilidad, formularios comprensibles y estados de carga. La técnica elegida debe responder a las necesidades del sitio.
+
+Por ejemplo, una página informativa puede ofrecer su contenido directamente, mientras que una herramienta interactiva puede necesitar solicitudes adicionales para mantener actualizados sus datos.
+
+## 5. Caché y una visión completa del recorrido
+
+La caché guarda temporalmente recursos o respuestas para reutilizarlos. Puede actuar en el navegador, en servicios intermedios o dentro de la infraestructura del servidor. Su utilidad depende de reglas que indiquen cuándo una copia sigue siendo válida. Reutilizar archivos estáticos es distinto de conservar información personal o datos que cambian con frecuencia.
+
+Al investigar un problema, conviene seguir el recorrido completo: resolución del dominio, conexión, solicitud, procesamiento, respuesta y renderizado. Una pantalla vacía puede deberse a una excepción de JavaScript; una operación rechazada puede ser una validación del backend. No todos los fallos visuales se originan en el mismo componente.
+
+Entender la arquitectura cliente-servidor permite hacer preguntas concretas: qué recurso se pidió, qué respondió el servidor y cómo utilizó esa respuesta la interfaz. Esa forma de observar una aplicación resulta más útil que tratarla como una sola pieza que simplemente funciona o falla.
+
+::::
+
+::: {.article-tags}
+#web · #dns
+:::
+
+:::: {.article-navigation}
+::: {.article-navigation-item}
+[← Artículo anterior: Computación en la nube](../computacion-nube/index.qmd)
+:::
+::::
+
+::::::

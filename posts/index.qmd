@@ -1,13 +1,356 @@
 ---
-title: "Artículos"
-description: "Artículos sobre desarrollo de software, tecnologías de la información y proyectos académicos."
-author: []
+title: ""
+pagetitle: "Artículos y proyectos"
+author: ""
+format:
+  html:
+    body-classes: content-catalog
+    title-block-style: none
 toc: false
-listing:
-  contents: "**/*.qmd"
-  type: default
-  sort: "date desc"
-  categories: true
 ---
 
-Aquí compartiré artículos técnicos y aprendizajes de mis proyectos. Las primeras publicaciones están en preparación.
+::: {.catalog-intro}
+
+[REGISTRO DE CONTENIDO]{.eyebrow}
+
+# Artículos y proyectos
+
+Explora artículos, aprendizajes y proyectos sobre desarrollo, tecnología e innovación digital.
+
+:::
+
+
+:::::: {#contenido .catalog-grid}
+
+
+::::: {#articulo-01 .catalog-card}
+
+::: {.catalog-image}
+:::
+
+:::: {.catalog-card-body}
+
+[Desarrollo web]{.catalog-category}
+
+::: {.catalog-meta}
+12 Mar 2026 · 5 min
+:::
+
+## Introducción al desarrollo web moderno {.catalog-title}
+
+::: {.catalog-description}
+Ecosistema actual de componentes, APIs REST y buenas prácticas de desarrollo web interactivo.
+:::
+
+::: {.catalog-tags}
+#frontend #api
+:::
+
+[Leer artículo →](introduccion-desarrollo-web/index.qmd){.catalog-link}
+
+::::
+
+:::::
+
+
+::::: {#articulo-02 .catalog-card}
+
+::: {.catalog-image}
+:::
+
+:::: {.catalog-card-body}
+
+[Inteligencia Artificial]{.catalog-category}
+
+::: {.catalog-meta}
+08 Mar 2026 · 7 min
+:::
+
+## ¿Qué es la inteligencia artificial? {.catalog-title}
+
+::: {.catalog-description}
+Fundamentos de algoritmos de aprendizaje, redes neuronales y su impacto en la ingeniería digital.
+:::
+
+::: {.catalog-tags}
+#ai #deeplearning
+:::
+
+[Leer artículo →](inteligencia-artificial/index.qmd){.catalog-link}
+
+::::
+
+:::::
+
+
+::::: {#articulo-03 .catalog-card}
+
+::: {.catalog-image}
+:::
+
+:::: {.catalog-card-body}
+
+[Bases de Datos]{.catalog-category}
+
+::: {.catalog-meta}
+28 Feb 2026 · 6 min
+:::
+
+## Fundamentos de bases de datos {.catalog-title}
+
+::: {.catalog-description}
+Modelado entidad-relación, optimización de consultas SQL y cuándo adoptar soluciones NoSQL.
+:::
+
+::: {.catalog-tags}
+#sql #nosql
+:::
+
+[Leer artículo →](fundamentos-bases-datos/index.qmd){.catalog-link}
+
+::::
+
+:::::
+
+
+::::: {#articulo-04 .catalog-card}
+
+::: {.catalog-image}
+:::
+
+:::: {.catalog-card-body}
+
+[Redes]{.catalog-category}
+
+::: {.catalog-meta}
+25 Feb 2026 · 5 min
+:::
+
+## Introducción a las redes de computadoras {.catalog-title}
+
+::: {.catalog-description}
+Modelo OSI, protocolos TCP/IP, enrutamiento básico y seguridad perimetral para estudiantes.
+:::
+
+::: {.catalog-tags}
+#tcpip #osi
+:::
+
+[Leer artículo →](introduccion-redes/index.qmd){.catalog-link}
+
+::::
+
+:::::
+
+
+::::: {#articulo-05 .catalog-card}
+
+::: {.catalog-image}
+:::
+
+:::: {.catalog-card-body}
+
+[Programación]{.catalog-category}
+
+::: {.catalog-meta}
+20 Feb 2026 · 4 min
+:::
+
+## Git y GitHub para estudiantes {.catalog-title}
+
+::: {.catalog-description}
+Control de versiones distribuido, resolución de conflictos y flujo de trabajo colaborativo.
+:::
+
+::: {.catalog-tags}
+#git #workflow
+:::
+
+[Leer artículo →](git-github-estudiantes/index.qmd){.catalog-link}
+
+::::
+
+:::::
+
+
+::::: {#articulo-06 .catalog-card}
+
+::: {.catalog-image}
+:::
+
+:::: {.catalog-card-body}
+
+[Programación]{.catalog-category}
+
+::: {.catalog-meta}
+18 Feb 2026 · 6 min
+:::
+
+## Principios de programación y arquitectura limpia {.catalog-title}
+
+::: {.catalog-description}
+Patrones de diseño esenciales, refactorización y escritura de código limpio y mantenible.
+:::
+
+::: {.catalog-tags}
+#solid #patterns
+:::
+
+[Leer artículo →](programacion-arquitectura-limpia/index.qmd){.catalog-link}
+
+::::
+
+:::::
+
+
+::::: {#articulo-07 .catalog-card}
+
+::: {.catalog-image}
+:::
+
+:::: {.catalog-card-body}
+
+[Desarrollo Móvil]{.catalog-category}
+
+::: {.catalog-meta}
+16 Feb 2026 · 5 min
+:::
+
+## Desarrollo de aplicaciones móviles {.catalog-title}
+
+::: {.catalog-description}
+Comparativa entre desarrollo nativo y multiplataforma, ciclo de vida y experiencia de usuario.
+:::
+
+::: {.catalog-tags}
+#ios #android
+:::
+
+[Leer artículo →](desarrollo-aplicaciones-moviles/index.qmd){.catalog-link}
+
+::::
+
+:::::
+
+
+::::: {#articulo-08 .catalog-card}
+
+::: {.catalog-image}
+:::
+
+:::: {.catalog-card-body}
+
+[Seguridad]{.catalog-category}
+
+::: {.catalog-meta}
+10 Feb 2026 · 6 min
+:::
+
+## Ciberseguridad y protección de datos {.catalog-title}
+
+::: {.catalog-description}
+Higiene digital, criptografía básica y mitigación de vulnerabilidades comunes en software.
+:::
+
+::: {.catalog-tags}
+#owasp #infosec
+:::
+
+[Leer artículo →](ciberseguridad-proteccion-datos/index.qmd){.catalog-link}
+
+::::
+
+:::::
+
+
+::::: {#articulo-09 .catalog-card}
+
+::: {.catalog-image}
+:::
+
+:::: {.catalog-card-body}
+
+[Cloud Computing]{.catalog-category}
+
+::: {.catalog-meta}
+05 Feb 2026 · 8 min
+:::
+
+## Computación en la nube {.catalog-title}
+
+::: {.catalog-description}
+Infraestructura como servicio, microservicios, contenedores Docker y escalabilidad elástica.
+:::
+
+::: {.catalog-tags}
+#devops #docker
+:::
+
+[Leer artículo →](computacion-nube/index.qmd){.catalog-link}
+
+::::
+
+:::::
+
+
+::::: {#articulo-10 .catalog-card}
+
+::: {.catalog-image}
+:::
+
+:::: {.catalog-card-body}
+
+[Desarrollo web]{.catalog-category}
+
+::: {.catalog-meta}
+12 Sep 2026 · 8 min
+:::
+
+## Cómo funciona una aplicación web moderna {.catalog-title}
+
+::: {.catalog-description}
+DNS, renderizado web, navegadores, computación distribuida y procesamiento de aplicaciones modernas.
+:::
+
+::: {.catalog-tags}
+#web #dns
+:::
+
+[Leer artículo →](aplicacion-web-moderna/index.qmd){.catalog-link}
+
+::::
+
+:::::
+
+
+::::: {#proyecto-puravida .catalog-card}
+
+::: {.catalog-image}
+:::
+
+:::: {.catalog-card-body}
+
+[Proyecto]{.catalog-category}
+
+::: {.catalog-meta}
+Proyecto integrador
+:::
+
+## PuraVida {.catalog-title}
+
+::: {.catalog-description}
+Aplicación web MVP para digitalizar la operación diaria de una fonda local ubicada en Suchiapa, Chiapas.
+:::
+
+::: {.catalog-tags}
+#react #springboot #mysql
+:::
+
+[Ver proyecto →](../proyectos/puravida/index.qmd){.catalog-link}
+
+::::
+
+:::::
+
+
+::::::

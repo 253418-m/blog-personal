@@ -1,0 +1,113 @@
+---
+title: "Principios de programación y arquitectura limpia"
+description: "Patrones de diseño esenciales, refactorización y escritura de código limpio y mantenible."
+author: Miguel
+date: 2026-02-18
+categories: [Programación]
+body-classes: article-page
+title-block-style: none
+toc: false
+---
+
+:::::: {.article-detail}
+
+::::: {.article-header}
+
+[← Volver a todo el contenido](../index.qmd){.article-back}
+
+::: {.article-kicker}
+PROGRAMACIÓN
+:::
+
+# Principios de programación y arquitectura limpia
+
+::: {.article-lead}
+Patrones de diseño esenciales, refactorización y escritura de código limpio y mantenible.
+:::
+
+::: {.article-meta}
+Miguel  
+18 Feb 2026 · 6 min
+:::
+
+:::::
+
+---
+
+:::: {.article-body}
+
+::: {.article-intro}
+Un programa puede producir el resultado esperado y, aun así, resultar difícil de modificar. Cuando una función mezcla cálculos, acceso a datos y presentación, cualquier cambio exige comprender demasiadas cosas al mismo tiempo. Organizar el código busca reducir esa dificultad, especialmente cuando una tarea pasa de una persona a otra. La arquitectura limpia, los principios de diseño y la refactorización ofrecen herramientas para pensar esa organización. Su valor depende de resolver problemas concretos con claridad, sin imponer estructuras más grandes que la aplicación que intentan mejorar.
+:::
+
+## 1. Responsabilidades, funciones y nombres
+
+Separar responsabilidades significa distinguir qué propósito cumple cada parte del programa. Una función que calcula un importe no debería necesitar conocer cómo dibujar un botón. Del mismo modo, una regla del negocio puede expresarse sin depender de detalles de una pantalla. Esta separación permite revisar y cambiar una responsabilidad con menos efectos sobre las demás.
+
+Las funciones y los módulos pequeños ayudan cuando tienen una tarea coherente. Pequeño no significa cumplir una cantidad fija de líneas: importa que sea posible resumir su intención y entender sus entradas, su resultado y sus efectos. Dividir cada operación trivial en otro archivo puede dificultar la lectura tanto como concentrar todo en una sola función.
+
+Los nombres aportan contexto. `calcularTotalPedido` explica más que `procesar`, siempre que describa realmente lo que hace la función. También conviene conservar un vocabulario consistente para los mismos conceptos. Si pedido y orden representan la misma entidad, alternarlos sin criterio obliga al lector a resolver una ambigüedad innecesaria.
+
+Los comentarios resultan útiles para explicar una decisión o una restricción que el código no revela. Repetir literalmente una instrucción añade ruido; explicar por qué existe una regla ayuda a conservarla durante una modificación.
+
+## 2. Acoplamiento, cohesión y SOLID
+
+La cohesión expresa cuánto se relacionan las responsabilidades dentro de un módulo. Un módulo cohesivo reúne elementos que participan en un mismo propósito. El acoplamiento describe las dependencias entre partes: cuando una modificación pequeña obliga a cambiar muchos lugares, puede existir una dependencia demasiado fuerte o mal organizada.
+
+SOLID agrupa cinco principios de diseño orientado a objetos que ayudan a examinar esas relaciones:
+
+- **Responsabilidad única:** agrupar lo que cambia por la misma razón y separar responsabilidades distintas.
+- **Abierto/cerrado:** favorecer extensiones sin tener que modificar continuamente partes estables.
+- **Sustitución de Liskov:** las implementaciones sustituibles deben respetar las expectativas del contrato que comparten.
+- **Segregación de interfaces:** evitar obligar a un consumidor a depender de operaciones que no necesita.
+- **Inversión de dependencias:** hacer que las políticas relevantes dependan de abstracciones adecuadas, en lugar de detalles concretos.
+
+Estos principios no exigen crear una interfaz por cada clase ni anticipar todas las funcionalidades posibles. Por ejemplo, si una regla de cálculo recibe datos ya preparados, puede probarse sin conectarse a una base de datos. La separación aporta una ventaja concreta. En cambio, inventar varias capas alrededor de un cálculo trivial puede añadir más trabajo que claridad.
+
+## 3. Capas y patrones con un propósito
+
+Una arquitectura por capas básica puede distinguir presentación, lógica de aplicación y acceso a datos. La presentación recibe entradas y muestra resultados; la lógica coordina tareas y aplica reglas; el acceso a datos se ocupa de guardar y consultar información. Los límites deben facilitar que cada parte cumpla su función con dependencias explícitas.
+
+Clean Architecture propone proteger las reglas centrales frente a detalles externos mediante una dirección controlada de las dependencias. Puede ser útil cuando existen reglas que deben mantenerse aunque cambie una interfaz o una tecnología. No constituye una regla universal: un script breve, un sitio estático o una aplicación pequeña pueden requerir una organización mucho más sencilla.
+
+Los patrones de diseño describen soluciones recurrentes, pero deben responder a una necesidad reconocible. Estrategia permite intercambiar formas de realizar una operación bajo un contrato común. Adaptador ayuda a presentar una interfaz compatible para una dependencia existente. Un repositorio puede concentrar operaciones de persistencia, aunque añadirlo sin una necesidad real solo introduce otro recorrido para seguir el código.
+
+Antes de aplicar un patrón conviene describir el problema en palabras sencillas. Si esa explicación no existe, probablemente sea temprano para añadir la abstracción.
+
+## 4. Refactorizar sin cambiar el comportamiento
+
+Refactorizar consiste en mejorar la estructura interna manteniendo el comportamiento observable. Renombrar una variable, extraer una función o retirar duplicación pueden ser refactorizaciones. Añadir una nueva regla funcional es otro tipo de cambio, aunque se realice durante la misma sesión de trabajo. La [definición de refactorización de Martin Fowler](https://martinfowler.com/books/refactoring.html) destaca las transformaciones pequeñas que conservan el comportamiento.
+
+Un proceso prudente empieza por comprender qué hace el código y cómo comprobarlo. Después se elige una mejora concreta, se aplica y se verifica el resultado. Separar cambios estructurales de nuevas funcionalidades facilita detectar qué provocó un problema y revisar la intención de cada modificación.
+
+Las pruebas existentes aportan una red de comprobación, pero su presencia no elimina la necesidad de revisar los casos importantes. Si todavía no hay pruebas, puede ser útil documentar entradas y resultados esperados antes de reorganizar una parte delicada. No hace falta reescribir todo el proyecto para mejorar un nombre o extraer una responsabilidad bien delimitada.
+
+## 5. Mantenibilidad y decisiones proporcionadas
+
+La mantenibilidad se aprecia al realizar cambios: cuánto contexto necesitamos, qué partes deben tocarse y qué tan fácil es comprobar el resultado. Una estructura entendible permite localizar responsabilidades, mientras que las dependencias ocultas obligan a investigar el sistema completo para resolver una tarea pequeña.
+
+> **Idea clave:** una buena organización hace visibles las responsabilidades y mantiene cada decisión técnica en proporción al problema que resuelve.
+
+Para revisar un módulo, conviene preguntar si sus nombres explican la intención, si mezcla responsabilidades y si puede comprenderse sin perseguir demasiados archivos. También ayuda identificar reglas repetidas y dependencias que dificultan las pruebas. Estas preguntas producen mejoras concretas sin necesitar una arquitectura nueva para cada aplicación.
+
+El objetivo final es que otra persona, o quien retome el proyecto más adelante, pueda entender por qué existe cada parte. Empezar con funciones claras, módulos coherentes y cambios pequeños proporciona una base sólida. Las capas y los patrones pueden incorporarse cuando el crecimiento del sistema revele una necesidad que esas herramientas resuelvan de forma visible.
+
+::::
+
+::: {.article-tags}
+#solid · #patterns
+:::
+
+:::: {.article-navigation}
+
+::: {.article-navigation-item}
+[← Artículo anterior: Git y GitHub para estudiantes](../git-github-estudiantes/index.qmd)
+:::
+
+::: {.article-navigation-item .article-navigation-next}
+[Siguiente artículo: Desarrollo de aplicaciones móviles →](../desarrollo-aplicaciones-moviles/index.qmd)
+:::
+
+::::
+
+::::::

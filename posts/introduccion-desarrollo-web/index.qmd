@@ -1,0 +1,111 @@
+---
+title: "Introducción al desarrollo web moderno"
+description: "Ecosistema actual de componentes, APIs REST y buenas prácticas de desarrollo web interactivo."
+author: Miguel
+date: 2026-03-12
+categories: ["Desarrollo web"]
+body-classes: article-page
+title-block-style: none
+toc: false
+---
+
+:::::: {.article-detail}
+
+::::: {.article-header}
+
+[← Volver a todo el contenido](../index.qmd){.article-back}
+
+::: {.article-kicker}
+DESARROLLO WEB
+:::
+
+# Introducción al desarrollo web moderno
+
+::: {.article-lead}
+Ecosistema actual de componentes, APIs REST y buenas prácticas de desarrollo web interactivo.
+:::
+
+::: {.article-meta}
+Miguel  
+12 Mar 2026 · 5 min
+:::
+
+:::::
+
+---
+
+:::: {.article-body}
+
+::: {.article-intro}
+Desarrollar para la web consiste en construir experiencias que las personas utilizan desde un navegador. Una página puede presentar información, mientras que una aplicación también permite consultar datos, realizar acciones y recibir respuestas. El desarrollo web moderno reúne esas posibilidades mediante tecnologías que colaboran entre sí. Para comprenderlo conviene empezar por sus responsabilidades básicas: cómo se estructura una interfaz, dónde se procesa la información y de qué manera se comunican ambas partes. Con esa base resulta más sencillo elegir herramientas sin depender de un framework concreto.
+:::
+
+## 1. Una aplicación con responsabilidades distintas
+
+El **frontend** es la parte con la que interactúa la persona: formularios, navegación, mensajes y contenido visible. Su tarea incluye presentar información con claridad y responder a acciones como escribir, seleccionar o enviar datos. También debe considerar distintos tamaños de pantalla, dispositivos de entrada y necesidades de accesibilidad.
+
+El **backend** atiende solicitudes y aplica las reglas de la aplicación. Puede comprobar permisos, validar datos y consultar una base de datos. Aunque el navegador permita seleccionar una opción, el servidor debe verificar que esa operación sea válida. La interfaz ayuda a utilizar el sistema; las decisiones sensibles requieren controles donde se procesa la solicitud.
+
+Esta separación describe responsabilidades y admite implementaciones diferentes. Una página informativa puede publicarse como archivos estáticos. Otra aplicación puede generar páginas en el servidor o actualizar partes de la pantalla desde el navegador. Lo importante es entender dónde ocurre cada tarea y qué información necesita.
+
+## 2. HTML, CSS y JavaScript como fundamentos
+
+**HTML** expresa la estructura y el significado del contenido. Encabezados, párrafos, enlaces, listas y formularios permiten organizar una página de manera que pueda interpretarse tanto visualmente como mediante tecnologías de asistencia. Elegir un botón para una acción y un enlace para navegar aporta un comportamiento coherente.
+
+**CSS** controla la presentación: tipografía, colores, espaciado y distribución. Sus herramientas de diseño permiten adaptar una misma estructura a pantallas amplias y pequeñas. Un diseño responsive también considera textos largos, tamaños de letra y controles fáciles de utilizar.
+
+**JavaScript** incorpora comportamiento cuando la experiencia lo requiere. Puede gestionar eventos, actualizar contenido o solicitar información al servidor. Su presencia no sustituye una estructura semántica ni exige convertir todas las páginas en aplicaciones complejas. Primero conviene identificar la interacción necesaria y después decidir cómo implementarla.
+
+## 3. Componentes e interfaces comprensibles
+
+Un componente agrupa una parte de la interfaz con una responsabilidad concreta. Puede ser una tarjeta, un formulario o una barra de navegación. La idea ayuda a mantener consistencia: si varias pantallas comparten un elemento, definir sus reglas evita resolverlo de manera distinta en cada lugar.
+
+La reutilización también necesita límites. Un componente que intenta cubrir demasiadas situaciones puede terminar siendo difícil de comprender. Resulta más útil separar responsabilidades claras y documentar qué datos recibe, qué muestra y qué acciones permite. Estos criterios pueden aplicarse con HTML y CSS o con herramientas que faciliten la composición de interfaces.
+
+### Estados que también forman parte del diseño
+
+Una interfaz debe contemplar lo que ocurre mientras carga información, cuando una consulta no devuelve resultados y cuando una operación falla. Mostrar un mensaje comprensible y permitir corregir una entrada son decisiones de diseño tan necesarias como elegir colores. Los datos de la aplicación y lo que ve la persona deben mantenerse coherentes.
+
+> **Idea clave:** una interfaz bien organizada permite comprender tanto las acciones disponibles como el estado actual de la información.
+
+## 4. APIs REST y comunicación con el servidor
+
+Una **API** establece una forma de comunicación entre programas. En una API orientada a REST, los recursos suelen identificarse mediante direcciones y se utilizan métodos HTTP para expresar operaciones. Por ejemplo, `GET` solicita una representación y `POST` puede enviar datos para crear un recurso o iniciar una operación.
+
+El navegador prepara una solicitud con la dirección, el método y la información necesaria. El servidor la recibe, comprueba sus condiciones y devuelve una respuesta. Esa respuesta incluye un estado HTTP y puede contener datos, frecuentemente en JSON. El frontend interpreta el resultado y actualiza la interfaz.
+
+Una respuesta debe comprobarse antes de asumir que la operación terminó correctamente. Los errores de validación, los permisos insuficientes y los problemas de conexión requieren tratamientos diferentes. Compartir un contrato claro sobre campos, formatos y respuestas ayuda a coordinar frontend y backend.
+
+La comunicación tampoco debe exponer credenciales privadas del servidor. El código enviado al navegador puede inspeccionarse. Por eso los secretos y las comprobaciones de autorización pertenecen a los componentes que puedan protegerlos adecuadamente.
+
+## 5. Herramientas y buenas prácticas para comenzar
+
+Las herramientas de desarrollo ayudan a escribir, inspeccionar y mantener el sitio. Un editor facilita trabajar con archivos; las herramientas del navegador permiten revisar estructura, estilos y solicitudes; el control de versiones registra cambios. Otros procesos pueden preparar recursos o verificar el código, según las necesidades del proyecto.
+
+Antes de añadir una herramienta conviene explicar qué problema resuelve. Una página pequeña no necesita todas las piezas de una aplicación grande. Mantener una estructura sencilla permite dedicar más atención al contenido, la legibilidad y el funcionamiento.
+
+Algunas prácticas útiles son:
+
+- Utilizar nombres que expliquen la responsabilidad de archivos y funciones.
+- Validar entradas y mostrar mensajes que permitan corregirlas.
+- Probar la navegación y los formularios con teclado y en pantallas pequeñas.
+- Mantener separados contenido, presentación y reglas de la aplicación.
+- Revisar qué datos se envían y qué permisos exige cada operación.
+
+Comprender estos fundamentos permite construir una base sólida y evaluar nuevas herramientas con criterio. El objetivo es que la solución responda a una necesidad concreta y que su organización pueda explicarse, revisarse y mantenerse.
+
+::::
+
+::: {.article-tags}
+#frontend · #api
+:::
+
+:::: {.article-navigation}
+
+::: {.article-navigation-item .article-navigation-next}
+[Siguiente artículo: ¿Qué es la inteligencia artificial? →](../inteligencia-artificial/index.qmd)
+:::
+
+::::
+
+::::::

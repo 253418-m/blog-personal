@@ -1,0 +1,111 @@
+---
+title: "Computación en la nube"
+description: "Infraestructura como servicio, microservicios, contenedores Docker y escalabilidad elástica."
+author: Miguel
+date: 2026-02-05
+categories: [Cloud Computing]
+body-classes: article-page
+title-block-style: none
+toc: false
+---
+
+:::::: {.article-detail}
+
+::::: {.article-header}
+
+[← Volver a todo el contenido](../index.qmd){.article-back}
+
+::: {.article-kicker}
+CLOUD COMPUTING
+:::
+
+# Computación en la nube
+
+::: {.article-lead}
+Infraestructura como servicio, microservicios, contenedores Docker y escalabilidad elástica.
+:::
+
+::: {.article-meta}
+Miguel  
+05 Feb 2026 · 8 min
+:::
+
+:::::
+
+---
+
+:::: {.article-body}
+
+::: {.article-intro}
+La computación en la nube permite utilizar recursos de procesamiento, almacenamiento y software mediante servicios accesibles por red. En lugar de adquirir y administrar toda la infraestructura física, una organización puede solicitar recursos a un proveedor y ajustar su uso según las necesidades. Esto cambia la forma de desplegar aplicaciones, pero no elimina las responsabilidades técnicas. Todavía es necesario organizar datos, configurar permisos, observar el funcionamiento y controlar los recursos consumidos. Para entender la nube conviene separar sus modelos de servicio de las tecnologías que pueden utilizarse dentro de ellos.
+:::
+
+## 1. Infraestructura local y servicios en la nube
+
+En una infraestructura local, la organización suele encargarse del equipo físico, la red y las tareas necesarias para mantenerlos operativos. En la nube, parte de esas responsabilidades se traslada al proveedor. El alcance de esa transferencia depende del servicio contratado: administrar una máquina virtual es diferente de utilizar una aplicación ya preparada.
+
+La nube facilita solicitar recursos sin instalar físicamente cada servidor. Sin embargo, una aplicación alojada allí sigue dependiendo de conexiones, configuraciones y componentes que pueden fallar. La ubicación del servicio no garantiza por sí sola seguridad, disponibilidad ni rendimiento.
+
+También existen combinaciones de infraestructura local y servicios remotos. La decisión depende de las necesidades del proyecto, sus restricciones y la capacidad de administración del equipo. Comprender quién mantiene cada componente permite distribuir responsabilidades y evitar supuestos incorrectos. El proveedor puede cuidar el hardware mientras el equipo sigue siendo responsable de sus usuarios, datos y reglas de acceso.
+
+## 2. IaaS, PaaS y SaaS
+
+Los modelos de servicio describen cuánto administra el proveedor y cuánto conserva bajo su control quien utiliza la nube. No son tecnologías intercambiables, sino niveles distintos de responsabilidad.
+
+- **IaaS, infraestructura como servicio:** ofrece recursos como máquinas virtuales, redes y almacenamiento. El usuario administra normalmente el sistema operativo y el software de la aplicación.
+- **PaaS, plataforma como servicio:** proporciona un entorno para desplegar aplicaciones y delega una parte mayor de la administración de infraestructura. El equipo se concentra en código, configuración y datos.
+- **SaaS, software como servicio:** entrega una aplicación lista para utilizar, como una herramienta de colaboración. Quien la usa gestiona cuentas y opciones disponibles, sin desplegar su código.
+
+Delegar tareas reduce algunas cargas operativas, pero también introduce restricciones propias del servicio. La comparación debe considerar compatibilidad, permisos, respaldo y capacidad de trasladar información. Tener menos acceso a la infraestructura puede ser conveniente si el objetivo principal es utilizar una función y no administrar servidores.
+
+## 3. Máquinas virtuales, contenedores y Docker
+
+Una máquina virtual utiliza virtualización para ejecutar un sistema operativo sobre recursos administrados por un entorno anfitrión. Permite separar entornos de ejecución y asignarles memoria, procesamiento y almacenamiento. Desde la perspectiva de una aplicación, puede funcionar como un servidor donde se instalan sus dependencias.
+
+Los contenedores empaquetan una aplicación con sus dependencias de ejecución, compartiendo el núcleo del sistema operativo anfitrión. Esta diferencia evita tratar un contenedor como si fuera una máquina virtual completa. El aislamiento y la configuración siguen requiriendo atención; empaquetar software no lo vuelve automáticamente seguro.
+
+Docker es un ejemplo de herramientas para crear imágenes y ejecutar contenedores. Una imagen describe un entorno reproducible; un contenedor es una instancia en ejecución de esa imagen. Los datos que deben sobrevivir a su eliminación necesitan una estrategia explícita de persistencia, como volúmenes o servicios externos.
+
+Los contenedores pueden apoyar una arquitectura de microservicios, donde varias funciones se ejecutan como servicios separados. No obstante, un monolito también puede ejecutarse en un contenedor. Adoptar microservicios introduce comunicación y coordinación adicionales; esa complejidad debe responder a una necesidad concreta.
+
+## 4. Escalabilidad y disponibilidad
+
+Escalar significa ajustar la capacidad para atender una carga de trabajo. La escalabilidad vertical aumenta recursos de una instancia; la horizontal agrega instancias. La elasticidad describe la capacidad de ajustar recursos conforme cambia la demanda, en ocasiones mediante reglas automatizadas.
+
+Agregar instancias no resuelve cualquier problema. Si todas dependen de una base de datos saturada, el límite puede permanecer. Además, almacenar sesiones o archivos únicamente dentro de una instancia complica distribuir las solicitudes. La aplicación debe diseñarse considerando dónde viven sus datos y cómo se comparten.
+
+> **Idea clave:** la nube ofrece herramientas para aumentar capacidad y recuperarse de fallos, pero la aplicación debe estar preparada para utilizarlas correctamente.
+
+La disponibilidad busca mantener el servicio accesible. Distribuir componentes, comprobar su estado y preparar recuperación puede reducir interrupciones, aunque también aumenta la operación necesaria. Un respaldo conserva información; una réplica ayuda a mantener otra copia disponible. Sus objetivos se relacionan, pero no son equivalentes.
+
+Antes de automatizar escalado conviene observar métricas como consumo de recursos y tiempos de respuesta. Esa observación permite identificar el componente que necesita atención y comprobar si el cambio mejora el comportamiento esperado.
+
+## 5. Consumo, proveedores y decisiones responsables
+
+El cobro bajo demanda relaciona el costo con recursos utilizados, aunque cada servicio tiene su propia forma de medir consumo. Procesamiento, almacenamiento y transferencia de datos pueden formar parte de ese cálculo. Una instancia olvidada o información acumulada sin revisión puede seguir generando consumo aunque el proyecto no esté en uso.
+
+Para un ejercicio académico, entender el costo comienza por identificar qué recursos se necesitan y durante cuánto tiempo. Conviene definir límites, observar el consumo y retirar recursos que ya no cumplen una función. Usar la nube tampoco implica que todo deba alojarse allí: un entorno local puede ser suficiente para desarrollar y estudiar una aplicación.
+
+AWS, Microsoft Azure y Google Cloud son ejemplos de proveedores de servicios en la nube. Sus catálogos incluyen distintas opciones, pero elegir una requiere revisar documentación y necesidades concretas. El nombre del proveedor no sustituye esa evaluación.
+
+Comprender modelos de servicio, persistencia, escalabilidad y responsabilidades ayuda a formular mejores decisiones. La nube resulta más fácil de explicar cuando se parte del problema y se elige un conjunto de recursos proporcionado al alcance real del proyecto.
+
+::::
+
+::: {.article-tags}
+#devops · #docker
+:::
+
+:::: {.article-navigation}
+
+::: {.article-navigation-item}
+[← Artículo anterior: Ciberseguridad y protección de datos](../ciberseguridad-proteccion-datos/index.qmd)
+:::
+
+::: {.article-navigation-item .article-navigation-next}
+[Siguiente artículo: Cómo funciona una aplicación web moderna →](../aplicacion-web-moderna/index.qmd)
+:::
+
+::::
+
+::::::

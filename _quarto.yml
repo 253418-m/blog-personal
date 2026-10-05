@@ -1,26 +1,37 @@
-project:
+﻿project:
   type: website
   output-dir: _site
-
 lang: es
-
 website:
   title: "Miguel Dev Blog"
   description: "Blog personal sobre desarrollo de software, tecnologías de la información y proyectos académicos."
   navbar:
+    title: "Miguel Molina"
+    background: white
+    foreground: "#082B4C"
     left:
       - href: index.qmd
         text: Inicio
       - href: posts/index.qmd
-        text: Artículos
-      - href: proyectos.qmd
-        text: Proyectos
+        text: Contenido
+
       - href: about.qmd
         text: Sobre mí
-  page-footer: "Miguel Dev Blog · Desarrollo de software y tecnologías de la información"
-
+  page-footer:
+    background: "#082B4C"
+    foreground: white
+    left: "**Miguel Dev Blog** · Blog & Portafolio"
+    right:
+      - href: index.qmd
+        text: Inicio
+      - href: posts/index.qmd
+        text: Contenido
+      - href: about.qmd
+        text: Sobre mí
 format:
   html:
     theme: cosmo
     css: styles.css
+    anchor-sections: false
     toc: false
+    page-layout: full

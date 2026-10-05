@@ -1,8 +1,0 @@
----
-title: "Blog"
-description: "Artículos sobre desarrollo de software, tecnologías de la información y proyectos académicos."
----
-
-Aquí compartiré artículos técnicos y aprendizajes de mis proyectos. Las primeras publicaciones están en preparación.
-
-[Consultar el listado de artículos](posts/index.qmd).

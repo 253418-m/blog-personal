@@ -1,0 +1,138 @@
+---
+title: "PuraVida"
+description: "PuraVida es una aplicación web MVP orientada a digitalizar la operación diaria de una fonda local ubicada en Suchiapa, Chiapas."
+author: Miguel
+categories: [Proyecto]
+title-block-style: none
+body-classes: article-page
+toc: false
+---
+
+:::::: {.article-detail .project-detail}
+
+::::: {.article-header}
+[← Volver a todo el contenido](../../posts/index.qmd){.article-back}
+
+::: {.article-kicker}
+PROYECTO INTEGRADOR
+:::
+
+# PuraVida
+
+::: {.article-lead}
+PuraVida es una aplicación web MVP orientada a digitalizar la operación diaria de una fonda local ubicada en Suchiapa, Chiapas.
+:::
+
+::: {.article-meta}
+Miguel · Proyecto académico
+:::
+:::::
+
+---
+
+:::: {.article-body}
+
+::: {.article-intro}
+El proyecto reúne dos perspectivas de una misma operación: la del cliente que consulta el menú y realiza un pedido, y la de la encargada que mantiene la información de la fonda y revisa las solicitudes. Su objetivo es reducir procesos manuales y facilitar el control operativo diario mediante una plataforma web sencilla. Esta página describe el alcance y las decisiones del proyecto, sin atribuirle resultados empresariales ni un despliegue que no estén documentados.
+:::
+
+## 1. El problema
+
+El contexto documentado del portafolio identifica actividades cotidianas por organizar: publicar el menú, recibir pedidos y registrar ventas. PuraVida propone reunir esas actividades en un mismo entorno digital para una fonda local de Suchiapa, Chiapas.
+
+El problema se aborda desde la coordinación de la información. El cliente necesita saber si el establecimiento está abierto y qué ofrece ese día. La encargada necesita mantener el menú y controlar qué pedidos acepta o rechaza. El proyecto no parte de cifras de ventas, tiempos medidos ni estudios de usuarios; su propósito es representar una solución tecnológica adaptada a esas tareas.
+
+## 2. La propuesta
+
+La propuesta es una aplicación web MVP: un producto con un alcance inicial delimitado. Incluye una parte pública para consultar información y una parte autenticada para realizar y gestionar operaciones.
+
+El visitante puede consultar el estado abierto o cerrado, revisar el menú y registrarse. El cliente autenticado puede realizar pedidos, consultar su historial y revisar notificaciones internas. La encargada gestiona el estado, el menú, las solicitudes, las ventas manuales y la información de seguimiento.
+
+> **Idea clave:** el alcance de PuraVida se concentra en conectar pedidos y gestión cotidiana, con reglas claras para cada actor.
+
+## 3. ¿Cómo funciona?
+
+El recorrido general del cliente es:
+
+1. Visitar la página pública y consultar el estado de la fonda.
+2. Revisar el menú del día.
+3. Registrarse o iniciar sesión para poder ordenar.
+4. Preparar el carrito y enviar el pedido desde la aplicación.
+5. Esperar la revisión de la encargada.
+6. Consultar la aceptación o el rechazo y las notificaciones internas.
+
+Solo los clientes autenticados pueden realizar pedidos. Si la fonda está cerrada, no se permite enviarlos. Las solicitudes requieren aceptación manual; cuando se rechazan, deben incluir un motivo. Este flujo conserva la intervención de la encargada en la decisión sobre cada pedido.
+
+## 4. Gestión de la fonda
+
+La encargada puede cambiar el estado de apertura y editar un menú que varía diariamente. También revisa los pedidos recibidos y decide si los acepta o rechaza. Las notificaciones se muestran dentro de la aplicación; el alcance no incluye mensajes por SMS ni notificaciones push.
+
+Las ventas presenciales se registran manualmente. Esta función permite incorporar operaciones que no nacen de un pedido enviado desde la aplicación. El dashboard, las estadísticas y los reportes semanales PDF forman parte de las herramientas de consulta contempladas para la gestión.
+
+La distinción entre ventas manuales y pedidos aceptados es importante: ambos aportan información al seguimiento, pero corresponden a recorridos de registro diferentes.
+
+## 5. Tecnologías utilizadas
+
+Las tecnologías conocidas del proyecto se distribuyen así:
+
+- **React:** construcción de la interfaz a partir de componentes.
+- **Vite:** herramientas para desarrollar y preparar el frontend.
+- **JavaScript:** lógica e interacción del cliente web.
+- **Java y Spring Boot:** implementación del backend y sus operaciones.
+- **MySQL:** persistencia de la información del proyecto.
+- **JWT con control por roles:** autenticación y control de acceso según el actor.
+
+El control por roles distingue las acciones del cliente y de la encargada. El uso de un token forma parte de la autenticación; las autorizaciones siguen siendo responsabilidad del backend. La elección de estas tecnologías no implica que el portafolio esté construido con ellas: el sitio que presenta el caso sigue siendo Quarto.
+
+## 6. Arquitectura
+
+El frontend utiliza una organización modular por funcionalidades basada en FSD ligero. Esta organización busca agrupar responsabilidades de la interfaz de forma comprensible y mantener una separación entre las distintas funciones de la aplicación.
+
+El backend se describe como una arquitectura hexagonal ligera dentro de un monolito modular. La idea es distinguir la lógica de negocio de los mecanismos que permiten recibir solicitudes y persistir información. Al ser un monolito modular, la separación de responsabilidades no exige desplegar cada módulo como un servicio independiente.
+
+MySQL proporciona la persistencia. El enfoque es mantener límites claros dentro de una aplicación cuyo tamaño corresponde a un MVP, sin presentar la arquitectura como un sistema empresarial de mayor alcance.
+
+## 7. Datos y estadísticas
+
+Las estadísticas consolidan información de pedidos aceptados y ventas manuales. No existe una tabla persistida llamada `ventas_unificadas`: la consolidación se realiza mediante consultas sobre los datos correspondientes.
+
+Esta decisión distingue los registros que se almacenan de la información que se obtiene al consultarlos. El resumen estadístico reúne los datos necesarios para la gestión sin describirse como una tercera fuente de ventas.
+
+Los reportes semanales pueden descargarse en PDF. No se atribuyen métricas comerciales al proyecto; se documenta la funcionalidad de consulta y reporte incluida en su alcance.
+
+## 8. Alcance del MVP
+
+El alcance incluido comprende:
+
+- Landing pública, estado abierto o cerrado y menú del día.
+- Registro, inicio de sesión, carrito y pedidos desde la aplicación.
+- Aceptación o rechazo manual, con motivo en los rechazos.
+- Notificaciones internas e historial de pedidos.
+- Registro manual de ventas.
+- Dashboard, estadísticas y reportes semanales PDF.
+
+Quedan fuera del MVP los pagos en línea, una aplicación móvil, múltiples sucursales, inventario, proveedores, fidelización, SMS, notificaciones push, reservaciones e integración con redes sociales. Esta delimitación evita confundir una posible ampliación futura con una funcionalidad incluida.
+
+## 9. Estado del proyecto
+
+Los archivos existentes del portafolio presentan PuraVida como un proyecto académico y una propuesta de aplicación web para la fonda. La información disponible documenta su propósito y alcance, pero no establece una fecha de finalización ni un estado de despliegue.
+
+Por tanto, este caso no lo identifica como terminado, publicado o en producción. El estado deberá actualizarse cuando exista información verificable del proyecto que permita describirlo con mayor precisión.
+
+## 10. Aprendizajes
+
+El caso permite trabajar la organización de requisitos a partir de actores, acciones y reglas de negocio. Separar la consulta pública de las operaciones autenticadas ayuda a relacionar la interfaz con el control por roles.
+
+También permite estudiar el modelado de datos, la distinción entre pedidos y ventas manuales, y la separación de responsabilidades entre frontend, backend y persistencia. La delimitación del MVP muestra cómo mantener una propuesta abordable sin incorporar funcionalidades ajenas a su objetivo.
+
+Estos aprendizajes se relacionan con las decisiones documentadas del proyecto. No implican resultados medidos en la fonda ni experiencia de operación en producción.
+
+::::
+
+::: {.article-tags}
+#react · #springboot · #mysql
+:::
+
+[Volver a Contenido →](../../posts/index.qmd){.article-back}
+
+::::::

@@ -1,0 +1,115 @@
+---
+title: "¿Qué es la inteligencia artificial?"
+description: "Fundamentos de algoritmos de aprendizaje, redes neuronales y su impacto en la ingeniería digital."
+author: Miguel
+date: 2026-03-08
+categories: ["Inteligencia Artificial"]
+body-classes: article-page
+title-block-style: none
+toc: false
+---
+
+:::::: {.article-detail}
+
+::::: {.article-header}
+
+[← Volver a todo el contenido](../index.qmd){.article-back}
+
+::: {.article-kicker}
+INTELIGENCIA ARTIFICIAL
+:::
+
+# ¿Qué es la inteligencia artificial?
+
+::: {.article-lead}
+Fundamentos de algoritmos de aprendizaje, redes neuronales y su impacto en la ingeniería digital.
+:::
+
+::: {.article-meta}
+Miguel  
+08 Mar 2026 · 7 min
+:::
+
+:::::
+
+---
+
+:::: {.article-body}
+
+::: {.article-intro}
+La inteligencia artificial aparece en herramientas que reconocen imágenes, recomiendan contenido, procesan lenguaje o ayudan a identificar patrones. Sin embargo, esas aplicaciones no utilizan necesariamente el mismo método ni resuelven los mismos problemas. Comprender sus fundamentos permite distinguir capacidades concretas de expectativas demasiado amplias. Para un estudiante de tecnologías de la información, la pregunta inicial puede ser práctica: qué tarea realiza el sistema, qué información necesita y cómo se comprueba que sus resultados son útiles. A partir de ahí se puede estudiar su funcionamiento con mayor claridad.
+:::
+
+## 1. IA, aprendizaje automático y aprendizaje profundo
+
+La **inteligencia artificial** es un campo que estudia sistemas capaces de realizar tareas asociadas con capacidades como reconocer patrones, razonar, planificar o utilizar lenguaje. Incluye enfoques diferentes. Algunos trabajan con reglas y conocimiento expresado explícitamente; otros ajustan su comportamiento a partir de datos.
+
+El **aprendizaje automático**, también llamado *machine learning*, pertenece a este campo. En lugar de programar cada condición de una respuesta, se construye un modelo que aprende relaciones a partir de ejemplos. Esto no significa que deje de necesitar decisiones humanas: alguien define el problema, selecciona datos y decide cómo evaluar el resultado.
+
+El **aprendizaje profundo**, o *deep learning*, es una familia de técnicas de aprendizaje automático basada en redes neuronales con varias capas. Es útil para determinadas tareas, pero no es la única forma de desarrollar un sistema de IA. Elegir un enfoque requiere considerar los datos disponibles, la complejidad del problema y las restricciones del proyecto.
+
+## 2. Los datos y el proceso de entrenamiento
+
+Entrenar un modelo consiste en ajustar sus parámetros mediante un procedimiento que busca mejorar su desempeño en una tarea. El objetivo depende del problema. Un sistema puede aprender a clasificar mensajes, estimar una cantidad o descubrir agrupaciones entre ejemplos.
+
+En el aprendizaje **supervisado**, los ejemplos incluyen una respuesta esperada. En el **no supervisado**, se explora la estructura de datos sin esas etiquetas. El aprendizaje **por refuerzo** utiliza señales de recompensa para aprender decisiones mediante interacción con un entorno. Son categorías generales, y un sistema puede combinar técnicas.
+
+Los datos necesitan preparación. Hay que revisar registros incompletos, inconsistencias, errores de etiquetado y si los ejemplos representan la situación en la que se utilizará el modelo. Una colección grande no garantiza calidad. Si ciertos casos quedan fuera, el resultado puede funcionar peor precisamente donde más se necesita.
+
+### Aprender ejemplos y generalizar
+
+Para evaluar el aprendizaje se reservan datos que no se utilizan para ajustar el modelo. Así se observa su comportamiento frente a ejemplos distintos. Memorizar el conjunto de entrenamiento puede producir resultados aparentemente buenos sin aprender relaciones útiles para casos nuevos. Evitar esta confusión es parte central del trabajo técnico.
+
+## 3. Redes neuronales a nivel conceptual
+
+Una red neuronal procesa datos mediante capas de unidades conectadas. Cada unidad combina valores de entrada usando parámetros y aplica una transformación. El resultado pasa a otras unidades hasta producir la salida del modelo. Estas operaciones permiten representar relaciones que pueden ser difíciles de expresar mediante reglas sencillas.
+
+Durante el entrenamiento se compara la salida con el objetivo mediante una función de pérdida. Un procedimiento de optimización modifica los parámetros para reducir ese error. En muchas redes se calculan gradientes que indican cómo influyen los parámetros en la pérdida. La explicación conceptual no implica que todas las arquitecturas trabajen exactamente igual.
+
+Distintas estructuras se adaptan a datos diferentes. Las imágenes, las secuencias y el lenguaje plantean necesidades particulares. También cambian el objetivo de entrenamiento y la manera de utilizar el modelo después. Una red que clasifica una imagen y un sistema que genera texto pueden compartir fundamentos matemáticos, pero sus comportamientos y criterios de evaluación son distintos.
+
+> **Idea clave:** un resultado convincente debe evaluarse frente a la tarea y los datos; la apariencia de inteligencia no demuestra que la respuesta sea correcta.
+
+## 4. Aplicaciones dentro de la ingeniería digital
+
+La IA puede apoyar procesos que implican reconocer relaciones en información. En una aplicación, un clasificador podría organizar mensajes por tema. Un sistema de recomendación puede ordenar opciones según señales de interacción. Una herramienta de visión puede identificar características de una imagen, mientras que otra procesa voz o texto.
+
+Integrar un modelo en software requiere más que ejecutar una predicción. Es necesario preparar la entrada, manejar respuestas inesperadas y decidir cómo se presenta el resultado. También hay que establecer qué ocurre cuando el servicio falla o cuando la confianza disponible no basta para tomar una decisión.
+
+La evaluación debe ajustarse a la tarea. Un modelo de clasificación puede estudiarse mediante los tipos de aciertos y errores que produce. En una herramienta generativa también interesa comprobar fidelidad, pertinencia y consistencia. La selección de métricas y ejemplos depende de lo que significa una respuesta útil en ese contexto.
+
+## 5. Limitaciones y uso responsable
+
+Un modelo puede equivocarse cuando recibe datos distintos a los que conoció durante el entrenamiento. También puede reproducir sesgos presentes en la información utilizada. Las respuestas de un sistema generativo pueden contener afirmaciones incorrectas aunque estén redactadas con fluidez. Por eso sus resultados necesitan revisión cuando se utilizan para explicar hechos o apoyar decisiones.
+
+El uso responsable comienza por definir límites claros. Se debe considerar qué datos se recopilan, quién puede acceder a ellos y si es necesario utilizarlos. La información personal o confidencial exige cuidado durante la preparación de datos y la integración del servicio.
+
+Al revisar una solución conviene preguntar:
+
+- ¿Qué tarea específica resuelve y qué queda fuera de su alcance?
+- ¿Con qué ejemplos se evaluó y cuáles siguen sin estar representados?
+- ¿Qué consecuencias tendría una respuesta equivocada?
+- ¿Puede una persona revisar o corregir el resultado?
+- ¿Se informa con claridad cuándo interviene un sistema automatizado?
+
+Estudiar inteligencia artificial implica aprender técnicas y también reconocer sus límites. Una base sólida permite construir soluciones útiles, documentar sus condiciones de uso y mantener el juicio humano en las decisiones que lo requieren.
+
+::::
+
+::: {.article-tags}
+#ai · #deeplearning
+:::
+
+:::: {.article-navigation}
+
+::: {.article-navigation-item}
+[← Artículo anterior: Introducción al desarrollo web moderno](../introduccion-desarrollo-web/index.qmd)
+:::
+
+::: {.article-navigation-item .article-navigation-next}
+[Siguiente artículo: Fundamentos de bases de datos →](../fundamentos-bases-datos/index.qmd)
+:::
+
+::::
+
+::::::

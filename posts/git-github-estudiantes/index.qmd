@@ -1,0 +1,127 @@
+---
+title: "Git y GitHub para estudiantes"
+description: "Control de versiones distribuido, resolución de conflictos y flujo de trabajo colaborativo."
+author: Miguel
+date: 2026-02-20
+categories: [Programación]
+body-classes: article-page
+title-block-style: none
+toc: false
+---
+
+:::::: {.article-detail}
+
+::::: {.article-header}
+
+[← Volver a todo el contenido](../index.qmd){.article-back}
+
+::: {.article-kicker}
+PROGRAMACIÓN
+:::
+
+# Git y GitHub para estudiantes
+
+::: {.article-lead}
+Control de versiones distribuido, resolución de conflictos y flujo de trabajo colaborativo.
+:::
+
+::: {.article-meta}
+Miguel  
+20 Feb 2026 · 4 min
+:::
+
+:::::
+
+---
+
+:::: {.article-body}
+
+::: {.article-intro}
+En un proyecto académico es común guardar archivos con nombres como final, final_corregido o entrega_nueva. Ese método deja de ser cómodo cuando varias personas editan el mismo trabajo o cuando necesitamos saber por qué cambió una función. El control de versiones registra la evolución del proyecto y permite comparar estados. Git y GitHub ayudan a trabajar con ese historial, aunque cumplen funciones distintas. Comprender sus conceptos básicos permite colaborar sin depender de intercambiar carpetas completas y sin perder el contexto de cada modificación.
+:::
+
+## 1. Git y el repositorio
+
+Git es un sistema de control de versiones distribuido. Un repositorio local contiene el historial del proyecto, de modo que muchas operaciones pueden realizarse sin conexión a Internet. GitHub es una plataforma que aloja repositorios y ofrece herramientas para organizar la colaboración; Git puede utilizarse sin GitHub y también con otros servicios.
+
+El repositorio no es únicamente una carpeta de archivos. Además del contenido que editamos, conserva información sobre cambios y relaciones entre versiones. Cuando clonamos un repositorio obtenemos una copia de trabajo y su historial disponible. Esto permite examinar cómo se llegó a un estado, comparar modificaciones y recuperar versiones registradas.
+
+Para empezar conviene distinguir tres espacios: los archivos del directorio de trabajo, el área de preparación y el historial confirmado. Editar un archivo no lo incorpora automáticamente a un commit. Primero elegimos qué cambios preparar; después los registramos. Esta separación permite revisar una modificación antes de guardarla en el historial y evitar que una entrega mezcle tareas sin relación.
+
+## 2. Commits que expliquen los cambios
+
+Un commit registra un estado del proyecto y lo conecta con su historial anterior. Incluye información del autor y un mensaje que debe explicar la modificación. Un buen commit reúne cambios relacionados: corregir una validación o añadir una sección concreta resulta más comprensible que registrar de golpe todas las modificaciones de varios días.
+
+Un recorrido breve para guardar un archivo puede ser:
+
+```bash
+git status
+git add archivo.qmd
+git commit -m "Aclara la introducción del artículo"
+```
+
+`git status` muestra el estado de la copia de trabajo. `git add` prepara el contenido indicado y `git commit` registra lo preparado. El nombre del archivo del ejemplo debe sustituirse por un archivo real del proyecto; estos comandos explican el proceso y no necesitan ejecutarse para leer el artículo.
+
+Antes de confirmar, revisa qué archivos se incluirán. Los archivos generados o temporales pueden excluirse mediante `.gitignore`, cuando corresponde. No deben agregarse contraseñas, claves o archivos privados. El historial conserva versiones, por lo que quitar un secreto de la versión actual no basta para retirarlo de commits anteriores.
+
+## 3. Ramas e integración del trabajo
+
+Una rama, o *branch*, identifica una línea de desarrollo dentro del repositorio. Permite trabajar en una modificación sin incorporarla inmediatamente a la rama compartida. No implica duplicar manualmente toda la carpeta ni crear un proyecto independiente.
+
+Para crear una rama y pasar a ella pueden utilizarse:
+
+```bash
+git branch mejora-documentacion
+git switch mejora-documentacion
+```
+
+Las modificaciones se registran en la rama actual. Cuando están listas, pueden integrarse mediante un *merge*, que combina historias de desarrollo. En algunos casos la integración avanza directamente hasta el trabajo nuevo; en otros, Git necesita combinar cambios de ambas líneas. La [documentación oficial de Git sobre ramas e integración](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) describe estas situaciones.
+
+En un equipo pequeño basta acordar una rama compartida y utilizar ramas de trabajo con nombres comprensibles. Crear muchas ramas sin propósito añade confusión. También conviene integrar avances con frecuencia razonable: cuanto más se separan las modificaciones, más contexto necesita el equipo para revisar cómo encajan.
+
+## 4. GitHub y la colaboración
+
+El repositorio remoto funciona como un punto de intercambio entre las copias del equipo. `git push` envía commits al remoto; `git pull` obtiene cambios y los integra según la configuración y las opciones utilizadas. Guardar un commit local no significa que los demás ya puedan verlo, y subir archivos no reemplaza la necesidad de revisar el trabajo.
+
+Una solicitud de cambios, o *pull request*, permite proponer una integración en GitHub. Allí pueden describirse la tarea, los archivos afectados y la forma de verificar el resultado. Los comentarios ayudan a discutir decisiones antes de incorporarlas a la rama compartida. Esta revisión también sirve en trabajos académicos para explicar contribuciones y detectar errores de interpretación.
+
+Un flujo sencillo puede organizarse así:
+
+1. Acordar una tarea concreta y quién la realizará.
+2. Actualizar la copia local antes de comenzar.
+3. Crear una rama y hacer cambios pequeños.
+4. Revisar y confirmar los archivos necesarios.
+5. Subir la rama y abrir una solicitud de cambios.
+6. Revisar el resultado, integrarlo y actualizar las demás copias.
+
+La herramienta no decide cómo distribuir tareas. El equipo debe comunicar cambios que afecten archivos compartidos, respetar convenciones y evitar sobrescribir aportes sin revisar.
+
+## 5. Conflictos y hábitos para mantener el historial
+
+Un conflicto aparece cuando Git no puede decidir automáticamente cómo combinar ciertos cambios. Puede ocurrir si dos ramas modifican la misma zona de un archivo de maneras distintas. No significa que el proyecto se perdió: requiere que una persona interprete las versiones y prepare el contenido correcto.
+
+Para resolverlo, se revisan los archivos señalados, se elige o combina el contenido y se retiran las marcas de conflicto. Después debe comprobarse que el resultado funciona, prepararlo y completar la integración. Aceptar una versión entera sin leerla puede descartar cambios necesarios del compañero.
+
+> **Idea clave:** un historial útil explica decisiones; los commits pequeños, las ramas con propósito y la revisión compartida facilitan entenderlas.
+
+Git no sustituye la comunicación ni garantiza que una aplicación sea correcta. Su aporte es conservar cambios y ofrecer mecanismos para integrarlos con trazabilidad. Para un primer proyecto académico, dominar estado, preparación, commit, rama e intercambio remoto suele ser suficiente. Con esos hábitos, cada entrega deja de ser una carpeta aislada y se convierte en una etapa identificable del mismo trabajo.
+
+::::
+
+::: {.article-tags}
+#git · #workflow
+:::
+
+:::: {.article-navigation}
+
+::: {.article-navigation-item}
+[← Artículo anterior: Introducción a las redes de computadoras](../introduccion-redes/index.qmd)
+:::
+
+::: {.article-navigation-item .article-navigation-next}
+[Siguiente artículo: Principios de programación y arquitectura limpia →](../programacion-arquitectura-limpia/index.qmd)
+:::
+
+::::
+
+::::::

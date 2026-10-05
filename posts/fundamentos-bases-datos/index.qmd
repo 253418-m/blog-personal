@@ -1,0 +1,119 @@
+---
+title: "Fundamentos de bases de datos"
+description: "Modelado entidad-relación, optimización de consultas SQL y cuándo adoptar soluciones NoSQL."
+author: Miguel
+date: 2026-02-28
+categories: ["Bases de Datos"]
+body-classes: article-page
+title-block-style: none
+toc: false
+---
+
+:::::: {.article-detail}
+
+::::: {.article-header}
+
+[← Volver a todo el contenido](../index.qmd){.article-back}
+
+::: {.article-kicker}
+BASES DE DATOS
+:::
+
+# Fundamentos de bases de datos
+
+::: {.article-lead}
+Modelado entidad-relación, optimización de consultas SQL y cuándo adoptar soluciones NoSQL.
+:::
+
+::: {.article-meta}
+Miguel  
+28 Feb 2026 · 6 min
+:::
+
+:::::
+
+---
+
+:::: {.article-body}
+
+::: {.article-intro}
+Una aplicación necesita conservar información de forma que pueda recuperarse, actualizarse y relacionarse con otros datos. Una base de datos organiza esa información y un sistema gestor proporciona mecanismos para trabajar con ella. Diseñarla implica más que crear campos: hay que comprender qué representa cada dato, qué relaciones existen y qué reglas deben mantenerse. Para comenzar, el modelo relacional ofrece una base clara. Sus conceptos permiten explicar cómo se representa la información y por qué un diseño cuidadoso evita problemas al utilizarla.
+:::
+
+## 1. Tablas, registros y atributos
+
+En una base de datos relacional, las tablas representan conjuntos de datos con una estructura definida. Cada fila, también llamada registro, describe un elemento; las columnas contienen sus atributos. En un ejemplo académico, una tabla de estudiantes podría guardar un identificador y un nombre. Otra tabla podría representar las asignaturas.
+
+Cada atributo necesita un tipo de dato acorde con su significado. Las fechas, los textos y las cantidades tienen operaciones y reglas distintas. También debe decidirse qué información es obligatoria y cuándo se admite un valor ausente. Un campo vacío no siempre significa lo mismo que un texto sin caracteres o una cantidad igual a cero.
+
+El gestor permite consultar y modificar los registros, pero también puede aplicar restricciones. Estas expresan condiciones como impedir valores duplicados o exigir datos obligatorios. Definirlas ayuda a proteger la coherencia incluso cuando varias partes de una aplicación escriben información.
+
+## 2. Identificadores y modelo entidad-relación
+
+Una **clave primaria** identifica cada registro de manera única. Debe distinguirlo sin ambigüedad y mantenerse estable. El nombre de una persona suele ser una elección inadecuada porque puede repetirse o cambiar. Un identificador separado facilita referirse al registro sin depender de un dato descriptivo.
+
+Una **clave foránea** vincula registros entre tablas. Por ejemplo, una inscripción puede indicar a qué estudiante y a qué asignatura corresponde. La integridad referencial ayuda a evitar referencias a elementos que no existen. También obliga a pensar qué debe ocurrir cuando se elimina o modifica un registro relacionado.
+
+Antes de construir tablas conviene realizar un modelo **entidad-relación**. Las entidades representan elementos relevantes, sus atributos describen características y las relaciones expresan cómo se conectan. La cardinalidad indica cuántos elementos pueden participar en cada lado de una relación.
+
+### Relacionar sin mezclar responsabilidades
+
+Un estudiante puede inscribirse en varias asignaturas y una asignatura puede recibir varios estudiantes. Esa relación se representa mediante una tabla intermedia de inscripciones. Allí también pueden ubicarse atributos que pertenecen a la relación, como su estado. Así se distingue la información del estudiante de la información sobre su participación.
+
+## 3. Normalización y reducción de redundancia
+
+La normalización ayuda a organizar tablas para reducir repeticiones innecesarias y problemas al modificar datos. Si el nombre de una asignatura se copia en cada inscripción, un cambio obliga a actualizar muchos registros. Si alguna actualización se omite, la misma asignatura puede quedar descrita de formas diferentes.
+
+Separar la información de las asignaturas en su propia tabla permite mantener ese dato en un lugar definido. Las inscripciones conservan la referencia correspondiente. El objetivo es que cada atributo dependa de la entidad o relación a la que realmente pertenece.
+
+También conviene evitar listas de valores dentro de una sola columna cuando cada elemento necesita consultarse o relacionarse individualmente. Guardar todas las asignaturas de una persona como texto dificulta buscar inscripciones y aplicar restricciones.
+
+La normalización requiere comprender las reglas del dominio. No consiste en dividir tablas sin criterio. En determinadas aplicaciones se toman decisiones de diseño adicionales por necesidades específicas, pero primero hay que poder explicar qué redundancia se introduce y cómo se conservará su consistencia.
+
+> **Idea clave:** una base de datos bien modelada conserva el significado de la información y hace explícitas las relaciones que la aplicación necesita respetar.
+
+## 4. SQL, consultas y desempeño
+
+**SQL** permite expresar operaciones sobre datos relacionales. Una consulta `SELECT` indica qué columnas se necesitan y puede incluir condiciones mediante `WHERE`. Las uniones, o `JOIN`, combinan registros relacionados. Otras instrucciones permiten insertar, actualizar o eliminar información según los permisos disponibles.
+
+Una consulta debe partir de una pregunta concreta. Para obtener las asignaturas de un estudiante se relacionan estudiantes, inscripciones y asignaturas. Seleccionar únicamente los campos necesarios mejora la claridad y evita transferir información que la aplicación no utiliza.
+
+Los **índices** proporcionan estructuras que pueden facilitar ciertas búsquedas. No deben añadirse sin revisar las consultas: ocupan espacio y también requieren mantenimiento cuando cambian los datos. Un plan de ejecución ayuda a observar cómo el gestor resuelve una consulta y dónde puede existir trabajo innecesario.
+
+Las modificaciones relacionadas pueden necesitar una **transacción**. Esta permite tratar varias operaciones como una unidad, de modo que se confirmen juntas o se reviertan si la operación no puede completarse. Así se evita dejar cambios parciales que incumplan las reglas previstas. El diseño de la transacción debe corresponder a una necesidad real de consistencia.
+
+## 5. NoSQL y elección de una solución
+
+El término **NoSQL** agrupa sistemas con modelos distintos al enfoque relacional tradicional. Algunos organizan documentos, otros pares clave-valor, grafos o familias de columnas. Cada modelo ofrece formas particulares de almacenar, consultar y relacionar información. Sus capacidades varían entre gestores.
+
+Un modelo documental puede resultar útil cuando la aplicación trabaja con estructuras agrupadas y de forma variable. Un grafo puede facilitar consultas centradas en conexiones. Estos ejemplos describen posibilidades; no significan que un modelo sea automáticamente mejor que otro.
+
+Para elegir conviene revisar:
+
+- Qué información se guarda y cómo cambia su estructura.
+- Qué relaciones y consultas necesita la aplicación.
+- Qué garantías de consistencia requieren sus operaciones.
+- Cómo se controlarán accesos, respaldos y recuperación.
+- Qué conocimientos tiene el equipo para mantener la solución.
+
+Aprender bases de datos comienza por representar correctamente el problema. Las herramientas y el rendimiento importan, pero un modelo comprensible permite consultar datos con sentido, prevenir inconsistencias y justificar las decisiones técnicas antes de aumentar la complejidad.
+
+::::
+
+::: {.article-tags}
+#sql · #nosql
+:::
+
+:::: {.article-navigation}
+
+::: {.article-navigation-item}
+[← Artículo anterior: ¿Qué es la inteligencia artificial?](../inteligencia-artificial/index.qmd)
+:::
+
+::: {.article-navigation-item .article-navigation-next}
+[Siguiente artículo: Introducción a las redes de computadoras →](../introduccion-redes/index.qmd)
+:::
+
+::::
+
+::::::

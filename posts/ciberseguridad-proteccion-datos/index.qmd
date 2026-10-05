@@ -1,0 +1,116 @@
+---
+title: "Ciberseguridad y protección de datos"
+description: "Higiene digital, criptografía básica y mitigación de vulnerabilidades comunes en software."
+author: Miguel
+date: 2026-02-10
+categories: [Seguridad]
+body-classes: article-page
+title-block-style: none
+toc: false
+---
+
+:::::: {.article-detail}
+
+::::: {.article-header}
+
+[← Volver a todo el contenido](../index.qmd){.article-back}
+
+::: {.article-kicker}
+SEGURIDAD
+:::
+
+# Ciberseguridad y protección de datos
+
+::: {.article-lead}
+Higiene digital, criptografía básica y mitigación de vulnerabilidades comunes en software.
+:::
+
+::: {.article-meta}
+Miguel  
+10 Feb 2026 · 6 min
+:::
+
+:::::
+
+---
+
+:::: {.article-body}
+
+::: {.article-intro}
+La ciberseguridad busca proteger sistemas, servicios e información frente a accesos indebidos, alteraciones y fallos que interrumpan su uso. No se reduce a instalar una herramienta: incluye decisiones de diseño, hábitos personales y procedimientos de mantenimiento. En un proyecto universitario, cuidar las credenciales, limitar los permisos y planificar respaldos ya forma parte de esa responsabilidad. Comprender estos principios permite reconocer riesgos y aplicar medidas proporcionadas, sin asumir que una aplicación pequeña está libre de problemas ni que una sola medida puede proteger todo el sistema.
+:::
+
+## 1. Qué se protege y por qué
+
+La confidencialidad significa que la información solo está disponible para quienes tienen autorización. La integridad busca que los datos conserven su exactitud y que sus cambios sean legítimos. La disponibilidad permite acceder al servicio cuando se necesita. Estos objetivos se relacionan, pero requieren medidas distintas: cifrar un archivo no garantiza que exista un respaldo recuperable.
+
+Antes de elegir controles conviene identificar qué información maneja el proyecto. No tiene el mismo impacto perder una preferencia de interfaz que exponer datos personales o permitir cambios en una cuenta ajena. Un inventario sencillo de datos, actores y operaciones ayuda a distinguir esas situaciones.
+
+El principio de mínimo privilegio propone conceder únicamente los permisos necesarios. Una cuenta destinada a consultar reportes no necesita modificar usuarios. Esta separación reduce el alcance de errores y accesos indebidos. También permite explicar con claridad qué puede hacer cada rol y comprobar que el servidor aplica esas reglas.
+
+## 2. Contraseñas y autenticación
+
+La autenticación verifica una identidad; la autorización determina qué acciones se permiten después. Iniciar sesión no implica tener acceso a toda la aplicación. Cada operación sensible debe comprobar los permisos de quien la solicita, incluso si la interfaz no muestra un botón para ejecutarla.
+
+Para el uso personal, es conveniente utilizar contraseñas largas y distintas entre servicios. Un gestor de contraseñas ayuda a organizar credenciales sin depender de la memoria. La autenticación multifactor agrega una comprobación adicional, aunque no sustituye el cuidado de los dispositivos ni la revisión de solicitudes sospechosas.
+
+Al desarrollar software, las contraseñas no deben almacenarse como texto legible ni con un cifrado reversible destinado a recuperarlas. Se utilizan funciones de derivación de contraseñas apropiadas, junto con un valor aleatorio por contraseña conocido como sal. Esa tarea debe apoyarse en bibliotecas mantenidas y configuraciones documentadas.
+
+Las sesiones también requieren atención. Cerrar sesión, gestionar su expiración y evitar que credenciales aparezcan en registros o repositorios son parte del diseño. Los mensajes de error deben informar lo necesario sin revelar información sensible sobre cuentas.
+
+## 3. Cifrado, HTTPS y protección de datos
+
+El cifrado transforma información para que su lectura dependa de una clave. Puede proteger datos almacenados o datos que viajan por una red. Su utilidad depende de administrar correctamente esas claves: incluir una clave secreta en código público puede anular la protección esperada.
+
+HTTPS utiliza TLS para proteger la comunicación entre cliente y servidor y verificar la identidad del servidor mediante certificados. Ayuda a evitar que terceros lean o alteren el tráfico durante el trayecto. Sin embargo, no corrige errores de autorización ni garantiza que la aplicación trate adecuadamente la información cuando ya la recibió.
+
+Proteger datos también significa reducir su exposición desde el inicio. Un formulario debe solicitar solo lo necesario para su propósito. Los registros de diagnóstico no deberían copiar contraseñas, tokens o datos personales completos. Los respaldos necesitan controles de acceso y una forma comprobada de recuperación.
+
+> **Idea clave:** proteger información empieza por decidir qué datos realmente se necesitan, quién puede utilizarlos y durante cuánto tiempo deben conservarse.
+
+Separar ambientes de prueba y datos reales evita trasladar información sensible a lugares donde los controles son más débiles. En ejercicios académicos pueden utilizarse datos de prueba claramente identificados.
+
+## 4. Actualizaciones e ingeniería social
+
+Las actualizaciones pueden corregir errores que afectan la seguridad de sistemas operativos, aplicaciones y dependencias. Mantener un inventario de lo utilizado permite reconocer qué componentes necesitan revisión. Actualizar requiere verificar compatibilidad y funcionamiento, sin dejar versiones desatendidas por falta de organización.
+
+La ingeniería social intenta influir en una persona para que entregue información o realice una acción perjudicial. Un mensaje que aparenta urgencia puede pedir una contraseña, un código de verificación o la apertura de un archivo inesperado. Revisar el contexto y confirmar la solicitud por un canal conocido ayuda a evitar decisiones precipitadas.
+
+Algunas prácticas de higiene digital son:
+
+- Bloquear los dispositivos cuando no se están utilizando.
+- Revisar permisos y accesos que ya no son necesarios.
+- Mantener respaldos separados y comprobar su recuperación.
+- Compartir información únicamente mediante canales adecuados.
+
+Estas medidas funcionan mejor cuando son fáciles de cumplir y están incorporadas al trabajo cotidiano. Una política confusa que nadie comprende difícilmente produce una protección consistente.
+
+## 5. Seguridad en aplicaciones web
+
+Las aplicaciones web deben considerar problemas como inyección, errores de control de acceso y exposición de información sensible. Para prevenir inyección en consultas se utilizan parámetros, evitando construir instrucciones con entradas sin tratar. La validación de datos comprueba formato y reglas del negocio, pero debe complementarse con controles adecuados en cada contexto.
+
+Cuando se muestra información proporcionada por usuarios, es necesario manejarla de acuerdo con el lugar donde aparece. El tratamiento de una entrada en una consulta no es el mismo que su presentación en una página. Las bibliotecas y los frameworks ofrecen mecanismos útiles, pero necesitan emplearse correctamente.
+
+OWASP reúne recursos educativos sobre seguridad de aplicaciones y sirve como referencia general para conocer riesgos y prácticas defensivas. Sus materiales ayudan a formular preguntas de revisión; utilizarlos no equivale a demostrar que un sistema está libre de vulnerabilidades.
+
+La protección debe revisarse durante todo el desarrollo. Definir permisos, manejar secretos, comprobar errores y planificar recuperación permite construir una base más sólida. La seguridad es una responsabilidad continua, apoyada en controles comprensibles y verificables.
+
+::::
+
+::: {.article-tags}
+#owasp · #infosec
+:::
+
+:::: {.article-navigation}
+
+::: {.article-navigation-item}
+[← Artículo anterior: Desarrollo de aplicaciones móviles](../desarrollo-aplicaciones-moviles/index.qmd)
+:::
+
+::: {.article-navigation-item .article-navigation-next}
+[Siguiente artículo: Computación en la nube →](../computacion-nube/index.qmd)
+:::
+
+::::
+
+::::::

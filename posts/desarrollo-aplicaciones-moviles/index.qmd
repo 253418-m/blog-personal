@@ -1,0 +1,112 @@
+---
+title: "Desarrollo de aplicaciones móviles"
+description: "Comparativa entre desarrollo nativo y multiplataforma, ciclo de vida y experiencia de usuario."
+author: Miguel
+date: 2026-02-16
+categories: [Desarrollo Móvil]
+body-classes: article-page
+title-block-style: none
+toc: false
+---
+
+:::::: {.article-detail}
+
+::::: {.article-header}
+
+[← Volver a todo el contenido](../index.qmd){.article-back}
+
+::: {.article-kicker}
+DESARROLLO MÓVIL
+:::
+
+# Desarrollo de aplicaciones móviles
+
+::: {.article-lead}
+Comparativa entre desarrollo nativo y multiplataforma, ciclo de vida y experiencia de usuario.
+:::
+
+::: {.article-meta}
+Miguel  
+16 Feb 2026 · 5 min
+:::
+
+:::::
+
+---
+
+:::: {.article-body}
+
+::: {.article-intro}
+Una aplicación móvil se utiliza en situaciones muy distintas a las de una computadora de escritorio. La persona puede estar caminando, tener una sola mano disponible o perder la conexión mientras realiza una tarea. Además, el sistema operativo comparte memoria, batería y procesamiento entre varias aplicaciones. Desarrollar para este entorno implica pensar tanto en la programación como en esas condiciones de uso. Comprender la plataforma, organizar la navegación y conservar correctamente los datos ayuda a construir una experiencia coherente, incluso cuando la pantalla es pequeña o la actividad se interrumpe.
+:::
+
+## 1. Un entorno con características propias
+
+Android e iOS son plataformas móviles con sus propios sistemas de permisos, herramientas de desarrollo y convenciones de interfaz. Ambas ofrecen capacidades como cámara, ubicación, almacenamiento y notificaciones, pero el acceso a ellas depende de las reglas del sistema. Una aplicación debe solicitar los permisos necesarios y explicar su propósito, en lugar de asumir que todas las funciones estarán disponibles.
+
+La variedad de dispositivos también influye en el diseño. Cambian la resolución, el tamaño de pantalla, la orientación y los recursos de hardware. Una interfaz que se ve bien en un teléfono concreto puede resultar incómoda en otro. Por eso conviene trabajar con distribuciones adaptables y probar diferentes condiciones desde las primeras etapas.
+
+El contexto móvil exige administrar recursos con cuidado. Descargar datos innecesarios o ejecutar trabajo continuo puede afectar la batería y la experiencia. Una primera decisión útil consiste en definir qué tareas necesita resolver la aplicación y qué información requiere cada una. Ese alcance orienta las decisiones técnicas posteriores.
+
+## 2. Desarrollo nativo y multiplataforma
+
+El desarrollo nativo utiliza herramientas y tecnologías propias de cada plataforma. En Android, por ejemplo, Kotlin y Jetpack Compose permiten construir aplicaciones e interfaces dentro de su ecosistema. En iOS, Swift y SwiftUI son ejemplos equivalentes. Este enfoque facilita trabajar directamente con las capacidades y convenciones del sistema, aunque mantener versiones para plataformas diferentes puede requerir esfuerzos separados.
+
+El desarrollo multiplataforma busca compartir una parte del código entre varios sistemas. Según la tecnología elegida, se pueden compartir la lógica, las interfaces o ambas. Esto no elimina las diferencias: permisos, integración con servicios del dispositivo y distribución pueden seguir necesitando ajustes específicos.
+
+Ninguna alternativa es adecuada para todos los proyectos. La elección depende del equipo, las funciones requeridas, las plataformas objetivo y el tiempo disponible para mantener el producto. En un proyecto académico resulta útil justificar esa elección con necesidades concretas. Aprender una herramienta tiene más sentido cuando se entiende qué problemas resuelve y qué responsabilidades siguen presentes.
+
+## 3. Interfaz, experiencia y navegación
+
+La interfaz organiza los elementos que una persona ve y toca; la experiencia de usuario incluye todo el recorrido para completar una tarea. Un formulario puede ser visualmente atractivo y, aun así, resultar difícil de usar si oculta errores o exige demasiados pasos. Conviene priorizar acciones claras, textos comprensibles y respuestas visibles ante cada interacción.
+
+En una aplicación de notas, por ejemplo, crear, editar y consultar una nota deberían tener recorridos previsibles. La navegación debe indicar dónde está la persona, cómo regresar y qué ocurre con sus cambios. Añadir pantallas sin un propósito definido aumenta la confusión y hace más difícil probar el flujo completo.
+
+También es necesario contemplar situaciones habituales:
+
+- Carga de información y ausencia de resultados.
+- Errores de conexión con una forma de reintentar.
+- Tamaños de texto accesibles y controles fáciles de tocar.
+- Confirmación antes de acciones que eliminan información.
+
+> **Idea clave:** una buena experiencia móvil conserva el contexto de la persona y permite continuar una tarea después de una interrupción.
+
+## 4. Ciclo de vida y persistencia de datos
+
+Una aplicación no permanece activa de manera indefinida. Puede pasar a segundo plano cuando se recibe una llamada, cambia la aplicación abierta o se bloquea el dispositivo. El sistema también puede finalizar su proceso para recuperar recursos. El ciclo de vida describe esas transiciones y permite decidir cuándo iniciar, pausar o liberar trabajo.
+
+Guardar información únicamente en variables de memoria es insuficiente para datos que deben sobrevivir al cierre. La persistencia local permite conservar preferencias, registros o información necesaria para trabajar sin conexión. Según el tipo de dato, pueden utilizarse mecanismos de configuración, archivos o una base de datos local.
+
+Debe distinguirse entre el estado temporal de una pantalla y los datos duraderos del usuario. La posición de desplazamiento no tiene el mismo significado que una nota guardada. Definir esa diferencia evita tanto perder información importante como almacenar detalles innecesarios.
+
+Si existe un servidor, aparece otra responsabilidad: sincronizar. Una operación puede quedar pendiente por falta de conexión, y los datos locales pueden diferir de los remotos. La aplicación necesita mostrar esa situación y establecer cómo confirmar cambios. Nunca debe presentar una operación como completada si todavía no tiene evidencia suficiente.
+
+## 5. Pruebas y distribución básica
+
+Las pruebas deben abarcar la lógica y el comportamiento de la interfaz. Una prueba de lógica puede verificar una validación; una prueba del recorrido comprueba que sea posible abrir un formulario, completarlo y observar el resultado. También conviene revisar permisos rechazados, conexión intermitente, rotación y retorno desde segundo plano.
+
+Los emuladores permiten explorar diferentes configuraciones sin disponer de todos los dispositivos. Los equipos físicos ayudan a observar interacción táctil, rendimiento y funciones de hardware en condiciones concretas. Ambos recursos se complementan: probar en un solo entorno deja escenarios sin revisar.
+
+La distribución incluye preparar una versión identificable, firmarla y entregarla por un canal apropiado. Las tiendas de aplicaciones y los canales de pruebas tienen requisitos propios; publicar requiere revisar esos requisitos y describir honestamente las funciones y el uso de datos. Una versión de prueba debe distinguirse de una versión destinada al público.
+
+Desarrollar una aplicación móvil significa coordinar plataforma, interfaz, datos y mantenimiento. Para comenzar, un alcance pequeño con navegación clara y persistencia bien definida permite aprender estas relaciones sin acumular funciones difíciles de sostener.
+
+::::
+
+::: {.article-tags}
+#ios · #android
+:::
+
+:::: {.article-navigation}
+
+::: {.article-navigation-item}
+[← Artículo anterior: Principios de programación y arquitectura limpia](../programacion-arquitectura-limpia/index.qmd)
+:::
+
+::: {.article-navigation-item .article-navigation-next}
+[Siguiente artículo: Ciberseguridad y protección de datos →](../ciberseguridad-proteccion-datos/index.qmd)
+:::
+
+::::
+
+::::::
