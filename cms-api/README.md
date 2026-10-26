@@ -2,7 +2,7 @@
 
 `cms-core-api` es la API interna para gestionar el contenido editorial del Blog Dev y del portafolio personal. Usa FastAPI, Pydantic v2 y Uvicorn, con contratos REST bajo `/api/v1`.
 
-La persistencia usa PostgreSQL, SQLAlchemy 2.x, Alembic y psycopg. El entorno actual utiliza PostgreSQL 18.6 nativo en Windows; Docker Compose ofrece PostgreSQL 16 como alternativa. Incluye el esquema editorial inicial y una migración incremental para usuarios administrativos; los routers siguen sin operaciones de negocio. El desarrollo sigue API-First y los modelos ORM no se exponen como respuestas HTTP.
+La persistencia usa PostgreSQL, SQLAlchemy 2.x, Alembic y psycopg. El entorno actual utiliza PostgreSQL 18.6 nativo en Windows; Docker Compose ofrece PostgreSQL 16 como alternativa. Incluye el esquema editorial, usuarios administrativos y autenticación HTTP con Argon2id y JWT. El desarrollo sigue API-First y los modelos ORM no se exponen como respuestas HTTP.
 
 ## Separación respecto a Quarto
 
@@ -19,7 +19,15 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-Además de FastAPI, Uvicorn y Pydantic v2, se declaran `SQLAlchemy>=2,<3`, `alembic>=1.13,<2`, `psycopg[binary]>=3.1,<4`, `pwdlib[argon2]>=0.3,<0.4` y `uuid6>=2025.0.1,<2026`. Esta última dependencia proporciona UUIDv7 en Python 3.13.
+Además de FastAPI, Uvicorn y Pydantic v2, se declaran `pydantic-settings>=2.13,<3`, `SQLAlchemy>=2,<3`, `alembic>=1.13,<2`, `psycopg[binary]>=3.1,<4`, `pwdlib[argon2]>=0.3,<0.4`, `uuid6>=2025.0.1,<2026` y `PyJWT>=2.10,<3`. UUIDv7 está disponible mediante uuid6 en Python 3.13; la versión de PyJWT validada es 2.15.1.
+
+Para desarrollar y ejecutar la suite, instala también sus dependencias:
+
+```powershell
+python -m pip install -r requirements-dev.txt
+```
+
+`requirements-dev.txt` incluye las dependencias normales y `httpx2>=2,<3`, usado por el TestClient de Starlette 1.10 para las pruebas HTTP.
 
 ## Ejecución de la API
 
@@ -36,7 +44,7 @@ python -m uvicorn app.main:app --reload
 | ReDoc | http://127.0.0.1:8000/redoc |
 | OpenAPI generado | http://127.0.0.1:8000/openapi.json |
 
-Templates, Documents, Workflow, Preview y Metrics son routers vacíos bajo `/api/v1`. El OpenAPI conserva `paths: {}`; `/` y las rutas de negocio responden `404`. La aplicación HTTP puede iniciar sin PostgreSQL porque todavía no utiliza sesiones de persistencia.
+El OpenAPI publica `POST /api/v1/auth/login` y `GET /api/v1/auth/me`. Templates, Documents, Workflow, Preview y Metrics siguen como routers vacíos bajo `/api/v1`; `/` y las rutas editoriales responden `404`. Las operaciones de autenticación utilizan PostgreSQL mediante las sesiones de persistencia existentes.
 
 ## Configuración
 
@@ -47,6 +55,16 @@ APP_ENV=development
 APP_HOST=127.0.0.1
 APP_PORT=8000
 ```
+
+La autenticación requiere además estas opciones:
+
+| Variable | Requisito o valor predeterminado |
+| --- | --- |
+| `JWT_SECRET_KEY` | Obligatoria, secreta y de al menos 32 bytes UTF-8; sin valor predeterminado |
+| `JWT_ALGORITHM` | `HS256`; es el único algoritmo admitido |
+| `JWT_ACCESS_TOKEN_EXPIRE_MINUTES` | `30`; configurable como entero positivo |
+
+`JWT_SECRET_KEY` usa `SecretStr`, se excluye de repr y serialización y no aparece en errores de configuración. La instalación local ya dispone de una clave generada en `.env`; conserva su valor privado y no lo copies a ejemplos, logs ni respuestas HTTP. El entorno real tiene prioridad sobre `.env` también para estas variables.
 
 Para cambiar host o puerto, pásalos también a Uvicorn:
 
@@ -212,19 +230,31 @@ raise SystemExit(subprocess.call([
 '@ | python -
 ```
 
-Estas pruebas trabajan dentro de una transacción que se revierte al terminar; no usan `drop_all()` ni alteran el esquema persistente. Las 24 pruebas administrativas usan una copia temporal privada de `admin_users` por conexión, con los tipos, constraints y defaults reales; no insertan, actualizan ni eliminan registros en `public.admin_users`. Comprueban unicidad, claves foráneas, orden de bloques, JSONB, relaciones ORM y timestamps con zona horaria. Incluyen persistencia administrativa, username duplicado, almacenamiento de hash como texto, último login NULL, desactivación y defaults PostgreSQL. Las pruebas estructurales verifican también el SQL offline de `0002` y su reversión aislada.
+Las pruebas de integración trabajan dentro de una transacción que se revierte al terminar; no usan `drop_all()` ni alteran el esquema persistente. Las 59 pruebas de integración administrativas usan una copia temporal privada de `admin_users` por conexión, con los tipos, constraints y defaults reales; no insertan, actualizan ni eliminan registros en `public.admin_users`. Comprueban persistencia, bootstrap, autenticación y respuestas HTTP con datos ficticios. Las pruebas editoriales verifican unicidad, claves foráneas, orden de bloques, JSONB, relaciones ORM y timestamps con zona horaria. Las pruebas estructurales verifican también el SQL offline de `0002` y su reversión aislada.
 
 Validación del 2026-10-25 sobre PostgreSQL 18.6 nativo en Windows: `SELECT 1`, las migraciones online `0001` y `0002`, el ciclo `0002 → 0001 → 0002`, los tipos y operaciones JSONB, las claves foráneas y las restricciones UNIQUE se comprobaron contra la base real. La base quedó en `0002_add_admin_users` y los datos ficticios se revirtieron.
 
 La validación de persistencia con `python -m unittest discover -s tests -v` finalizó con **45 passed, 0 failed, 0 skipped**; las 19 pruebas de integración se ejecutaron. El test de borrado de una Template referenciada espera correctamente SQLSTATE `23001` para `RESTRICT` en PostgreSQL 18; los casos de referencias inexistentes conservan `23503`.
 
+La suite completa tras implementar autenticación HTTP finalizó con **163 passed, 0 failed, 0 skipped**, incluidas 72 pruebas de integración contra PostgreSQL. Cubre configuración, hashing, bootstrap, repositorio, AuthService, JWT, login, `/auth/me` y sus contratos OpenAPI. Durante esta validación no se inició sesión con el administrador real ni se modificó su registro.
+
 ## Autenticación administrativa
 
-El CMS utilizará usuarios administrativos propios mediante `username + password`. El hashing y la verificación Argon2id ya están implementados con `PasswordHash.recommended()` de pwdlib, sin parámetros criptográficos manuales. Login HTTP, JWT y protección de endpoints permanecen pendientes.
+El CMS utiliza usuarios administrativos propios mediante `username + password`. El hashing y la verificación Argon2id están implementados con `PasswordHash.recommended()` de pwdlib, sin parámetros criptográficos manuales. El login HTTP emite un JWT de acceso y `/auth/me` exige un Bearer válido. La protección se aplica únicamente a `/auth/me`; los routers editoriales siguen sin CRUD ni protección global.
 
 `admin_users` contiene exactamente `user_id`, `username`, `password_hash`, `is_active`, `created_at`, `updated_at` y `last_login_at`. El username es único y la base solo almacena `password_hash` como TEXT: las contraseñas originales nunca se persisten. `app/core/security.py` expone `PasswordHasher`, `hash_password()` y `verify_password()`; la verificación incorrecta o de un hash inválido devuelve `False`. No se retornan hashes mediante HTTP ni mediante el resultado del bootstrap.
 
-`is_active` tiene default `true` en ORM y PostgreSQL, y `last_login_at` comienza como NULL. El bootstrap genera UUIDv7 mediante `uuid6.uuid7()` y suministra timestamps UTC explícitos. No se agregan relaciones con contenido editorial, roles, email, tokens ni sesiones.
+`is_active` tiene default `true` en ORM y PostgreSQL, y `last_login_at` comienza como NULL. El bootstrap genera UUIDv7 mediante `uuid6.uuid7()` y suministra timestamps UTC explícitos. No se agregan roles, email, tablas de tokens o sesiones ni relaciones con contenido editorial.
+
+### Login y consulta del administrador actual
+
+`POST /api/v1/auth/login` recibe JSON con `username` y `password`. Un login válido de una cuenta activa devuelve `200` con exactamente `access_token`, `token_type: "bearer"` y `expires_in` en segundos: `1800` con la configuración predeterminada. AuthService verifica Argon2id y confirma `last_login_at` en UTC dentro de una transacción antes de emitir el token. El UPDATE exige nuevamente `is_active = true`, de modo que una desactivación durante la verificación impide completar el login. Para un username inexistente ejecuta una verificación con un hash ficticio; usuario inexistente, contraseña incorrecta y cuenta inactiva producen el mismo `401`, `{"detail":"Credenciales inválidas."}` y `WWW-Authenticate: Bearer`.
+
+El JWT contiene únicamente `sub` con el UUID del administrador, `iat`, `exp` y `type: "access"`. Se firma y valida exclusivamente con HS256; el token no contiene contraseña ni hash. La validación exige los cuatro claims, un UUID válido y fechas coherentes, además de verificar firma y expiración.
+
+`GET /api/v1/auth/me` recibe `Authorization: Bearer TU_ACCESS_TOKEN`, consulta el usuario actual en PostgreSQL y devuelve `200` con exactamente `user_id`, `username` e `is_active`. Un Bearer ausente, inválido o expirado, o un usuario que ya no existe, produce `401`, `{"detail":"No se pudieron validar las credenciales."}` y `WWW-Authenticate: Bearer`. Una cuenta inactiva con token válido produce `403` y `{"detail":"Cuenta inactiva."}`.
+
+Las solicitudes de login que no cumplen el contrato JSON devuelven `422` con `{"detail":"Solicitud de autenticación inválida."}`, sin reflejar datos recibidos. Los errores de persistencia se presentan como `503` y `{"detail":"Servicio de autenticación no disponible."}`. No se implementan refresh tokens, logout, CRUD editorial ni frontend `cms-admin`.
 
 ### Bootstrap manual del primer administrador
 
@@ -242,19 +272,19 @@ El username se guarda sin espacios exteriores y no puede estar vacío. Como deci
 
 `AdminBootstrapService` y el repositorio SQLAlchemy usan la Session existente y una transacción: crean únicamente el primer administrador activo, con `last_login_at = NULL`. Si existe el username o cualquier administrador, incluso inactivo, el bootstrap se rechaza sin modificarlo. Los intentos concurrentes se serializan mediante un bloqueo transaccional PostgreSQL; se requiere el aislamiento habitual `READ COMMITTED`. La CLI confirma el éxito sin mostrar contraseña ni hash, y SQLAlchemy oculta los parámetros de consultas en logs y errores.
 
-La suite actual ejecuta **89 passed, 0 failed, 0 skipped**: incluye 11 pruebas de configuración, 9 de hashing, 18 de bootstrap/repositorio contra PostgreSQL y 6 de CLI. Los datos de bootstrap son exclusivamente ficticios, se aíslan en tablas temporales y se revierten; el administrador real permanece intacto. Se comprobó la carga local en procesos nuevos sin `DATABASE_URL` heredada, SQLAlchemy conectado a `cms_core` como `cms_user` y Alembic en `0002_add_admin_users (head)`. El esquema persistente y las migraciones permanecen intactos.
+La validación anterior de bootstrap y configuración finalizó con **89 passed, 0 failed, 0 skipped**; la suite completa actual es la de 163 pruebas descrita arriba. Los datos de bootstrap son exclusivamente ficticios, se aíslan en tablas temporales y se revierten; el administrador real permanece intacto. Se comprobó la carga local en procesos nuevos sin `DATABASE_URL` heredada, SQLAlchemy conectado a `cms_core` como `cms_user` y Alembic en `0002_add_admin_users (head)`. El esquema persistente y las migraciones permanecen intactos.
 
-`cms-admin` será una aplicación privada separada del sitio público Quarto. Todavía no se crea su carpeta ni se añade a navegación, sitemap o `docs/`; la futura autenticación y autorización proporcionarán la seguridad del CMS.
+`cms-admin` será una aplicación privada separada del sitio público Quarto. Todavía no se crea su carpeta ni se añade a navegación, sitemap o `docs/`. Los futuros endpoints editoriales deberán incorporar su autorización explícita; el login y `/auth/me` ya están disponibles.
 
 ## Organización y contratos pendientes
 
 | Carpeta | Responsabilidad |
 | --- | --- |
 | `app/api/v1/` | Agregador y routers REST |
-| `app/core/` | Configuración y excepciones |
+| `app/core/` | Configuración, hashing Argon2id, JWT y excepciones |
 | `app/domain/` | Modelos preliminares y estados del dominio |
-| `app/schemas/` | Schemas Pydantic preliminares, sin rutas activas |
-| `app/services/` | Bootstrap administrativo y estructura para futuros casos de uso |
+| `app/schemas/` | Contratos de autenticación y schemas editoriales preliminares |
+| `app/services/` | AuthService, bootstrap administrativo y futuros casos de uso |
 | `app/repositories/` | Abstracciones para persistencia |
 | `app/infrastructure/database/` | Base, sesiones, ORM, repositorio y entrada explícita al bootstrap |
 | `app/cli/` | Bootstrap interactivo del primer administrador |
@@ -263,11 +293,26 @@ La suite actual ejecuta **89 passed, 0 failed, 0 skipped**: incluye 11 pruebas d
 | `postman/` | Preparación de pruebas manuales |
 | `api-docs/` | Plan técnico |
 
-El contrato de persistencia ya define los campos de Template, Document, CanvasBlock y ReviewReport y exige UUIDv7. Los modelos de dominio y schemas HTTP iniciales continúan preliminares; no se actualizan ni conectan a endpoints en esta fase. Aún deben precisarse los cuerpos Create, Update y Response por operación, sus reglas y catálogos pendientes.
+El contrato de persistencia ya define los campos de Template, Document, CanvasBlock y ReviewReport y exige UUIDv7. Los modelos de dominio y schemas HTTP editoriales continúan preliminares y no se conectan a endpoints en esta fase. Aún deben precisarse los cuerpos Create, Update y Response por operación, sus reglas y catálogos pendientes. Los contratos HTTP de autenticación ya están implementados.
 
 ## Postman y próximos contratos
 
-Usa `base_url=http://127.0.0.1:8000`. Las futuras pruebas cubrirán GET, POST, PUT y DELETE, con JSON cuando corresponda. No hay requests de negocio implementados.
+Usa `base_url=http://127.0.0.1:8000`, con la API en ejecución y un administrador existente. Para comprobar la autenticación manualmente en Postman:
+
+1. Crea una petición **POST** a `http://127.0.0.1:8000/api/v1/auth/login`. En **Authorization**, selecciona **No Auth**. En **Body → raw → JSON**, introduce tus credenciales únicamente al realizar la prueba:
+
+   ```json
+   {
+     "username": "TU_USUARIO",
+     "password": "TU_PASSWORD"
+   }
+   ```
+
+2. Envía la petición y comprueba `200`, `token_type: "bearer"` y `expires_in: 1800` con el TTL predeterminado. Copia el `access_token` de esa respuesta para la petición siguiente.
+3. Crea una petición **GET** a `http://127.0.0.1:8000/api/v1/auth/me`. En **Authorization → Bearer Token**, pega el token recibido; Postman enviará `Authorization: Bearer TU_ACCESS_TOKEN`. No necesita body.
+4. Comprueba `200` y que la respuesta contiene únicamente `user_id`, `username` e `is_active`. Para comprobar errores, usa un password ficticio incorrecto en login (`401`) o elimina el Bearer de `/auth/me` (`401`).
+
+Los valores `TU_USUARIO`, `TU_PASSWORD` y `TU_ACCESS_TOKEN` son marcadores, no credenciales. No guardes contraseñas ni tokens reales en colecciones exportadas, ejemplos o archivos del repositorio. Esta fase no incorpora una colección Postman. Las operaciones editoriales GET, POST, PUT y DELETE siguen pendientes.
 
 PATCH permanece `CONTRACT_PENDING`. Live Preview requiere WebSocket y no se implementa todavía. Tampoco se integran un servicio analítico ni un agente de revisión.
 

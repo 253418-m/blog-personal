@@ -58,7 +58,7 @@ class CreateAdminCLITests(unittest.TestCase):
         self.assertNotIn("internal-fixture-never-echo", output.getvalue())
         self.assertNotIn("test-password", output.getvalue())
 
-    def test_fastapi_still_exposes_no_business_or_auth_endpoints(self):
+    def test_fastapi_exposes_only_auth_routes_without_business_endpoints(self):
         from app.main import app
 
-        self.assertEqual(app.openapi()["paths"], {})
+        self.assertEqual(set(app.openapi()["paths"]), {"/api/v1/auth/login", "/api/v1/auth/me"})

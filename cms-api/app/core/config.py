@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import Field, SecretStr, ValidationError, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict, SettingsError
@@ -27,6 +28,16 @@ class Settings(BaseSettings):
     app_host: str = "127.0.0.1"
     app_port: int = 8000
     database_url: SecretStr = Field(repr=False, exclude=True)
+    jwt_secret_key: SecretStr = Field(repr=False, exclude=True)
+    jwt_algorithm: Literal["HS256"] = "HS256"
+    jwt_access_token_expire_minutes: int = Field(default=30, gt=0)
+
+    @field_validator("jwt_secret_key")
+    @classmethod
+    def validate_jwt_secret(cls, value: SecretStr) -> SecretStr:
+        if len(value.get_secret_value().encode("utf-8")) < 32:
+            raise ValueError("JWT_SECRET_KEY debe tener al menos 32 bytes.")
+        return value
 
     @field_validator("database_url")
     @classmethod
@@ -49,7 +60,9 @@ def get_settings() -> Settings:
         errors = error.errors(include_input=False, include_context=False)
         if any(e["loc"] == ("database_url",) and e["type"] == "missing" for e in errors):
             raise RuntimeError("Define DATABASE_URL en el entorno o en el .env local del backend.") from None
-        raise RuntimeError("Configuración inválida; revisa DATABASE_URL y las opciones APP_*.") from None
+        if any(e["loc"] == ("jwt_secret_key",) and e["type"] == "missing" for e in errors):
+            raise RuntimeError("Define JWT_SECRET_KEY en el entorno o en el .env local del backend.") from None
+        raise RuntimeError("Configuración inválida; revisa DATABASE_URL, JWT_* y APP_*.") from None
     except (SettingsError, OSError):
         raise RuntimeError("No se pudo cargar la configuración del entorno o del .env local.") from None
 

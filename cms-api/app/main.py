@@ -16,6 +16,7 @@ app = FastAPI(
     redoc_url="/redoc",
     openapi_url="/openapi.json",
     openapi_tags=[
+        {"name": "auth", "description": "Autenticación administrativa JSON y Bearer JWT."},
         {"name": "templates", "description": "Plantillas editoriales."},
         {"name": "documents", "description": "Documentos administrados por el CMS."},
         {"name": "workflow", "description": "Flujo de revisión y publicación editorial."},
