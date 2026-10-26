@@ -1,13 +1,16 @@
 """Render completo de Quarto en staging y sustitución compensable de docs/."""
 
 from dataclasses import dataclass
+from html.parser import HTMLParser
 import logging
 from pathlib import Path
+import posixpath
 import shutil
 import subprocess
 import tempfile
 from time import monotonic
 from typing import Protocol
+from urllib.parse import urljoin, urlsplit
 
 from app.services.quarto_export import SLUG_PATTERN
 
@@ -29,7 +32,41 @@ class QuartoRenderResult:
 
 
 class QuartoRenderer(Protocol):
-    def render_site(self, *, staging_dir: Path, expected_slug: str) -> QuartoRenderResult: ...
+    def render_site(self, *, staging_dir: Path, expected_slug: str,
+                    expect_post: bool = True) -> QuartoRenderResult: ...
+
+
+class _Links(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.hrefs: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "a":
+            self.hrefs.extend(value for name, value in attrs if name == "href" and value is not None)
+
+
+def validate_rendered_html(stage: Path, slug: str, *, expect_post: bool) -> None:
+    if not (stage / "index.html").is_file():
+        raise QuartoRenderError(RENDER_MESSAGE)
+    post_html = stage / "posts" / slug / "index.html"
+    if expect_post:
+        if not post_html.is_file():
+            raise QuartoRenderError(RENDER_MESSAGE)
+        return
+    listing = stage / "posts" / "index.html"
+    if post_html.exists() or not listing.is_file():
+        raise QuartoRenderError(RENDER_MESSAGE)
+    try:
+        links = _Links()
+        links.feed(listing.read_text(encoding="utf-8"))
+        target = f"/posts/{slug}"
+        for href in links.hrefs:
+            path = posixpath.normpath(urlsplit(urljoin("https://quarto.invalid/posts/index.html", href)).path)
+            if path == target or path == f"{target}/index.html":
+                raise QuartoRenderError(RENDER_MESSAGE)
+    except (OSError, UnicodeError, ValueError):
+        raise QuartoRenderError(RENDER_MESSAGE) from None
 
 
 def validate_project(project_root: Path) -> Path:
@@ -69,7 +106,8 @@ class SubprocessQuartoRenderer:
         self._executable = executable
         self._timeout_seconds = timeout_seconds
 
-    def render_site(self, *, staging_dir: Path, expected_slug: str) -> QuartoRenderResult:
+    def render_site(self, *, staging_dir: Path, expected_slug: str,
+                    expect_post: bool = True) -> QuartoRenderResult:
         root = validate_project(self._project_root)
         if not SLUG_PATTERN.fullmatch(expected_slug) or self._timeout_seconds <= 0:
             raise QuartoRenderError(RENDER_MESSAGE)
@@ -103,9 +141,11 @@ class SubprocessQuartoRenderer:
             raise QuartoRenderError(RENDER_MESSAGE)
         logger.info("render_completed return_code=%s duration_ms=%s", process.returncode,
                     round((monotonic() - started) * 1000))
-        if not (staging_dir / "index.html").is_file() or not (staging_dir / "posts" / expected_slug / "index.html").is_file():
+        try:
+            validate_rendered_html(staging_dir, expected_slug, expect_post=expect_post)
+        except QuartoRenderError:
             logger.error("Quarto render: falta output esperado")
-            raise QuartoRenderError(RENDER_MESSAGE)
+            raise
         logger.info("html_validation_completed")
         return QuartoRenderResult(True, process.returncode, round((monotonic() - started) * 1000))
 
@@ -148,7 +188,7 @@ class QuartoRenderService:
         self._project_root = Path(project_root)
         self._renderer = renderer
 
-    def render_site(self, expected_slug: str) -> QuartoRenderReceipt:
+    def render_site(self, expected_slug: str, *, expect_post: bool = True) -> QuartoRenderReceipt:
         root = validate_project(self._project_root)
         workspace = tempfile.TemporaryDirectory(prefix=".cms-render-", dir=root)
         stage = Path(workspace.name) / "stage"
@@ -158,10 +198,12 @@ class QuartoRenderService:
         moved_docs = False
         phase = "render_start"
         try:
-            result = self._renderer.render_site(staging_dir=stage, expected_slug=expected_slug)
+            result = self._renderer.render_site(staging_dir=stage, expected_slug=expected_slug,
+                                                expect_post=expect_post)
             phase = "render_completed"
-            if not result.success or not (stage / "index.html").is_file() or not (stage / "posts" / expected_slug / "index.html").is_file():
+            if not result.success:
                 raise QuartoRenderError(RENDER_MESSAGE)
+            validate_rendered_html(stage, expected_slug, expect_post=expect_post)
             phase = "html_validation_completed"
             if docs.is_symlink() or (docs.exists() and not docs.is_dir()):
                 raise QuartoRenderError(RENDER_MESSAGE)

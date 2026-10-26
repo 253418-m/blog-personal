@@ -11,12 +11,15 @@ import { useApiData } from '../hooks/useApiData'
 import { missingPublishFields } from '../utils/documentForm'
 import { formatDate } from '../utils/format'
 
-function actionError(action, error) {
+function actionError(action, error, contentType) {
   if (action === 'publish') {
     if (error instanceof ApiError && error.status === 409) return 'No fue posible publicar: el slug o el contenido Quarto ya existe, o cambió el estado.'
     if (error instanceof ApiError && error.status === 422) return 'No fue posible publicar: revisa título, contenido y metadatos obligatorios.'
     if (error instanceof ApiError && error.status === 500) return 'No fue posible publicar el post. El borrador se conservó.'
     return 'No fue posible publicar el documento. Comprueba el estado del borrador.'
+  }
+  if (action === 'archive' && contentType === 'POST' && error instanceof ApiError && error.status === 500) {
+    return 'No fue posible archivar el post. El contenido permanece publicado.'
   }
   if (error instanceof ApiError && error.status === 409) return 'La operación no está permitida para el estado actual.'
   return action === 'delete' ? 'No fue posible eliminar el borrador.' : 'No fue posible archivar el documento.'
@@ -87,9 +90,10 @@ export function DocumentDetailPage() {
       setUpdated(result)
       try { setUpdated(await getDocument(documentId)) } catch { /* La respuesta 200 ya refleja el nuevo estado. */ }
       setFeedback({ tone: 'success', message: action === 'publish'
-        ? 'Post publicado correctamente.' : 'Documento archivado.' })
+        ? 'Post publicado correctamente.' : document.content_type === 'POST'
+          ? 'Post archivado correctamente y retirado del sitio generado.' : 'Documento archivado.' })
     } catch (failure) {
-      setFeedback({ tone: 'error', message: actionError(action, failure) })
+      setFeedback({ tone: 'error', message: actionError(action, failure, document.content_type) })
     } finally {
       setBusy(false)
       setIntent(null)
@@ -109,7 +113,8 @@ export function DocumentDetailPage() {
     </div>
     {location.state?.flash && <Feedback tone="success">{location.state.flash}</Feedback>}
     {feedback && <Feedback tone={feedback.tone}>{feedback.message}</Feedback>}
-    {busy && <p className="page-status" role="status">{intent === 'publish' ? 'Publicando y generando el sitio...' : 'Procesando…'}</p>}
+    {busy && <p className="page-status" role="status">{intent === 'publish' ? 'Publicando y generando el sitio...'
+      : intent === 'archive' && document.content_type === 'POST' ? 'Archivando y actualizando el sitio...' : 'Procesando…'}</p>}
     <section className="panel detail-panel" aria-label="Detalle del documento">
       <dl className="detail-grid">
         <div><dt>Tipo</dt><dd>{document.content_type}</dd></div>
@@ -139,13 +144,16 @@ export function DocumentDetailPage() {
     </div>
     {document.status === 'ARCHIVADO' && <p className="muted">Archivado: no admite nuevas acciones editoriales.</p>}
     {intent && <ConfirmDialog
-      title={intent === 'publish' ? 'Publicar documento' : intent === 'archive' ? 'Archivar documento' : 'Eliminar borrador'}
-      confirmLabel={intent === 'publish' ? 'Publicar ahora' : intent === 'archive' ? 'Archivar ahora' : 'Eliminar borrador'}
+      title={intent === 'publish' ? 'Publicar documento' : intent === 'archive' && document.content_type === 'POST'
+        ? '¿Archivar este post?' : intent === 'archive' ? 'Archivar documento' : 'Eliminar borrador'}
+      confirmLabel={intent === 'publish' ? 'Publicar ahora' : intent === 'archive' ? 'Archivar' : 'Eliminar borrador'}
       danger={intent === 'delete'} busy={busy} onConfirm={confirmAction} onCancel={() => setIntent(null)}>
       {intent === 'publish' ? <p>{document.content_type === 'POST'
         ? 'Al publicar este post ya no podrá editarse. Se generarán el QMD y el sitio Quarto. ¿Deseas continuar?'
         : 'Se publicará este documento. ¿Deseas continuar?'}</p>
-        : intent === 'archive' ? <p>¿Deseas archivar este documento? El estado administrativo cambiará, pero la retirada del sitio público aún no está automatizada.</p>
+        : intent === 'archive' ? <p>{document.content_type === 'POST'
+          ? 'El post se retirará del sitio generado y dejará de aparecer en Contenido. Esta acción no puede deshacerse desde el CMS.'
+          : '¿Deseas archivar este documento? Esta acción no puede deshacerse desde el CMS.'}</p>
           : <p>Esta acción eliminará el borrador. ¿Deseas continuar?</p>}
     </ConfirmDialog>}
   </>

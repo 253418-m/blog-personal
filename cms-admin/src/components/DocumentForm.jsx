@@ -27,14 +27,14 @@ function MetadataFields({ contract, values, errors, onChange, isPost }) {
         {field.expected_type === 'BOOLEAN' ? (
           <>
             <div className="field-label-row">
-              <label className="checkbox-label" htmlFor={id}>
-                <input id={id} type="checkbox" checked={values[field.field_key] === true}
-                  onChange={(event) => onChange(field.field_key, event.target.checked)} />
-                <span>{label}</span>
-              </label>
+              <label htmlFor={id}>{label}</label>
               <HelpTooltip text={help} />
             </div>
             <small className="field-status">{hint}</small>
+            <div className="field-control field-control--checkbox">
+              <input id={id} type="checkbox" checked={values[field.field_key] === true}
+                onChange={(event) => onChange(field.field_key, event.target.checked)} />
+            </div>
           </>
         ) : (
           <>
@@ -101,7 +101,7 @@ export function DocumentForm({ templates, initialDocument, onSubmit, saving = fa
       ...(initialDocument ? {} : { content_type: 'POST' }) })
   }
 
-  return <form className="document-form panel" onSubmit={handleSubmit} noValidate>
+  return <form className="document-form post-form panel" onSubmit={handleSubmit} noValidate>
     <div className="form-note">
       <p>Tipo: <strong>{isPost ? 'Artículo / Post' : 'Página / Landing'}</strong></p>
       {isPost && <p>Este contenido se publicará como un artículo dentro de la sección Contenido del sitio.</p>}

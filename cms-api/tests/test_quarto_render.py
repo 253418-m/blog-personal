@@ -17,13 +17,18 @@ class _FixtureRenderer:
         self.calls = []
         self.fail = False
 
-    def render_site(self, *, staging_dir: Path, expected_slug: str) -> QuartoRenderResult:
+    def render_site(self, *, staging_dir: Path, expected_slug: str,
+                    expect_post: bool = True) -> QuartoRenderResult:
         self.calls.append(expected_slug)
         staging_dir.mkdir()
         (staging_dir / "index.html").write_text("Nuevo inicio", encoding="utf-8")
-        target = staging_dir / "posts" / expected_slug
-        target.mkdir(parents=True)
-        (target / "index.html").write_text("Nuevo post", encoding="utf-8")
+        posts = staging_dir / "posts"
+        posts.mkdir()
+        (posts / "index.html").write_text("Catálogo nuevo", encoding="utf-8")
+        if expect_post:
+            target = posts / expected_slug
+            target.mkdir()
+            (target / "index.html").write_text("Nuevo post", encoding="utf-8")
         if self.fail:
             raise QuartoRenderError("error ficticio")
         return QuartoRenderResult(True, 0, 12)
@@ -102,6 +107,33 @@ class QuartoRenderTests(unittest.TestCase):
             self.service.render_site("nuevo-post")
         self.assertEqual((docs / "original.html").read_bytes(), b"original")
         self.assertEqual(list(self.root.glob('.cms-render-*')), [])
+
+    def test_archive_rejects_stale_post_html_or_listing_link(self):
+        docs = self.root / "docs"
+        docs.mkdir()
+        (docs / "original.html").write_bytes(b"original")
+
+        def stale_render(*, staging_dir, expected_slug, expect_post):
+            staging_dir.mkdir()
+            (staging_dir / "index.html").write_text("Home", encoding="utf-8")
+            posts = staging_dir / "posts"
+            posts.mkdir()
+            (posts / "index.html").write_text(
+                '<a href="nuevo-post/">Still listed</a>' if not stale_html else "No link",
+                encoding="utf-8",
+            )
+            if stale_html:
+                target = posts / expected_slug
+                target.mkdir()
+                (target / "index.html").write_text("Stale", encoding="utf-8")
+            return QuartoRenderResult(True, 0, 1)
+
+        for stale_html in (True, False):
+            with self.subTest(stale_html=stale_html), patch.object(self.renderer, "render_site", stale_render):
+                with self.assertRaises(QuartoRenderError):
+                    self.service.render_site("nuevo-post", expect_post=False)
+                self.assertEqual((docs / "original.html").read_bytes(), b"original")
+                self.assertEqual(list(self.root.glob('.cms-render-*')), [])
 
     def test_stage_install_failure_restores_original_docs(self):
         docs = self.root / "docs"

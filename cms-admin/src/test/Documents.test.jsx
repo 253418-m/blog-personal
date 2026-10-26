@@ -31,7 +31,7 @@ function reply(data, status = 200) {
 }
 
 function mockBackend({ documents = [fixtureDocument()], templates = [postTemplate, alternateTemplate, landingTemplate],
-  publishStatus = 200, publishGate, documentsStatus = 200 } = {}) {
+  publishStatus = 200, publishGate, archiveStatus = 200, archiveGate, documentsStatus = 200 } = {}) {
   const rows = documents.map((item) => ({ ...item }))
   const fetchMock = vi.fn(async (rawUrl, init = {}) => {
     const url = new URL(rawUrl)
@@ -75,6 +75,8 @@ function mockBackend({ documents = [fixtureDocument()], templates = [postTemplat
       return reply(row)
     }
     if (method === 'POST' && match[2] === 'archive') {
+      if (archiveGate) await archiveGate
+      if (archiveStatus !== 200) return reply({}, archiveStatus)
       row.status = 'ARCHIVADO'
       return reply(row)
     }
@@ -344,17 +346,47 @@ describe('Detalle y ciclo de vida', () => {
     expect(screen.getByRole('button', { name: 'Publicar' })).toBeInTheDocument()
   })
 
-  it('archivar confirma y advierte que el sitio público sigue disponible', async () => {
-    const fetchMock = mockBackend({ documents: [fixtureDocument('PUBLICADO')] })
+  it('archivar POST confirma, espera el render y pasa a ARCHIVADO', async () => {
+    let release
+    const gate = new Promise((resolve) => { release = resolve })
+    const fetchMock = mockBackend({ documents: [fixtureDocument('PUBLICADO')], archiveGate: gate })
     open('/contenido/doc-1')
     await screen.findByRole('heading', { name: 'Borrador original' })
     await userEvent.click(screen.getByRole('button', { name: 'Archivar' }))
     const dialog = screen.getByRole('dialog')
-    expect(within(dialog).getByText(/retirada del sitio público aún no está automatizada/)).toBeInTheDocument()
-    await userEvent.click(within(dialog).getByRole('button', { name: 'Archivar ahora' }))
-    expect(await screen.findByText('Documento archivado.')).toBeInTheDocument()
+    expect(within(dialog).getByRole('heading', { name: '¿Archivar este post?' })).toBeInTheDocument()
+    expect(within(dialog).getByText(/se retirará del sitio generado/)).toBeInTheDocument()
+    expect(within(dialog).queryByText(/seguirá público/)).not.toBeInTheDocument()
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Archivar' }))
+    expect(screen.getByRole('status')).toHaveTextContent('Archivando y actualizando el sitio...')
+    expect(within(dialog).getByRole('button', { name: 'Procesando…' })).toBeDisabled()
+    release()
+    expect(await screen.findByText('Post archivado correctamente y retirado del sitio generado.')).toBeInTheDocument()
+    expect(screen.getByText(/Archivado: no admite/)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Archivar' })).not.toBeInTheDocument()
     expect(fetchMock.mock.calls.some(([url, init]) => url.endsWith('/archive') && init.method === 'POST')).toBe(true)
+  })
+
+  it.each([[500, 'El contenido permanece publicado'], [409, 'estado actual']])(
+    'archivar POST con error %s mantiene la vista PUBLICADO', async (status, message) => {
+      mockBackend({ documents: [fixtureDocument('PUBLICADO')], archiveStatus: status })
+      open('/contenido/doc-1')
+      await screen.findByRole('heading', { name: 'Borrador original' })
+      await userEvent.click(screen.getByRole('button', { name: 'Archivar' }))
+      await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Archivar' }))
+      expect(await screen.findByRole('alert')).toHaveTextContent(message)
+      expect(screen.getByRole('button', { name: 'Archivar' })).toBeInTheDocument()
+    },
+  )
+
+  it('LANDING archivada conserva un mensaje administrativo y no promete retirada Quarto', async () => {
+    mockBackend({ documents: [fixtureDocument('PUBLICADO', { content_type: 'LANDING' })] })
+    open('/contenido/doc-1')
+    await screen.findByRole('heading', { name: 'Borrador original' })
+    await userEvent.click(screen.getByRole('button', { name: 'Archivar' }))
+    expect(within(screen.getByRole('dialog')).queryByText(/sitio generado/)).not.toBeInTheDocument()
+    await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Archivar' }))
+    expect(await screen.findByText('Documento archivado.')).toBeInTheDocument()
   })
 
   it('eliminar BORRADOR confirma, acepta 204 y vuelve al listado', async () => {

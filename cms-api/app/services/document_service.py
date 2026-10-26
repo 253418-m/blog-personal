@@ -189,14 +189,49 @@ class DocumentService:
         return response
 
     def archive_document(self, document_id: UUID) -> DocumentResponse:
-        with self._repository() as repository:
-            document = self._require(repository, document_id, write=True)
-            if document.status != DocumentStatus.PUBLICADO:
-                raise DomainConflict("Solo puede archivarse un Document PUBLICADO.")
-            document.status = DocumentStatus.ARCHIVADO
-            document.updated_at = datetime.now(timezone.utc)
-            repository.update(document)
-            return DocumentResponse.model_validate(document)
+        withdrawn = None
+        rendered = None
+        try:
+            with self._repository() as repository:
+                document = self._require(repository, document_id, write=True)
+                if document.status != DocumentStatus.PUBLICADO:
+                    raise DomainConflict("Solo puede archivarse un Document PUBLICADO.")
+                if document.content_type == DocumentContentType.POST:
+                    repository.lock_quarto_publication()
+                    try:
+                        withdrawn = self._quarto_exporter.withdraw_post(document.slug)
+                    except QuartoExportError:
+                        raise QuartoExportUnavailable("No fue posible retirar el contenido Quarto.") from None
+                    try:
+                        rendered = self._quarto_render_service.render_site(document.slug, expect_post=False)
+                    except QuartoRenderError:
+                        raise QuartoRenderUnavailable("No fue posible actualizar el sitio Quarto.") from None
+                document.status = DocumentStatus.ARCHIVADO
+                document.updated_at = datetime.now(timezone.utc)
+                repository.update(document)
+                response = DocumentResponse.model_validate(document)
+                if rendered is not None:
+                    logger.info("db_commit_started action=archive")
+        except Exception:
+            if withdrawn is not None:
+                logger.warning("compensation_started action=archive")
+            compensation_failed = False
+            if withdrawn is not None:
+                try:
+                    self._quarto_exporter.restore_withdrawal(withdrawn)
+                except QuartoExportError:
+                    compensation_failed = True
+            if rendered is not None:
+                try:
+                    rendered.restore()
+                except QuartoRenderError:
+                    compensation_failed = True
+            if compensation_failed:
+                raise QuartoRenderUnavailable("No fue posible compensar el archivado Quarto.") from None
+            raise
+        if rendered is not None:
+            rendered.finalize()
+        return response
 
     def delete_document(self, document_id: UUID) -> None:
         with self._repository() as repository:

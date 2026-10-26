@@ -177,14 +177,25 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 .document-form textarea { min-height: 300px; resize: vertical; line-height: 1.55; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
 .field-hint { margin: -2px 0 3px; font-size: .83rem; }
-.field-with-unit { display: flex; align-items: center; gap: 10px; }
-.field-with-unit input { max-width: 170px; }
-.field-unit { color: #536678; font-size: .88rem; }
+.field-with-unit { display: flex; align-items: center; gap: 10px; width: 100%; min-width: 0; }
+.field-with-unit input { flex: 1 1 auto; min-width: 0; max-width: none; }
+.field-unit { flex: 0 0 auto; color: #536678; font-size: .88rem; }
 .field-error { color: #9a3030; }
 .form-field [aria-invalid='true'] { border-color: #b33b3b; }
 .metadata-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; border: 1px solid #dce7ee; border-radius: 10px; padding: 18px; }
 .metadata-intro { grid-column: 1 / -1; margin: 0; }
 .metadata-fields legend { color: #082b4c; font-weight: 800; padding: 0 5px; }
+.post-form .form-grid, .post-form .metadata-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.post-form .form-field { align-content: start; }
+.post-form .field-label-row { min-height: 20px; }
+.post-form .form-grid > .form-field { grid-template-rows: minmax(20px, auto) 44px auto; }
+.post-form .metadata-fields > .form-field { grid-template-rows: minmax(20px, auto) 18px 44px auto; }
+.post-form .field-status { line-height: 18px; margin: 0; }
+.post-form .field-hint { margin: 0; }
+.post-form .form-field input:not([type='checkbox']), .post-form .form-field select { height: 44px; box-sizing: border-box; }
+.post-form .field-with-unit input { width: auto; }
+.post-form .field-control--checkbox { display: flex; align-items: center; min-height: 44px; }
+.post-form .field-control--checkbox input { width: 18px; height: 18px; accent-color: #082b4c; }
 .checkbox-label { display: flex; align-items: start; gap: 9px; padding-top: 12px; }
 .checkbox-label input { width: 18px; height: 18px; accent-color: #082b4c; }
 .checkbox-label span { display: grid; gap: 2px; }
@@ -224,6 +235,7 @@ tbody tr:last-child td { border-bottom: 0; }
 @media (max-width: 760px) {
   .content-heading { align-items: flex-start; flex-direction: column; }
   .form-grid, .metadata-fields, .detail-grid, .metadata-summary { grid-template-columns: minmax(0, 1fr); }
+  .post-form .form-grid, .post-form .metadata-fields { grid-template-columns: minmax(0, 1fr); }
   .document-table thead { display: none; }
   .document-table, .document-table tbody, .document-table tr, .document-table td { display: block; width: 100%; }
   .document-table tr { border-bottom: 8px solid #f4f7fa; padding: 8px 0; }

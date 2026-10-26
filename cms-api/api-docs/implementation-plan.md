@@ -1,6 +1,6 @@
 # Plan de implementación de cms-core-api
 
-La API implementa login, Templates y Documents con JWT Bearer. Publicar un POST exporta QMD, renderiza el sitio Quarto completo a staging, actualiza `docs/` y después confirma PostgreSQL. LANDING continúa publicándose solo en la base. La migración 0003 permanece vigente y esta fase no añade migraciones.
+La API implementa login, Templates y Documents con JWT Bearer. Publicar un POST exporta QMD, renderiza el sitio Quarto completo a staging, actualiza `docs/` y después confirma PostgreSQL. Archivar un POST retira su QMD y su salida HTML/listing mediante un nuevo render compensable antes de confirmar PostgreSQL. LANDING continúa sincronizándose solo en la base. La migración 0003 permanece vigente y esta fase no añade migraciones.
 
 ## Estado actual
 
@@ -13,7 +13,7 @@ La API implementa login, Templates y Documents con JWT Bearer. Publicar un POST 
 | PostgreSQL runtime validation | `IMPLEMENTED` | Conexión real SQLAlchemy/psycopg, SELECT 1, identidad de conexión y esquema físico verificados |
 | Migration 0001 online validation | `IMPLEMENTED` | Aplicación online y cuatro tablas editoriales verificadas antes de crear admin_users |
 | Migration 0002 online validation | `IMPLEMENTED` | Creación exclusiva de admin_users y ciclo 0002 → 0001 → 0002 validados; base en HEAD |
-| Integration tests | `IMPLEMENTED` | Suite actual: 330 passed, 0 failed, 0 skipped; baseline de esta fase 326/0/0 |
+| Integration tests | `IMPLEMENTED` | Suite actual: 345 passed, 0 failed, 0 skipped; baseline de esta fase 330/0/0 |
 | Environment configuration | `IMPLEMENTED` | pydantic-settings, variables reales con precedencia y errores seguros sin fallback de base de datos |
 | Automatic local .env loading | `IMPLEMENTED` | Ruta portable relativa al módulo; carga automática sin depender del cwd ni exportar DATABASE_URL manualmente |
 | Centralized Settings | `IMPLEMENTED` | BaseSettings inmutable y en caché; get_settings/get_database_url compartidos por persistencia, Alembic y CLI |
@@ -41,6 +41,9 @@ La API implementa login, Templates y Documents con JWT Bearer. Publicar un POST 
 | Quarto CLI renderer | `IMPLEMENTED` | Render completo a staging mediante subprocess, timeout configurable |
 | POST publish → Quarto render | `IMPLEMENTED` | Verificar HTML antes de PUBLICADO |
 | Render compensation | `IMPLEMENTED` | Backup y restauración de docs/ ante fallo |
+| Archived post withdrawal | `IMPLEMENTED` | Retira exclusivamente `posts/<slug>/index.qmd`; conserva archivos extra y permite restaurar bytes exactos |
+| Archive → Quarto sync | `IMPLEMENTED` | Render sin el POST, verifica ausencia de HTML y enlace en catálogo antes de ARCHIVADO |
+| Archive compensation | `IMPLEMENTED` | Fallo de render o commit revierte DB y restaura QMD y `docs/` anteriores |
 | Local static output generation | `IMPLEMENTED` | Sustitución completa de docs/ tras render correcto |
 | Quarto backend isolation | `IMPLEMENTED` | `project.render` limita las páginas a raíz, posts y proyectos públicos; `project.resources` limita los recursos |
 | Internal CMS content exclusion | `IMPLEMENTED` | `cms-api/` y staging quedan fuera de HTML, recursos, búsqueda y output; verificado en copias temporales |
@@ -55,7 +58,7 @@ La API implementa login, Templates y Documents con JWT Bearer. Publicar un POST 
 | Create POST UI | `IMPLEMENTED` | Borrador POST con plantilla POST, slug sugerido y metadatos dinámicos |
 | Draft edit UI | `IMPLEMENTED` | PUT de los cinco campos editables, solo para BORRADOR |
 | Publish POST UI | `IMPLEMENTED` | Confirmación, validación visual y estados del render; backend conserva la autoridad |
-| Archive Document UI | `IMPLEMENTED` | Confirmación y aviso de que el sitio público aún no se retira |
+| Archive Document UI | `IMPLEMENTED` | Confirmación, espera del render y resultado del sitio generado local |
 | Delete draft UI | `IMPLEMENTED` | Confirmación y DELETE únicamente en BORRADOR |
 | Templates admin CRUD UI | `IMPLEMENTED` | Lista, detalle, creación, edición y eliminación mediante endpoints existentes |
 | Dynamic metadata editor | `IMPLEMENTED` | Campos adicionales tipados, validación de claves y editor JSON de estructura |
@@ -63,7 +66,6 @@ La API implementa login, Templates y Documents con JWT Bearer. Publicar un POST 
 | cms-admin deploy | `PENDING` | Sin despliegue del frontend privado |
 | GitHub Pages deployment integration | `PENDING` | Sin commit, push ni deploy |
 | LANDING → Quarto | `PENDING` | Inicio y Sobre mí continúan intactos |
-| Archive → Quarto sync | `PENDING` | ARCHIVE_QUARTO_SYNC pendiente |
 | Legacy QMD import | `PENDING` | LEGACY_POST_IMPORT pendiente |
 | Public content API | `PENDING` | Sin rutas públicas nuevas |
 | PATCH contract | `CONTRACT_PENDING` | Sin ruta, cuerpo ni implementación |
@@ -202,7 +204,7 @@ Ambos endpoints requieren Bearer y no necesitan body. Devuelven el Document actu
 
 Publicar requiere título y contenido no vacíos y todos los metadatos requeridos válidos. Establece published_at y updated_at. Archivar conserva published_at y actualiza updated_at. Estado incompatible o transición repetida: 409. Inexistente: 404. Se bloquea la fila durante la operación y cualquier fallo revierte los cambios.
 
-Publicar POST valida contenido/Template/metadatos, reserva un directorio nuevo y escribe QMD. Quarto 1.10.18 renderiza el proyecto completo en staging con `--output-dir`; se verifican `index.html` y el HTML del POST antes de sustituir `docs/`. El backup anterior permanece hasta confirmar PostgreSQL. Errores de CLI, timeout, output incompleto o filesystem devuelven 500 seguro y mantienen BORRADOR. La compensación restaura `docs/` y elimina solo el QMD nuevo; cualquier fallo excepcional se registra y se informa. Publicaciones POST concurrentes se serializan mediante advisory lock transaccional. LANDING no genera archivos ni ejecuta Quarto. Archivar no toca QMD ni docs (`ARCHIVE_QUARTO_SYNC = PENDING`). Los artículos históricos no se modifican ni importan. El listing nativo de `posts/index.qmd` descubre automáticamente los QMD en `posts/*/index.qmd` y los ordena por fecha; `plantilla/` queda fuera por `draft: true`. PuraVida conserva una tarjeta manual. No hay deploy.
+Publicar POST valida contenido/Template/metadatos, reserva un directorio nuevo y escribe QMD. Quarto 1.10.18 renderiza el proyecto completo en staging con `--output-dir`; se verifican `index.html` y el HTML del POST antes de sustituir `docs/`. El backup anterior permanece hasta confirmar PostgreSQL. Errores de CLI, timeout, output incompleto o filesystem devuelven 500 seguro y mantienen BORRADOR. La compensación restaura `docs/` y elimina solo el QMD nuevo; cualquier fallo excepcional se registra y se informa. Publicación y archivado POST se serializan mediante el mismo advisory lock transaccional. Al archivar un POST se guardan sus bytes originales, se retira solo `index.qmd`, se renderiza staging y se comprueba que `docs/index.html` y `docs/posts/index.html` existen, que el HTML del POST no existe y que el catálogo no lo enlaza. Solo entonces se instala `docs/` y se confirma ARCHIVADO. Si QMD ya falta, se registra y se intenta la retirada del HTML; rollback no crea un QMD inexistente. Fallos posteriores restauran `docs/` y el QMD exacto, y mantienen PUBLICADO; un fallo excepcional de compensación se registra y se informa. LANDING no ejecuta Quarto al publicar ni archivar. Los artículos históricos no se modifican ni importan. El listing nativo de `posts/index.qmd` descubre automáticamente los QMD en `posts/*/index.qmd` y los ordena por fecha; `plantilla/` queda fuera por `draft: true`. PuraVida conserva una tarjeta manual. No hay deploy.
 
 ## FASE 4 — Live Preview
 
@@ -242,4 +244,4 @@ Mantener rutas y semántica HTTP. Usar path parameters para identidad, query par
 
 Templates y Documents traducen errores de dominio a 404/409/422 y fallos de persistencia a 503 seguro. Documents devuelve 201 al crear, 200 al consultar/editar/publicar/archivar y 204 vacío al eliminar un borrador.
 
-Siguen pendientes PATCH (`CONTRACT_PENDING`), editor LANDING, despliegue de cms-admin, despliegue GitHub Pages, exportación LANDING, sincronización al archivar e importación histórica. cms-admin permite login, sesiones JWT y administración de Documents y Templates desde las rutas existentes; permanece fuera de Quarto. Las pruebas manuales de la interfaz se documentan en `cms-admin/README.md` y no se ejecutan en la suite. Los tests no renderizan el sitio real.
+Siguen pendientes PATCH (`CONTRACT_PENDING`), editor LANDING, despliegue de cms-admin, despliegue GitHub Pages, exportación LANDING e importación histórica. cms-admin permite login, sesiones JWT y administración de Documents y Templates desde las rutas existentes; permanece fuera de Quarto. Las pruebas manuales de la interfaz se documentan en `cms-admin/README.md` y no se ejecutan en la suite. Los tests no renderizan el sitio real.

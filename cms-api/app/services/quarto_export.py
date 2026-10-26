@@ -33,11 +33,23 @@ class QuartoExportResult:
     file_id: int
 
 
+@dataclass(frozen=True)
+class QuartoWithdrawalReceipt:
+    slug: str
+    existed: bool
+    original_bytes: bytes | None
+    removed_directory: bool
+
+
 class QuartoExporter(Protocol):
     def export_post(self, *, slug: str, title: str, metadata_values: dict, content: str,
                     published_at: datetime) -> QuartoExportResult: ...
 
     def remove_export(self, result: QuartoExportResult) -> None: ...
+
+    def withdraw_post(self, slug: str) -> QuartoWithdrawalReceipt: ...
+
+    def restore_withdrawal(self, receipt: QuartoWithdrawalReceipt) -> None: ...
 
 
 class FileSystemQuartoExporter:
@@ -124,3 +136,71 @@ class FileSystemQuartoExporter:
         except OSError:
             logger.exception("No se pudo compensar la exportación Quarto tras fallar la transacción.")
             raise QuartoExportError("No fue posible compensar la exportación Quarto.") from None
+
+    def _withdrawal_paths(self, slug: str) -> tuple[Path, Path]:
+        if not SLUG_PATTERN.fullmatch(slug):
+            raise QuartoExportError("No fue posible retirar el contenido Quarto.")
+        posts = self._posts_root()
+        directory = posts / slug
+        source = directory / "index.qmd"
+        try:
+            if directory.is_symlink() or (directory.exists() and
+                                          (not directory.is_dir() or directory.resolve(strict=True).parent != posts)):
+                raise OSError("unsafe post directory")
+            if source.is_symlink() or (source.exists() and
+                                       (not source.is_file() or source.resolve(strict=True).parent != directory)):
+                raise OSError("unsafe post source")
+        except OSError:
+            raise QuartoExportError("No fue posible retirar el contenido Quarto.") from None
+        return directory, source
+
+    def withdraw_post(self, slug: str) -> QuartoWithdrawalReceipt:
+        directory, source = self._withdrawal_paths(slug)
+        if not source.exists():
+            logger.warning("quarto_withdraw_source_missing slug=%s", slug)
+            return QuartoWithdrawalReceipt(slug, False, None, False)
+        try:
+            original = source.read_bytes()
+            source.unlink()
+        except OSError:
+            raise QuartoExportError("No fue posible retirar el contenido Quarto.") from None
+        removed_directory = False
+        try:
+            directory.rmdir()
+            removed_directory = True
+        except OSError:
+            # Un directorio con imágenes u otros recursos debe permanecer intacto.
+            pass
+        return QuartoWithdrawalReceipt(slug, True, original, removed_directory)
+
+    def restore_withdrawal(self, receipt: QuartoWithdrawalReceipt) -> None:
+        if not receipt.existed:
+            return
+        directory, source = self._withdrawal_paths(receipt.slug)
+        temporary: Path | None = None
+        created_source = False
+        try:
+            if source.exists():
+                raise OSError("source recreated during withdrawal")
+            directory.mkdir(exist_ok=True)
+            with tempfile.NamedTemporaryFile(dir=directory, prefix=".restore-", suffix=".tmp", delete=False) as file:
+                temporary = Path(file.name)
+                file.write(receipt.original_bytes)
+                file.flush()
+                os.fsync(file.fileno())
+            # El destino no debe sobrescribirse si otro proceso lo creó.
+            with source.open("xb") as target:
+                created_source = True
+                target.write(temporary.read_bytes())
+                target.flush()
+                os.fsync(target.fileno())
+            temporary.unlink()
+            if source.read_bytes() != receipt.original_bytes:
+                raise OSError("withdrawal restore verification failed")
+        except OSError:
+            if temporary is not None:
+                temporary.unlink(missing_ok=True)
+            if created_source:
+                source.unlink(missing_ok=True)
+            logger.exception("No se pudo restaurar el QMD tras fallar el archivado.")
+            raise QuartoExportError("No fue posible restaurar el contenido Quarto.") from None

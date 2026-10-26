@@ -146,17 +146,16 @@ class QuartoPublishTests(DocumentHTTPTestCase):
         self.assertEqual(list((self.quarto_root / "posts").iterdir()), [])
         self.assertEqual(self.put_document(document, title="Landing actualizada").status_code, 200)
 
-    def test_published_post_stays_immutable_but_can_archive_without_touching_qmd(self):
+    def test_published_post_stays_immutable_and_archive_withdraws_qmd(self):
         document = self.seed_document(slug="archivo-estable-ficticio")
         self.publish(document)
         file = self.quarto_root / "posts/archivo-estable-ficticio/index.qmd"
-        content = file.read_bytes()
         self.assertEqual(self.put_document(document, title="Prohibido").status_code, 409)
         self.assertEqual(self.remove_document(document).status_code, 409)
-        with patch.object(self.quarto_render_service, "render_site") as render:
-            self.assertEqual(self.archive(document).status_code, 200)
-        render.assert_not_called()
-        self.assertEqual(file.read_bytes(), content)
+        self.assertEqual(self.archive(document).status_code, 200)
+        self.assertFalse(file.exists())
+        self.assertFalse((self.quarto_root / "docs/posts/archivo-estable-ficticio/index.html").exists())
+        self.assertTrue((self.quarto_root / "docs/posts/index.html").is_file())
 
     def test_invalid_metadata_or_content_never_invokes_renderer(self):
         missing = self.seed_document(slug="missing-metadata-ficticio", metadata_values={})

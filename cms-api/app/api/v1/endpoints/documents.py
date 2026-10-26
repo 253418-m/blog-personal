@@ -1,4 +1,4 @@
-"""API administrativa de Documents con export y render POST al publicar."""
+"""API administrativa de Documents con sincronización Quarto de POST."""
 
 from typing import Annotated
 from uuid import UUID

@@ -22,11 +22,15 @@ from tests.test_templates import TemplateHTTPTestCase
 
 
 class _FixtureQuartoRenderer:
-    def render_site(self, *, staging_dir: Path, expected_slug: str) -> QuartoRenderResult:
-        destination = staging_dir / "posts" / expected_slug
-        destination.mkdir(parents=True)
+    def render_site(self, *, staging_dir: Path, expected_slug: str,
+                    expect_post: bool = True) -> QuartoRenderResult:
+        (staging_dir / "posts").mkdir(parents=True)
         (staging_dir / "index.html").write_text("Sitio temporal", encoding="utf-8")
-        (destination / "index.html").write_text("Post temporal", encoding="utf-8")
+        (staging_dir / "posts/index.html").write_text("Catálogo temporal", encoding="utf-8")
+        if expect_post:
+            destination = staging_dir / "posts" / expected_slug
+            destination.mkdir()
+            (destination / "index.html").write_text("Post temporal", encoding="utf-8")
         return QuartoRenderResult(True, 0, 1)
 
 
