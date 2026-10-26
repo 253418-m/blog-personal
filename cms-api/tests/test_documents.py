@@ -1,6 +1,8 @@
 """Documents y lifecycle reales sobre pg_temp; no se usan cuentas ni contenido reales."""
 
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest.mock import patch
 from uuid import UUID
 
@@ -13,6 +15,7 @@ from app.infrastructure.database.document_repository import SQLAlchemyDocumentRe
 from app.infrastructure.database.models import AdminUserModel, DocumentModel, TemplateModel
 from app.main import app
 from app.services.document_service import DocumentService
+from app.services.quarto_export import FileSystemQuartoExporter
 from tests.auth_support import AUTH_USER_ID
 from tests.test_templates import TemplateHTTPTestCase
 
@@ -25,7 +28,12 @@ class DocumentHTTPTestCase(TemplateHTTPTestCase):
         ))
         quoted = self.connection.dialect.identifier_preparer.quote(name)
         self.connection.execute(text(f"ALTER TABLE pg_temp.documents RENAME CONSTRAINT {quoted} TO uq_documents_slug"))
-        app.dependency_overrides[get_document_service] = lambda: DocumentService(self.session_factory)
+        self.quarto_directory = TemporaryDirectory()
+        self.addCleanup(self.quarto_directory.cleanup)
+        self.quarto_root = Path(self.quarto_directory.name)
+        (self.quarto_root / "posts").mkdir()
+        self.quarto_exporter = FileSystemQuartoExporter(self.quarto_root)
+        app.dependency_overrides[get_document_service] = lambda: DocumentService(self.session_factory, self.quarto_exporter)
         self.post_template = self.seed(allow_published_edit=True, metadata_contract=[
             {"field_key": "category", "expected_type": "STRING", "is_required": True},
             {"field_key": "reading_time", "expected_type": "INTEGER", "is_required": False},

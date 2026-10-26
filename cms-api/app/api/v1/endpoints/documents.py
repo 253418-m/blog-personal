@@ -1,4 +1,4 @@
-"""API administrativa de Documents y lifecycle; sin integración con Quarto."""
+"""API administrativa de Documents con exportación POST al publicar."""
 
 from typing import Annotated
 from uuid import UUID
@@ -7,11 +7,13 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from fastapi.routing import APIRoute
 
 from app.api.dependencies.auth import get_current_admin
+from app.core.config import get_settings
 from app.core.exceptions import BusinessRuleViolation, DomainConflict, ResourceNotFound
 from app.domain.enums import DocumentContentType, DocumentStatus
 from app.infrastructure.database.session import SessionLocal
 from app.schemas.document import DocumentCreateRequest, DocumentListResponse, DocumentResponse, DocumentUpdateRequest
-from app.services.document_service import DocumentService, DocumentStorageUnavailable
+from app.services.document_service import DocumentService, DocumentStorageUnavailable, QuartoExportUnavailable
+from app.services.quarto_export import FileSystemQuartoExporter
 
 
 class _DocumentRoute(APIRoute):
@@ -21,16 +23,17 @@ class _DocumentRoute(APIRoute):
         async def handler(request: Request):
             try:
                 return await original(request)
-            except (ResourceNotFound, DomainConflict, BusinessRuleViolation, DocumentStorageUnavailable) as error:
+            except (ResourceNotFound, DomainConflict, BusinessRuleViolation, DocumentStorageUnavailable, QuartoExportUnavailable) as error:
                 status = {ResourceNotFound: 404, DomainConflict: 409,
-                          BusinessRuleViolation: 422, DocumentStorageUnavailable: 503}[type(error)]
+                          BusinessRuleViolation: 422, DocumentStorageUnavailable: 503,
+                          QuartoExportUnavailable: 500}[type(error)]
                 raise HTTPException(status_code=status, detail=str(error)) from None
 
         return handler
 
 
 def get_document_service() -> DocumentService:
-    return DocumentService(SessionLocal)
+    return DocumentService(SessionLocal, FileSystemQuartoExporter(get_settings().quarto_project_root))
 
 
 router = APIRouter(
@@ -40,6 +43,7 @@ router = APIRouter(
                404: {"description": "Document o Template no encontrado"},
                409: {"description": "Conflicto de slug o estado"},
                422: {"description": "Solicitud o metadatos inválidos"},
+               500: {"description": "No fue posible exportar el contenido a Quarto"},
                503: {"description": "Persistencia no disponible"}},
 )
 Service = Annotated[DocumentService, Depends(get_document_service)]

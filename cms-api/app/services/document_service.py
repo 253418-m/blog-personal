@@ -1,4 +1,4 @@
-"""Reglas POST/LANDING y lifecycle local; publicar no ejecuta Quarto."""
+"""Reglas POST/LANDING; publicar POST exporta Quarto sin renderizarlo."""
 
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
@@ -16,15 +16,21 @@ from app.infrastructure.database.models import DocumentModel, TemplateModel
 from app.repositories.interfaces import DocumentRepository
 from app.schemas.document import DocumentCreateRequest, DocumentResponse, DocumentUpdateRequest
 from app.services.metadata_validation import validate_metadata
+from app.services.quarto_export import QuartoCollisionError, QuartoExporter, QuartoExportError
 
 
 class DocumentStorageUnavailable(DomainError):
     """Fallo operativo seguro para la capa HTTP."""
 
 
+class QuartoExportUnavailable(DomainError):
+    """Fallo seguro de exportación o compensación."""
+
+
 class DocumentService:
-    def __init__(self, session_factory: Callable[[], Session]) -> None:
+    def __init__(self, session_factory: Callable[[], Session], quarto_exporter: QuartoExporter) -> None:
         self._session_factory = session_factory
+        self._quarto_exporter = quarto_exporter
 
     @contextmanager
     def _repository(self) -> Iterator[DocumentRepository]:
@@ -115,20 +121,39 @@ class DocumentService:
             return DocumentResponse.model_validate(document)
 
     def publish_document(self, document_id: UUID) -> DocumentResponse:
-        with self._repository() as repository:
-            document = self._require(repository, document_id, write=True)
-            if document.status != DocumentStatus.BORRADOR:
-                raise DomainConflict("Solo puede publicarse un BORRADOR.")
-            template = self._template(repository.get_templates({document.template_id}), document.template_id, document.content_type)
-            self._validate(template, document.metadata_values or {}, document.content, published=True)
-            if not document.title.strip():
-                raise BusinessRuleViolation("El título no puede estar vacío al publicar.")
-            now = datetime.now(timezone.utc)
-            document.status = DocumentStatus.PUBLICADO
-            document.published_at = now
-            document.updated_at = now
-            repository.update(document)
-            return DocumentResponse.model_validate(document)
+        exported = None
+        try:
+            with self._repository() as repository:
+                document = self._require(repository, document_id, write=True)
+                if document.status != DocumentStatus.BORRADOR:
+                    raise DomainConflict("Solo puede publicarse un BORRADOR.")
+                template = self._template(repository.get_templates({document.template_id}), document.template_id, document.content_type)
+                self._validate(template, document.metadata_values or {}, document.content, published=True)
+                if not document.title.strip():
+                    raise BusinessRuleViolation("El título no puede estar vacío al publicar.")
+                now = datetime.now(timezone.utc)
+                if document.content_type == DocumentContentType.POST:
+                    try:
+                        exported = self._quarto_exporter.export_post(
+                            slug=document.slug, title=document.title, metadata_values=document.metadata_values or {},
+                            content=document.content, published_at=now,
+                        )
+                    except QuartoCollisionError:
+                        raise DomainConflict("Ya existe contenido Quarto con ese slug.") from None
+                    except QuartoExportError:
+                        raise QuartoExportUnavailable("No fue posible exportar el contenido a Quarto.") from None
+                document.status = DocumentStatus.PUBLICADO
+                document.published_at = now
+                document.updated_at = now
+                repository.update(document)
+                return DocumentResponse.model_validate(document)
+        except Exception:
+            if exported is not None and exported.created:
+                try:
+                    self._quarto_exporter.remove_export(exported)
+                except QuartoExportError:
+                    raise QuartoExportUnavailable("No fue posible compensar la exportación Quarto.") from None
+            raise
 
     def archive_document(self, document_id: UUID) -> DocumentResponse:
         with self._repository() as repository:

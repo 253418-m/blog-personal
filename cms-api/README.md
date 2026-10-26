@@ -236,7 +236,7 @@ Validación del 2026-10-25 sobre PostgreSQL 18.6 nativo en Windows: `SELECT 1`, 
 
 La validación de persistencia con `python -m unittest discover -s tests -v` finalizó con **45 passed, 0 failed, 0 skipped**; las 19 pruebas de integración se ejecutaron. El test de borrado de una Template referenciada espera correctamente SQLSTATE `23001` para `RESTRICT` en PostgreSQL 18; los casos de referencias inexistentes conservan `23503`.
 
-Baselines anteriores: autenticación 163/0/0 y Templates 218/0/0. La suite completa actual finaliza con **289 passed, 0 failed, 0 skipped**. Las 71 pruebas nuevas de Documents cubren 60 casos HTTP (CREATE 15, LIST/GET 8, UPDATE 8, PUBLISH 7, edición publicada 6, ARCHIVE 5, DELETE 5, autorización 2, rollback 4), 5 de metadatos, 3 de OpenAPI y 3 de migración. El administrador real y la Template real mantienen todos sus campos; Documents termina con cero filas.
+Baselines anteriores: autenticación 163/0/0, Templates 218/0/0 y Documents 289/0/0. La suite actual finaliza con **306 passed, 0 failed, 0 skipped**. Los 17 casos nuevos cubren exportación y errores de filesystem, colisiones con artículos históricos, compensación tras fallo de base, POST/LANDING y reglas de Auth/Documents. Todos utilizan directorios temporales; ninguna prueba crea QMD en el sitio real. En la base real permanecen el administrador, dos Templates y tres Documents, sin cambios.
 
 ## Autenticación administrativa
 
@@ -272,7 +272,7 @@ El username se guarda sin espacios exteriores y no puede estar vacío. Como deci
 
 `AdminBootstrapService` y el repositorio SQLAlchemy usan la Session existente y una transacción: crean únicamente el primer administrador activo, con `last_login_at = NULL`. Si existe el username o cualquier administrador, incluso inactivo, el bootstrap se rechaza sin modificarlo. Los intentos concurrentes se serializan mediante un bloqueo transaccional PostgreSQL; se requiere el aislamiento habitual `READ COMMITTED`. La CLI confirma el éxito sin mostrar contraseña ni hash, y SQLAlchemy oculta los parámetros de consultas en logs y errores.
 
-La validación histórica de bootstrap y configuración finalizó con 89/0/0. Sigue pasando dentro de las 289 pruebas actuales. Settings funciona sin DATABASE_URL heredada, conectado a cms_core como cms_user. HEAD actual: `0003_simplify_documents`; no se modificó el administrador real.
+La validación histórica de bootstrap y configuración finalizó con 89/0/0. Sigue pasando dentro de las 306 pruebas actuales. Settings funciona sin DATABASE_URL heredada, conectado a cms_core como cms_user. HEAD actual: `0003_simplify_documents`; no se modificó el administrador real.
 
 `cms-admin` será una aplicación privada separada del sitio público Quarto. Todavía no se crea su carpeta ni se añade a navegación, sitemap o `docs/`. Los futuros endpoints editoriales deberán incorporar su autorización explícita; el login y `/auth/me` ya están disponibles.
 
@@ -463,6 +463,44 @@ Para PUT envía el mismo JSON del Document elegido **sin content_type**, conserv
 
 Flujo manual: crea POST → PUT de borrador (200) → publish (200) → PUT (409) → archive (200) → PUT/publish/DELETE (409). Crea LANDING → publish → PUT (200 si allow_published_edit=true, conservando published_at) → archive → PUT (409). Para probar DELETE 204, crea otro borrador con slug diferente y elimínalo antes de publicar. Las pruebas manuales de publicación dejan registros deliberadamente persistidos, que luego solo pueden archivarse por esta API.
 
-**Publicar todavía no modifica Quarto.** No se importan artículos históricos, no se escriben QMD, no se ejecuta `quarto render` ni se despliega. La futura integración podrá mapear LANDING inicio a `/` y sobre-mi a `/sobre-mi`; Contenido será el listado de POST PUBLICADO, no otro Document. QUARTO_SYNC, LEGACY_POST_IMPORT, Public content API y cms-admin siguen pendientes. PATCH continúa CONTRACT_PENDING.
+**Publicar un POST crea `posts/<slug>/index.qmd` antes del commit de PostgreSQL.** Una colisión con cualquier directorio existente, incluidos artículos históricos, devuelve 409 sin sobrescribirlo. Si falla la exportación, permanece BORRADOR; si falla la transacción después de crear el archivo, se intenta retirar solo ese archivo nuevo y se informa si la compensación falla. LANDING continúa publicándose solo en PostgreSQL. Archivar un POST conserva su QMD: `ARCHIVE_QUARTO_SYNC = PENDING`. No se ejecuta `quarto render` ni se despliega, así que el nuevo POST no aparece aún en GitHub Pages. No se importan QMD históricos. LANDING→Quarto, LEGACY_POST_IMPORT, Public Content API y cms-admin siguen pendientes; PATCH continúa CONTRACT_PENDING.
+
+### Exportación POST a Quarto
+
+`FileSystemQuartoExporter` usa `QUARTO_PROJECT_ROOT` desde Settings. En desarrollo, el valor predeterminado se calcula desde la ubicación del backend y apunta a la raíz de este repositorio; el entorno real puede sobrescribirlo. `.env.example` muestra un valor ficticio. La carpeta `posts/` debe existir. El slug se valida de nuevo y solo se crea un directorio nuevo dentro de `posts/`. El archivo se escribe primero en un temporal, se sincroniza, se mueve a `index.qmd` y se verifica; se limpian restos ante fallos. Las pruebas inyectan otra raíz temporal.
+
+La salida sigue el front matter observado en los artículos existentes: `title`, `date`, `categories` si existe `metadata_values.category`, `body-classes: article-page`, `title-block-style: none` y `toc: false`. `author: Miguel` se hereda de `posts/_metadata.yml`. Los strings y arrays se codifican como JSON válido en YAML, lo que protege comillas, Unicode y saltos. `reading_time` no se añade al front matter porque los posts actuales no lo usan como campo. Después del delimitador YAML se copia `Document.content` sin renderizarlo.
+
+Ejemplo de archivo generado para un POST ficticio publicado el 2026-10-26:
+
+```qmd
+---
+title: "Prueba de exportación CMS"
+date: 2026-10-26
+categories: ["Pruebas"]
+body-classes: article-page
+title-block-style: none
+toc: false
+---
+
+# Prueba de exportación
+
+Contenido ficticio.
+```
+
+Para una prueba manual desde Postman, usa un slug claramente ficticio y nuevo, por ejemplo `cms-prueba-quarto`. Obtén primero `{{post_template_id}}` de GET `/api/v1/templates`; adapta `metadata_values` al contrato de esa Template. Con Bearer `{{access_token}}`, envía **POST Create Document** a `{{base_url}}/api/v1/documents` con:
+
+```json
+{
+  "title": "Prueba de exportación CMS",
+  "slug": "cms-prueba-quarto",
+  "content_type": "POST",
+  "template_id": "{{post_template_id}}",
+  "metadata_values": {"category": "Pruebas", "reading_time": 1},
+  "content": "# Prueba de exportación\n\nContenido ficticio."
+}
+```
+
+Guarda `document_id` de la respuesta 201 y envía **POST Publish Document** a `{{base_url}}/api/v1/documents/{{document_id}}/publish`, sin body. Espera 200 y `status: PUBLICADO`. Verifica localmente `C:/Users/migue/blog-personal/posts/cms-prueba-quarto/index.qmd`: debe contener el front matter y el contenido enviados. Si la carpeta ya existe, elige otro slug claramente ficticio antes de crear el borrador; nunca se sobrescribe. Esta prueba **no se ejecutó automáticamente**. El POST publicado no admite DELETE. Después puedes archivarlo y conservarlo como evidencia; para retirarlo de base y filesystem haría falta una tarea de mantenimiento específica. No se agregó ninguna ruta que eluda esa regla.
 
 Consulta [el plan de implementación](api-docs/implementation-plan.md) y [las convenciones de Postman](postman/README.md).

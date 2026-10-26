@@ -1,6 +1,6 @@
 # Plan de implementación de cms-core-api
 
-La API implementa login JSON, consulta del administrador autenticado, Templates y Documents simplificados con JWT Bearer. Documents incluye publicación y archivado solo en PostgreSQL. La migración 0003 agrega contenido y fecha de creación; no cambia Quarto. La documentación del backend permanece en `cms-api/api-docs/`.
+La API implementa login, Templates y Documents con JWT Bearer. Publicar un POST exporta un QMD nuevo antes de confirmar PostgreSQL; LANDING continúa publicándose solo en la base. La migración 0003 permanece vigente y esta fase no añade migraciones. La documentación del backend permanece en `cms-api/api-docs/`.
 
 ## Estado actual
 
@@ -13,7 +13,7 @@ La API implementa login JSON, consulta del administrador autenticado, Templates 
 | PostgreSQL runtime validation | `IMPLEMENTED` | Conexión real SQLAlchemy/psycopg, SELECT 1, identidad de conexión y esquema físico verificados |
 | Migration 0001 online validation | `IMPLEMENTED` | Aplicación online y cuatro tablas editoriales verificadas antes de crear admin_users |
 | Migration 0002 online validation | `IMPLEMENTED` | Creación exclusiva de admin_users y ciclo 0002 → 0001 → 0002 validados; base en HEAD |
-| Integration tests | `IMPLEMENTED` | Suite actual: 289 passed, 0 failed, 0 skipped; baseline de entrada 218/0/0 |
+| Integration tests | `IMPLEMENTED` | Suite actual: 306 passed, 0 failed, 0 skipped; baseline de entrada 289/0/0 |
 | Environment configuration | `IMPLEMENTED` | pydantic-settings, variables reales con precedencia y errores seguros sin fallback de base de datos |
 | Automatic local .env loading | `IMPLEMENTED` | Ruta portable relativa al módulo; carga automática sin depender del cwd ni exportar DATABASE_URL manualmente |
 | Centralized Settings | `IMPLEMENTED` | BaseSettings inmutable y en caché; get_settings/get_database_url compartidos por persistencia, Alembic y CLI |
@@ -26,7 +26,7 @@ La API implementa login JSON, consulta del administrador autenticado, Templates 
 | Template CRUD | `IMPLEMENTED` | POST/GET/PUT/DELETE, sin paginación ni idempotencia |
 | Template authorization | `IMPLEMENTED` | Las cuatro operaciones usan get_current_admin |
 | Documents CRUD | `IMPLEMENTED` | POST, GET colección/detalle, PUT y DELETE de borradores |
-| Workflow | `IMPLEMENTED` | BORRADOR → PUBLICADO → ARCHIVADO; sin revisión ni efectos en Quarto |
+| Workflow | `IMPLEMENTED` | BORRADOR → PUBLICADO → ARCHIVADO; exportación QMD únicamente al publicar POST |
 | Document enums | `IMPLEMENTED` | POST/LANDING; BORRADOR/PUBLICADO/ARCHIVADO |
 | Document schemas | `IMPLEMENTED` | Requests estrictos y respuesta de once campos |
 | Document repository | `IMPLEMENTED` | SQLAlchemy, filtros y orden estable |
@@ -35,12 +35,18 @@ La API implementa login JSON, consulta del administrador autenticado, Templates 
 | LANDING published editing | `IMPLEMENTED` | Solo con permiso de la Template; conserva published_at |
 | Metadata validation | `IMPLEMENTED` | Tipos exactos, campos conocidos y requeridos al publicar |
 | Migration 0003 online validation | `IMPLEMENTED` | Ciclo 0002 → 0003 → 0002 → 0003 y datos reales intactos |
-| Quarto integration | `PENDING` | QUARTO_SYNC pendiente |
+| Quarto POST exporter | `IMPLEMENTED` | Archivo nuevo `posts/<slug>/index.qmd`, sin render |
+| POST publish → QMD | `IMPLEMENTED` | Exportar antes del commit, compensar fallo posterior |
+| Quarto collision protection | `IMPLEMENTED` | Nunca sobrescribir directorios existentes |
+| Quarto render | `PENDING` | Sin ejecución automática |
+| GitHub Pages deployment integration | `PENDING` | Sin commit, push ni deploy |
+| LANDING → Quarto | `PENDING` | Inicio y Sobre mí continúan intactos |
+| Archive → Quarto sync | `PENDING` | ARCHIVE_QUARTO_SYNC pendiente |
 | Legacy QMD import | `PENDING` | LEGACY_POST_IMPORT pendiente |
 | Public content API | `PENDING` | Sin rutas públicas nuevas |
 | PATCH contract | `CONTRACT_PENDING` | Sin ruta, cuerpo ni implementación |
 
-La persistencia está validada contra PostgreSQL local. El administrador y la Template reales se conservan, con comparación de todos sus campos antes y después. Documents permanece vacío tras las pruebas; no se crean seeds. HEAD actual: `0003_simplify_documents`.
+La persistencia está validada contra PostgreSQL local. La base real contiene un administrador, dos Templates y tres Documents; se conservaron todos sus campos antes y después de esta fase. Los tests usan datos ficticios temporales y no crean seeds. HEAD actual: `0003_simplify_documents`.
 
 ## Persistencia implementada
 
@@ -97,7 +103,7 @@ El estado anterior `ADMIN_BOOTSTRAP_PENDING` pasa a `READY_FOR_MANUAL_EXECUTION`
 
 La transacción del servicio usa un bloqueo PostgreSQL para serializar bootstraps bajo `READ COMMITTED`. Cualquier administrador existente, incluso inactivo, impide crear otro; un username duplicado no se modifica. Se generan UUIDv7, timestamps UTC y `is_active = true`, con `last_login_at = NULL`. Los errores hacen rollback y la CLI presenta mensajes seguros; el engine oculta parámetros SQL.
 
-Baseline de autenticación: 163/0/0; baseline de Templates: 218/0/0. Ambas regresiones pasan dentro de la suite actual 289/0/0. `pip check` y `compileall app` pasan. El administrador real permanece intacto y Alembic está en `0003_simplify_documents (head)`.
+Baselines de autenticación 163/0/0, Templates 218/0/0 y Documents 289/0/0. Todas las regresiones pasan dentro de la suite actual 306/0/0. El administrador, las dos Templates y los tres Documents reales permanecen intactos. Alembic está en `0003_simplify_documents (head)`.
 
 `POST /api/v1/auth/login` es público y acepta JSON con username/password. AuthService normaliza espacios exteriores del username, verifica Argon2 y el estado activo, actualiza únicamente `last_login_at` con UTC y confirma la transacción antes de emitir un token. La actualización exige que la cuenta siga activa, por si se desactiva durante la verificación. Usuario inexistente ejecuta igualmente una verificación contra un hash Argon2id ficticio. Usuario ausente, contraseña incorrecta y cuenta inactiva reciben el mismo 401 y `WWW-Authenticate: Bearer`. Los errores de persistencia no emiten tokens; los errores de validación HTTP no devuelven el cuerpo de login.
 
@@ -174,7 +180,7 @@ Ambos endpoints requieren Bearer y no necesitan body. Devuelven el Document actu
 
 Publicar requiere título y contenido no vacíos y todos los metadatos requeridos válidos. Establece published_at y updated_at. Archivar conserva published_at y actualiza updated_at. Estado incompatible o transición repetida: 409. Inexistente: 404. Se bloquea la fila durante la operación y cualquier fallo revierte los cambios.
 
-Publicar únicamente modifica PostgreSQL: no escribe QMD, no ejecuta render ni despliega. Los artículos Quarto existentes permanecen intactos y no se importan. Futura correspondencia: LANDING inicio → `/`, LANDING sobre-mi → `/sobre-mi`; Contenido será un listado POST+PUBLICADO, no otro Document. QUARTO_SYNC y LEGACY_POST_IMPORT permanecen pendientes; no hay revisión automática ni EN_REVISION activo.
+Publicar POST valida contenido/Template/metadatos, reserva un directorio nuevo, escribe y verifica su QMD y confirma PostgreSQL. Una colisión devuelve 409; un fallo de filesystem devuelve 500 seguro y mantiene BORRADOR. Si falla la transacción posterior, intenta compensar solo el archivo recién creado; el error de compensación se registra y se informa. Publicar LANDING no genera archivos. Archivar no toca QMD (`ARCHIVE_QUARTO_SYNC = PENDING`). Los artículos históricos no se modifican ni importan. Futura correspondencia: LANDING inicio → `/`, LANDING sobre-mi → `/sobre-mi`; Contenido será un listado POST+PUBLICADO. No se ejecutan render ni deploy.
 
 ## FASE 4 — Live Preview
 
@@ -214,4 +220,4 @@ Mantener rutas y semántica HTTP. Usar path parameters para identidad, query par
 
 Templates y Documents traducen errores de dominio a 404/409/422 y fallos de persistencia a 503 seguro. Documents devuelve 201 al crear, 200 al consultar/editar/publicar/archivar y 204 vacío al eliminar un borrador.
 
-Siguen pendientes PATCH (`CONTRACT_PENDING`), cms-admin, integración CMS → Quarto e importación de artículos históricos. Primero probar manualmente el ciclo de Documents en Postman; después definir QUARTO_SYNC y LEGACY_POST_IMPORT. No se generó contenido real automáticamente.
+Siguen pendientes PATCH (`CONTRACT_PENDING`), cms-admin, Quarto render, despliegue GitHub Pages, exportación LANDING, sincronización al archivar e importación histórica. La prueba manual recomendada usa `cms-prueba-quarto` y se documenta en README; no se creó contenido real automáticamente.

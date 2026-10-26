@@ -11,6 +11,7 @@ from sqlalchemy.exc import ArgumentError
 
 
 ENV_FILE = Path(__file__).resolve().parents[2] / ".env"
+DEFAULT_QUARTO_PROJECT_ROOT = ENV_FILE.parent.parent
 
 
 class Settings(BaseSettings):
@@ -31,6 +32,7 @@ class Settings(BaseSettings):
     jwt_secret_key: SecretStr = Field(repr=False, exclude=True)
     jwt_algorithm: Literal["HS256"] = "HS256"
     jwt_access_token_expire_minutes: int = Field(default=30, gt=0)
+    quarto_project_root: Path = DEFAULT_QUARTO_PROJECT_ROOT
 
     @field_validator("jwt_secret_key")
     @classmethod
