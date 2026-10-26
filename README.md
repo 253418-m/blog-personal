@@ -18,6 +18,7 @@ quarto preview
 
 `quarto render` genera el sitio en `docs/`.
 - `docs/`: salida generada del sitio para GitHub Pages.
+
 ## Estructura
 
 - `_quarto.yml`: configuración global, navegación y tema.

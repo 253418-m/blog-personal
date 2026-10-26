@@ -13,7 +13,7 @@ La API implementa login, Templates y Documents con JWT Bearer. Publicar un POST 
 | PostgreSQL runtime validation | `IMPLEMENTED` | Conexión real SQLAlchemy/psycopg, SELECT 1, identidad de conexión y esquema físico verificados |
 | Migration 0001 online validation | `IMPLEMENTED` | Aplicación online y cuatro tablas editoriales verificadas antes de crear admin_users |
 | Migration 0002 online validation | `IMPLEMENTED` | Creación exclusiva de admin_users y ciclo 0002 → 0001 → 0002 validados; base en HEAD |
-| Integration tests | `IMPLEMENTED` | Suite actual: 326 passed, 0 failed, 0 skipped; baseline de esta fase 324/0/0 |
+| Integration tests | `IMPLEMENTED` | Suite actual: 330 passed, 0 failed, 0 skipped; baseline de esta fase 326/0/0 |
 | Environment configuration | `IMPLEMENTED` | pydantic-settings, variables reales con precedencia y errores seguros sin fallback de base de datos |
 | Automatic local .env loading | `IMPLEMENTED` | Ruta portable relativa al módulo; carga automática sin depender del cwd ni exportar DATABASE_URL manualmente |
 | Centralized Settings | `IMPLEMENTED` | BaseSettings inmutable y en caché; get_settings/get_database_url compartidos por persistencia, Alembic y CLI |
@@ -46,6 +46,14 @@ La API implementa login, Templates y Documents con JWT Bearer. Publicar un POST 
 | Internal CMS content exclusion | `IMPLEMENTED` | `cms-api/` y staging quedan fuera de HTML, recursos, búsqueda y output; verificado en copias temporales |
 | Automatic Content catalog | `IMPLEMENTED` | Listing grid nativo de Quarto, ordenado por `date desc`; PuraVida conserva su tarjeta manual |
 | Quarto post discovery | `IMPLEMENTED` | `posts/*/index.qmd` incluye posts históricos y CMS; el scaffold `draft: true` queda fuera |
+| cms-admin scaffold | `IMPLEMENTED` | React + Vite separado del sitio Quarto; build en `cms-admin/dist/` |
+| Admin Login UI | `IMPLEMENTED` | Login JSON contra FastAPI, sin registro público |
+| JWT session handling | `IMPLEMENTED` | sessionStorage, validación `/auth/me`, limpieza ante 401 y logout local |
+| Protected admin routes | `IMPLEMENTED` | Dashboard, Contenido y Plantillas requieren sesión validada |
+| Admin Dashboard | `IMPLEMENTED` | Resumen y cinco Documents recientes desde consultas reales |
+| Documents admin CRUD UI | `PENDING` | Contenido solo consulta y filtros locales |
+| Templates admin CRUD UI | `PENDING` | Plantillas solo consulta |
+| cms-admin deploy | `PENDING` | Sin despliegue del frontend privado |
 | GitHub Pages deployment integration | `PENDING` | Sin commit, push ni deploy |
 | LANDING → Quarto | `PENDING` | Inicio y Sobre mí continúan intactos |
 | Archive → Quarto sync | `PENDING` | ARCHIVE_QUARTO_SYNC pendiente |
@@ -97,8 +105,8 @@ Los tests de integración requieren TEST_DATABASE_URL local y la base migrada. S
 | JWT access token | `IMPLEMENTED` |
 | get_current_admin | `IMPLEMENTED` |
 | Global endpoint protection | `PENDING` |
-| cms-admin frontend | `PENDING` |
-| cms-admin | `PENDING` |
+| cms-admin frontend | `IMPLEMENTED` |
+| cms-admin | `PARTIAL` |
 
 La entidad contiene exactamente `user_id` (UUID), `username` (VARCHAR UNIQUE), `password_hash` (TEXT), `is_active` (BOOLEAN default true), `created_at`, `updated_at` y `last_login_at` (timestamps con zona horaria). Solo `last_login_at` admite NULL y comienza sin fecha. No hay roles, email, contraseñas en texto plano, tokens, sesiones ni relaciones nuevas con tablas editoriales.
 
@@ -110,7 +118,7 @@ El estado anterior `ADMIN_BOOTSTRAP_PENDING` pasa a `READY_FOR_MANUAL_EXECUTION`
 
 La transacción del servicio usa un bloqueo PostgreSQL para serializar bootstraps bajo `READ COMMITTED`. Cualquier administrador existente, incluso inactivo, impide crear otro; un username duplicado no se modifica. Se generan UUIDv7, timestamps UTC y `is_active = true`, con `last_login_at = NULL`. Los errores hacen rollback y la CLI presenta mensajes seguros; el engine oculta parámetros SQL.
 
-Baselines de autenticación 163/0/0, Templates 218/0/0, Documents 289/0/0 y exportación QMD 306/0/0. Todas las regresiones pasan dentro de la suite actual 326/0/0. Alembic está en `0003_simplify_documents (head)`.
+Baselines de autenticación 163/0/0, Templates 218/0/0, Documents 289/0/0 y exportación QMD 306/0/0. Todas las regresiones pasan dentro de la suite actual 330/0/0. Alembic está en `0003_simplify_documents (head)`.
 
 `POST /api/v1/auth/login` es público y acepta JSON con username/password. AuthService normaliza espacios exteriores del username, verifica Argon2 y el estado activo, actualiza únicamente `last_login_at` con UTC y confirma la transacción antes de emitir un token. La actualización exige que la cuenta siga activa, por si se desactiva durante la verificación. Usuario inexistente ejecuta igualmente una verificación contra un hash Argon2id ficticio. Usuario ausente, contraseña incorrecta y cuenta inactiva reciben el mismo 401 y `WWW-Authenticate: Bearer`. Los errores de persistencia no emiten tokens; los errores de validación HTTP no devuelven el cuerpo de login.
 
@@ -227,4 +235,4 @@ Mantener rutas y semántica HTTP. Usar path parameters para identidad, query par
 
 Templates y Documents traducen errores de dominio a 404/409/422 y fallos de persistencia a 503 seguro. Documents devuelve 201 al crear, 200 al consultar/editar/publicar/archivar y 204 vacío al eliminar un borrador.
 
-Siguen pendientes PATCH (`CONTRACT_PENDING`), cms-admin, despliegue GitHub Pages, exportación LANDING, sincronización al archivar e importación histórica. La prueba manual recomendada usa `cms-prueba-render` y se documenta en README; `cms-prueba-quarto` ya existe y permanece intacto. Los tests no renderizaron el sitio real.
+Siguen pendientes PATCH (`CONTRACT_PENDING`), CRUD visual de Documents y Templates, despliegue de cms-admin, despliegue GitHub Pages, exportación LANDING, sincronización al archivar e importación histórica. La primera versión de cms-admin permite login, sesiones JWT y vistas de consulta; permanece fuera de Quarto. La prueba manual recomendada usa `cms-prueba-render` y se documenta en README; `cms-prueba-quarto` ya existe y permanece intacto. Los tests no renderizaron el sitio real.

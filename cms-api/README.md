@@ -68,6 +68,8 @@ La autenticación requiere además estas opciones:
 
 `JWT_SECRET_KEY` usa `SecretStr`, se excluye de repr y serialización y no aparece en errores de configuración. La instalación local ya dispone de una clave generada en `.env`; conserva su valor privado y no lo copies a ejemplos, logs ni respuestas HTTP. El entorno real tiene prioridad sobre `.env` también para estas variables.
 
+`CORS_ALLOWED_ORIGINS` admite orígenes HTTP(S) separados por comas. Por defecto permite únicamente `http://localhost:5173` y `http://127.0.0.1:5173` para `cms-admin/` local; configura los orígenes reales antes de otro despliegue. CORS permite `GET`, `POST`, `PUT`, `DELETE` y `OPTIONS` con `Authorization` y `Content-Type`, sin cookies ni comodín. El frontend vive fuera del sitio Quarto y su guía está en [`cms-admin/README.md`](../cms-admin/README.md).
+
 Para cambiar host o puerto, pásalos también a Uvicorn:
 
 ```powershell
@@ -238,7 +240,7 @@ Validación del 2026-10-25 sobre PostgreSQL 18.6 nativo en Windows: `SELECT 1`, 
 
 La validación de persistencia con `python -m unittest discover -s tests -v` finalizó con **45 passed, 0 failed, 0 skipped**; las 19 pruebas de integración se ejecutaron. El test de borrado de una Template referenciada espera correctamente SQLSTATE `23001` para `RESTRICT` en PostgreSQL 18; los casos de referencias inexistentes conservan `23503`.
 
-Baselines anteriores: autenticación 163/0/0, Templates 218/0/0, Documents 289/0/0 y exportación QMD 306/0/0. La suite actual finaliza con **326 passed, 0 failed, 0 skipped**. Incluye renders reales de Quarto sobre proyectos temporales, pruebas de descubrimiento del catálogo, timeout, errores y restauración de `docs/`. Ninguna prueba renderiza el sitio real. La base local contiene un administrador, dos Templates y cinco Documents al cierre de esta validación.
+Baselines anteriores: autenticación 163/0/0, Templates 218/0/0, Documents 289/0/0 y exportación QMD 306/0/0. La suite actual finaliza con **330 passed, 0 failed, 0 skipped**. Incluye renders reales de Quarto sobre proyectos temporales, pruebas de descubrimiento del catálogo, CORS, timeout, errores y restauración de `docs/`. Ninguna prueba renderiza el sitio real. La base local contiene un administrador, dos Templates y cinco Documents al cierre de esta validación.
 
 ## Autenticación administrativa
 
@@ -274,7 +276,7 @@ El username se guarda sin espacios exteriores y no puede estar vacío. Como deci
 
 `AdminBootstrapService` y el repositorio SQLAlchemy usan la Session existente y una transacción: crean únicamente el primer administrador activo, con `last_login_at = NULL`. Si existe el username o cualquier administrador, incluso inactivo, el bootstrap se rechaza sin modificarlo. Los intentos concurrentes se serializan mediante un bloqueo transaccional PostgreSQL; se requiere el aislamiento habitual `READ COMMITTED`. La CLI confirma el éxito sin mostrar contraseña ni hash, y SQLAlchemy oculta los parámetros de consultas en logs y errores.
 
-La validación histórica de bootstrap y configuración finalizó con 89/0/0. Sigue pasando dentro de las 326 pruebas actuales. Settings funciona sin DATABASE_URL heredada, conectado a cms_core como cms_user. HEAD actual: `0003_simplify_documents`; no se modificó el administrador real.
+La validación histórica de bootstrap y configuración finalizó con 89/0/0. Sigue pasando dentro de las 330 pruebas actuales. Settings funciona sin DATABASE_URL heredada, conectado a cms_core como cms_user. HEAD actual: `0003_simplify_documents`; no se modificó el administrador real.
 
 `cms-admin` será una aplicación privada separada del sitio público Quarto. Todavía no se crea su carpeta ni se añade a navegación, sitemap o `docs/`. Los futuros endpoints editoriales deberán incorporar su autorización explícita; el login y `/auth/me` ya están disponibles.
 

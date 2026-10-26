@@ -3,6 +3,7 @@
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal
+from urllib.parse import urlsplit
 
 from pydantic import Field, SecretStr, ValidationError, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict, SettingsError
@@ -35,6 +36,27 @@ class Settings(BaseSettings):
     quarto_project_root: Path = DEFAULT_QUARTO_PROJECT_ROOT
     quarto_executable: str = "quarto"
     quarto_render_timeout_seconds: int = Field(default=120, gt=0)
+    cors_allowed_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+
+    @field_validator("cors_allowed_origins")
+    @classmethod
+    def validate_cors_origins(cls, value: str) -> str:
+        for origin in (item.strip() for item in value.split(",") if item.strip()):
+            parsed = urlsplit(origin)
+            if (parsed.scheme not in {"http", "https"} or not parsed.hostname or
+                    "*" in parsed.netloc or any(char.isspace() for char in origin) or
+                    parsed.username or parsed.password or parsed.path or parsed.query or
+                    parsed.fragment or origin == "*"):
+                raise ValueError("CORS_ALLOWED_ORIGINS debe contener orígenes HTTP(S) válidos.")
+            try:
+                parsed.port
+            except ValueError:
+                raise ValueError("CORS_ALLOWED_ORIGINS contiene un puerto inválido.") from None
+        return value
+
+    @property
+    def cors_origins(self) -> list[str]:
+        return [origin.strip() for origin in self.cors_allowed_origins.split(",") if origin.strip()]
 
     @field_validator("jwt_secret_key")
     @classmethod

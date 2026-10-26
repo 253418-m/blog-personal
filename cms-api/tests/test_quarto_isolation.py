@@ -39,6 +39,10 @@ class QuartoIsolationTests(unittest.TestCase):
             private.parent.mkdir(parents=True)
             private.write_text("---\ntitle: Interno\n---\n\nMARCADOR_INTERNO\n", encoding="utf-8")
             (root / "cms-api/private.py").write_text("MARCADOR_INTERNO", encoding="utf-8")
+            admin = root / "cms-admin/src/App.jsx"
+            admin.parent.mkdir(parents=True)
+            admin.write_text("MARCADOR_ADMIN_PRIVADO", encoding="utf-8")
+            (root / "cms-admin/README.md").write_text("MARCADOR_ADMIN_PRIVADO", encoding="utf-8")
             (root / "README.md").write_text("MARCADOR_INTERNO", encoding="utf-8")
             for name in (".cms-render-dinamico", ".quarto-staging-dinamico"):
                 staging = root / name / "stage"
@@ -64,12 +68,14 @@ class QuartoIsolationTests(unittest.TestCase):
                 ".nojekyll",
             ):
                 self.assertTrue((output / relative).is_file(), relative)
-            for relative in ("cms-api", ".cms-render-dinamico", ".quarto-staging-dinamico"):
+            for relative in ("cms-api", "cms-admin", ".cms-render-dinamico", ".quarto-staging-dinamico"):
                 self.assertFalse((output / relative).exists(), relative)
             search = (output / "search.json").read_text(encoding="utf-8")
-            for forbidden in ("cms-api", "implementation-plan", "MARCADOR_INTERNO"):
+            for forbidden in ("cms-api", "cms-admin", "implementation-plan", "MARCADOR_INTERNO",
+                              "MARCADOR_ADMIN_PRIVADO"):
                 self.assertNotIn(forbidden, search)
             self.assertNotIn("cms-api", (output / "index.html").read_text(encoding="utf-8"))
+            self.assertNotIn("cms-admin", (output / "index.html").read_text(encoding="utf-8"))
             sitemap = output / "sitemap.xml"
             if sitemap.exists():
                 self.assertNotIn("cms-api", sitemap.read_text(encoding="utf-8"))
@@ -87,6 +93,9 @@ class QuartoIsolationTests(unittest.TestCase):
             private = root / "cms-api/api-docs/implementation-plan.md"
             private.parent.mkdir(parents=True)
             shutil.copy2(PROJECT_ROOT / "cms-api/api-docs/implementation-plan.md", private)
+            admin = root / "cms-admin/README.md"
+            admin.parent.mkdir(parents=True)
+            admin.write_text("MARCADOR_ADMIN_PRIVADO", encoding="utf-8")
 
             result = subprocess.run(
                 ["quarto", "render"], cwd=root, capture_output=True, text=True, timeout=180
@@ -98,8 +107,10 @@ class QuartoIsolationTests(unittest.TestCase):
                 html = output / source.relative_to(root).with_suffix(".html")
                 self.assertTrue(html.is_file(), str(html.relative_to(output)))
             self.assertFalse((output / "cms-api").exists())
+            self.assertFalse((output / "cms-admin").exists())
             search = (output / "search.json").read_text(encoding="utf-8")
             self.assertNotIn("cms-api", search)
+            self.assertNotIn("cms-admin", search)
             self.assertNotIn("implementation-plan", search)
             sitemap = output / "sitemap.xml"
             if sitemap.exists():
