@@ -1,8 +1,9 @@
-"""Reglas POST/LANDING; publicar POST exporta Quarto sin renderizarlo."""
+"""Reglas POST/LANDING y publicación con export, render y compensación."""
 
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from datetime import datetime, timezone
+import logging
 from uuid import UUID
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -17,6 +18,11 @@ from app.repositories.interfaces import DocumentRepository
 from app.schemas.document import DocumentCreateRequest, DocumentResponse, DocumentUpdateRequest
 from app.services.metadata_validation import validate_metadata
 from app.services.quarto_export import QuartoCollisionError, QuartoExporter, QuartoExportError
+from app.services.quarto_render import QuartoRenderError, QuartoRenderService
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class DocumentStorageUnavailable(DomainError):
@@ -27,10 +33,16 @@ class QuartoExportUnavailable(DomainError):
     """Fallo seguro de exportación o compensación."""
 
 
+class QuartoRenderUnavailable(DomainError):
+    """Fallo seguro de render o restauración de docs/."""
+
+
 class DocumentService:
-    def __init__(self, session_factory: Callable[[], Session], quarto_exporter: QuartoExporter) -> None:
+    def __init__(self, session_factory: Callable[[], Session], quarto_exporter: QuartoExporter,
+                 quarto_render_service: QuartoRenderService) -> None:
         self._session_factory = session_factory
         self._quarto_exporter = quarto_exporter
+        self._quarto_render_service = quarto_render_service
 
     @contextmanager
     def _repository(self) -> Iterator[DocumentRepository]:
@@ -122,6 +134,7 @@ class DocumentService:
 
     def publish_document(self, document_id: UUID) -> DocumentResponse:
         exported = None
+        rendered = None
         try:
             with self._repository() as repository:
                 document = self._require(repository, document_id, write=True)
@@ -133,6 +146,7 @@ class DocumentService:
                     raise BusinessRuleViolation("El título no puede estar vacío al publicar.")
                 now = datetime.now(timezone.utc)
                 if document.content_type == DocumentContentType.POST:
+                    repository.lock_quarto_publication()
                     try:
                         exported = self._quarto_exporter.export_post(
                             slug=document.slug, title=document.title, metadata_values=document.metadata_values or {},
@@ -142,18 +156,37 @@ class DocumentService:
                         raise DomainConflict("Ya existe contenido Quarto con ese slug.") from None
                     except QuartoExportError:
                         raise QuartoExportUnavailable("No fue posible exportar el contenido a Quarto.") from None
+                    try:
+                        rendered = self._quarto_render_service.render_site(document.slug)
+                    except QuartoRenderError:
+                        raise QuartoRenderUnavailable("No fue posible generar el sitio Quarto.") from None
                 document.status = DocumentStatus.PUBLICADO
                 document.published_at = now
                 document.updated_at = now
                 repository.update(document)
-                return DocumentResponse.model_validate(document)
+                response = DocumentResponse.model_validate(document)
+                if rendered is not None:
+                    logger.info("db_commit_started")
         except Exception:
+            if exported is not None:
+                logger.warning("compensation_started")
+            compensation_failed = False
+            if rendered is not None:
+                try:
+                    rendered.restore()
+                except QuartoRenderError:
+                    compensation_failed = True
             if exported is not None and exported.created:
                 try:
                     self._quarto_exporter.remove_export(exported)
                 except QuartoExportError:
-                    raise QuartoExportUnavailable("No fue posible compensar la exportación Quarto.") from None
+                    compensation_failed = True
+            if compensation_failed:
+                raise QuartoRenderUnavailable("No fue posible compensar la publicación Quarto.") from None
             raise
+        if rendered is not None:
+            rendered.finalize()
+        return response
 
     def archive_document(self, document_id: UUID) -> DocumentResponse:
         with self._repository() as repository:

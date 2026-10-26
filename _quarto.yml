@@ -1,6 +1,15 @@
 ﻿project:
   type: website
   output-dir: docs
+  render:
+    - index.qmd
+    - about.qmd
+    - posts/**/*.qmd
+    - proyectos/**/*.qmd
+  resources:
+    - images/**
+    - styles.css
+    - .nojekyll
 lang: es
 website:
   title: "Miguel Dev Blog"

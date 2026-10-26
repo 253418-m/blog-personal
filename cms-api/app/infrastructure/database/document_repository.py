@@ -2,7 +2,7 @@
 
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.domain.enums import DocumentContentType, DocumentStatus
@@ -12,6 +12,11 @@ from app.infrastructure.database.models import DocumentModel, TemplateModel
 class SQLAlchemyDocumentRepository:
     def __init__(self, session: Session) -> None:
         self._session = session
+
+    def lock_quarto_publication(self) -> None:
+        # Serializa renders de distintos POST entre workers mientras dura la
+        # transacción. Un render completo comparte un único destino docs/.
+        self._session.execute(select(func.pg_advisory_xact_lock(4850171141436910677)))
 
     def get_by_id(self, document_id: UUID, *, for_update: bool = False) -> DocumentModel | None:
         query = select(DocumentModel).where(DocumentModel.document_id == document_id)

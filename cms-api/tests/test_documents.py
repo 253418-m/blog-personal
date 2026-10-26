@@ -16,8 +16,18 @@ from app.infrastructure.database.models import AdminUserModel, DocumentModel, Te
 from app.main import app
 from app.services.document_service import DocumentService
 from app.services.quarto_export import FileSystemQuartoExporter
+from app.services.quarto_render import QuartoRenderResult, QuartoRenderService
 from tests.auth_support import AUTH_USER_ID
 from tests.test_templates import TemplateHTTPTestCase
+
+
+class _FixtureQuartoRenderer:
+    def render_site(self, *, staging_dir: Path, expected_slug: str) -> QuartoRenderResult:
+        destination = staging_dir / "posts" / expected_slug
+        destination.mkdir(parents=True)
+        (staging_dir / "index.html").write_text("Sitio temporal", encoding="utf-8")
+        (destination / "index.html").write_text("Post temporal", encoding="utf-8")
+        return QuartoRenderResult(True, 0, 1)
 
 
 class DocumentHTTPTestCase(TemplateHTTPTestCase):
@@ -32,8 +42,14 @@ class DocumentHTTPTestCase(TemplateHTTPTestCase):
         self.addCleanup(self.quarto_directory.cleanup)
         self.quarto_root = Path(self.quarto_directory.name)
         (self.quarto_root / "posts").mkdir()
+        (self.quarto_root / "_quarto.yml").write_text(
+            "project:\n  type: website\n  output-dir: docs\n", encoding="utf-8"
+        )
         self.quarto_exporter = FileSystemQuartoExporter(self.quarto_root)
-        app.dependency_overrides[get_document_service] = lambda: DocumentService(self.session_factory, self.quarto_exporter)
+        self.quarto_render_service = QuartoRenderService(self.quarto_root, _FixtureQuartoRenderer())
+        app.dependency_overrides[get_document_service] = lambda: DocumentService(
+            self.session_factory, self.quarto_exporter, self.quarto_render_service
+        )
         self.post_template = self.seed(allow_published_edit=True, metadata_contract=[
             {"field_key": "category", "expected_type": "STRING", "is_required": True},
             {"field_key": "reading_time", "expected_type": "INTEGER", "is_required": False},

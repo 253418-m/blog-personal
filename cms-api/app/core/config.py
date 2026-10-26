@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     jwt_algorithm: Literal["HS256"] = "HS256"
     jwt_access_token_expire_minutes: int = Field(default=30, gt=0)
     quarto_project_root: Path = DEFAULT_QUARTO_PROJECT_ROOT
+    quarto_executable: str = "quarto"
+    quarto_render_timeout_seconds: int = Field(default=120, gt=0)
 
     @field_validator("jwt_secret_key")
     @classmethod
