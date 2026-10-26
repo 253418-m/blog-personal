@@ -41,7 +41,7 @@ class DatabaseModelTests(unittest.TestCase):
             "documents": {
                 "document_id", "slug", "title", "content_type", "status",
                 "template_id", "frozen_template", "metadata_values", "updated_at",
-                "published_at",
+                "published_at", "content", "created_at",
             },
             "canvas_blocks": {
                 "block_id", "document_id", "block_type", "order_index",
@@ -136,7 +136,7 @@ class DatabaseModelTests(unittest.TestCase):
     def test_timestamps_have_timezone_and_no_implicit_clock(self):
         timestamps = {
             "templates": {"created_at"},
-            "documents": {"updated_at", "published_at"},
+            "documents": {"created_at", "updated_at", "published_at"},
             "review_reports": {"audited_at"},
         }
         for table_name, names in timestamps.items():
@@ -148,17 +148,17 @@ class DatabaseModelTests(unittest.TestCase):
                     self.assertIsNone(column.default)
                     self.assertIsNone(column.server_default)
 
-    def test_only_document_status_is_a_closed_vocabulary(self):
+    def test_active_document_status_excludes_legacy_review_without_changing_historical_check(self):
         expected_statuses = {status.value for status in DocumentStatus}
         self.assertEqual(
-            expected_statuses, {"BORRADOR", "EN_REVISION", "PUBLICADO", "ARCHIVADO"}
+            expected_statuses, {"BORRADOR", "PUBLICADO", "ARCHIVADO"}
         )
         documents = Base.metadata.tables["documents"]
         status_type = documents.c.status.type
         self.assertIsInstance(status_type, String)
         if isinstance(status_type, Enum):
             self.assertFalse(status_type.native_enum)
-            self.assertEqual(set(status_type.enums), expected_statuses)
+            self.assertEqual(set(status_type.enums), expected_statuses | {"EN_REVISION"})
         checks = " ".join(
             str(constraint.sqltext.compile(
                 dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}

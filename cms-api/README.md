@@ -44,7 +44,7 @@ python -m uvicorn app.main:app --reload
 | ReDoc | http://127.0.0.1:8000/redoc |
 | OpenAPI generado | http://127.0.0.1:8000/openapi.json |
 
-El OpenAPI publica `POST /api/v1/auth/login` y `GET /api/v1/auth/me`. Templates, Documents, Workflow, Preview y Metrics siguen como routers vacíos bajo `/api/v1`; `/` y las rutas editoriales responden `404`. Las operaciones de autenticación utilizan PostgreSQL mediante las sesiones de persistencia existentes.
+El OpenAPI publica login y `/auth/me`, las cuatro operaciones de Templates y las siete de Documents (CRUD, publish, archive). Templates y Documents requieren JWT Bearer mediante `get_current_admin`. Preview y Metrics siguen sin operaciones; `/` responde `404`.
 
 ## Configuración
 
@@ -157,7 +157,7 @@ alembic current
 
 La revisión `initial_cms_schema` define `templates`, `documents`, `canvas_blocks` y `review_reports`, con UUID, JSONB, timestamps con zona horaria, claves, restricciones e índices.
 
-La cadena actual es `0001_initial_cms_schema → 0002_add_admin_users`. La revisión `0002` agrega únicamente `admin_users`; `0001` y las cuatro tablas editoriales permanecen sin cambios. `alembic heads` debe mostrar una sola HEAD: `0002_add_admin_users`.
+La cadena actual es `0001_initial_cms_schema → 0002_add_admin_users → 0003_simplify_documents`, con una sola HEAD: `0003_simplify_documents`. `0001` y `0002` permanecen intactas. `0003` agrega únicamente `documents.content` (TEXT NOT NULL) y `documents.created_at` (TIMESTAMPTZ NOT NULL). Para filas históricas usa contenido vacío y copia `updated_at` a `created_at`; no inventa contenido ni fechas.
 
 Después de modificar modelos, genera una futura migración con:
 
@@ -167,7 +167,7 @@ alembic revision --autogenerate -m "descripcion"
 
 Revisa manualmente cada migración antes de aplicarla. Autogenerate requiere una conexión a PostgreSQL y no sustituye revisar tipos, relaciones y efectos sobre los datos.
 
-Para comprobar la reversión incremental **solo en la base local de desarrollo**, partiendo de `0002_add_admin_users`:
+El ciclo `0002 → 0003 → 0002 → 0003` fue validado en PostgreSQL local, con Documents vacíos y conservando el administrador y la Template reales. Para una base de desarrollo en `0003` y sin Documents:
 
 ```powershell
 alembic downgrade -1
@@ -175,7 +175,7 @@ alembic upgrade head
 alembic current
 ```
 
-Desde `0002`, `downgrade -1` elimina `admin_users` y sus cuentas, dejando las cuatro tablas editoriales de `0001` intactas. El upgrade posterior restaura la tabla vacía. No ejecutes este ciclo sobre datos que quieras conservar ni contra bases externas o de producción.
+Desde `0003`, `downgrade -1` elimina únicamente las dos columnas nuevas; se niega a ejecutarse si hay Documents para evitar pérdida de contenido. No bajar de `0002`: su reversión eliminaría `admin_users`. El ciclo mostrado solo debe ejecutarse en una base local de desarrollo sin Documents.
 
 Para inspeccionar solamente el SQL de `0002` sin conectar a PostgreSQL, con `DATABASE_URL` definida:
 
@@ -192,17 +192,17 @@ alembic downgrade 0002_add_admin_users:0001_initial_cms_schema --sql
 | Document → CanvasBlocks | `canvas_blocks.document_id` con `ON DELETE CASCADE` |
 | Document → ReviewReports | `review_reports.document_id` con `ON DELETE CASCADE` |
 
-`templates.name` y `documents.slug` son únicos. `(document_id, order_index)` es único en `canvas_blocks`. Las cascadas internas no autorizan borrar documentos: el futuro servicio deberá impedir eliminar físicamente `PUBLICADO` o `ARCHIVADO`.
+`templates.name` y `documents.slug` son únicos. `(document_id, order_index)` es único en `canvas_blocks`. DocumentService permite eliminar físicamente solo BORRADOR, nunca PUBLICADO ni ARCHIVADO.
 
 JSONB almacena `metadata_contract`, `layout_structure`, `frozen_template`, `metadata_values`, `content_payload`, `style_config` y `findings`. `latest_review` se obtendrá de `review_reports` por `audited_at DESC`, sin columna duplicada. No hay tablas para MetricSnapshot ni PreviewSession.
 
-Los identificadores se almacenan como UUID de PostgreSQL. El contrato exige UUIDv7, cuya generación corresponde a futuros casos de uso en la aplicación; no hay UUIDv4 ni defaults de UUID en la base. Las operaciones futuras deben suministrar timestamps explícitos con zona horaria.
+Los identificadores se almacenan como UUID de PostgreSQL. El contrato exige UUIDv7, generado en la aplicación por bootstrap administrativo y TemplateService; no hay UUIDv4 ni defaults de UUID en la base. Las operaciones futuras deben suministrar timestamps explícitos con zona horaria.
 
-`status` acepta mediante CHECK los cuatro valores confirmados: `BORRADOR`, `EN_REVISION`, `PUBLICADO`, `ARCHIVADO`. `target_type`, `content_type` y `block_type` usan texto porque sus catálogos siguen `CONTRACT_PENDING`; `expected_type` también sigue pendiente dentro del contrato JSON de metadatos. No se inventan enums cerrados.
+El CHECK histórico conserva BORRADOR/EN_REVISION/PUBLICADO/ARCHIVADO para compatibilidad con `0001`. El contrato activo solo admite BORRADOR/PUBLICADO/ARCHIVADO y content_type POST/LANDING. No hay flujo EN_REVISION ni operaciones de bloques. Los tipos de metadatos son STRING/INTEGER/BOOLEAN/DATE.
 
-La Session factory permite futuros límites transaccionales como `with SessionLocal.begin() as session:`. La dependency gestiona el cierre de la sesión; cada caso de uso deberá definir su transacción. Aún no se implementan creación, transferencia de default, reasignación, publicación ni archivado.
+La Session factory permite `session.begin()`. TemplateService y DocumentService administran transacciones completas; los repositorios solo hacen flush. Las mutaciones de Documents bloquean su fila para serializar edición/publicación/archivado; la validación mantiene estable la Template asociada con un bloqueo de lectura. Autenticación conserva su propia sesión.
 
-Las invariantes «al menos una Template» y «exactamente una default» requieren inicialización y coordinación transaccional en servicios, con bloqueo adecuado para concurrencia. No quedan garantizadas por un CHECK por fila. `bootstrap.py` registra `BOOTSTRAP_PENDING` / `CONTRACT_PENDING`; no inserta una plantilla arbitraria. La base recién migrada estará vacía hasta definir los valores oficiales de la plantilla inicial.
+El catálogo puede comenzar vacío. La primera Template se crea manualmente por POST y debe enviar `is_default=true`; de lo contrario recibe `422`. TemplateService conserva exactamente una default cuando existe contenido y bloquea el borrado de la última Template. Serializa las escrituras mediante `LOCK TABLE templates IN SHARE ROW EXCLUSIVE MODE`, incluso con catálogo vacío, y usa una sola transacción para cada transferencia. Las lecturas normales siguen permitidas; las escrituras administrativas esperan su turno. No se generan seeds ni una primera Template automáticamente.
 
 ### Pruebas y validación
 
@@ -230,17 +230,17 @@ raise SystemExit(subprocess.call([
 '@ | python -
 ```
 
-Las pruebas de integración trabajan dentro de una transacción que se revierte al terminar; no usan `drop_all()` ni alteran el esquema persistente. Las 59 pruebas de integración administrativas usan una copia temporal privada de `admin_users` por conexión, con los tipos, constraints y defaults reales; no insertan, actualizan ni eliminan registros en `public.admin_users`. Comprueban persistencia, bootstrap, autenticación y respuestas HTTP con datos ficticios. Las pruebas editoriales verifican unicidad, claves foráneas, orden de bloques, JSONB, relaciones ORM y timestamps con zona horaria. Las pruebas estructurales verifican también el SQL offline de `0002` y su reversión aislada.
+Las pruebas de integración revierten sus transacciones; las pruebas HTTP y administrativas usan copias pg_temp, sin modificar registros reales. Las pruebas de 0003 ejecutan backfill, rechazo de downgrade con filas y ciclo vacío exclusivamente sobre Documents temporales. Se verifican constraints, FK, JSONB, timestamps, HTTP y rollback.
 
 Validación del 2026-10-25 sobre PostgreSQL 18.6 nativo en Windows: `SELECT 1`, las migraciones online `0001` y `0002`, el ciclo `0002 → 0001 → 0002`, los tipos y operaciones JSONB, las claves foráneas y las restricciones UNIQUE se comprobaron contra la base real. La base quedó en `0002_add_admin_users` y los datos ficticios se revirtieron.
 
 La validación de persistencia con `python -m unittest discover -s tests -v` finalizó con **45 passed, 0 failed, 0 skipped**; las 19 pruebas de integración se ejecutaron. El test de borrado de una Template referenciada espera correctamente SQLSTATE `23001` para `RESTRICT` en PostgreSQL 18; los casos de referencias inexistentes conservan `23503`.
 
-La suite completa tras implementar autenticación HTTP finalizó con **163 passed, 0 failed, 0 skipped**, incluidas 72 pruebas de integración contra PostgreSQL. Cubre configuración, hashing, bootstrap, repositorio, AuthService, JWT, login, `/auth/me` y sus contratos OpenAPI. Durante esta validación no se inició sesión con el administrador real ni se modificó su registro.
+Baselines anteriores: autenticación 163/0/0 y Templates 218/0/0. La suite completa actual finaliza con **289 passed, 0 failed, 0 skipped**. Las 71 pruebas nuevas de Documents cubren 60 casos HTTP (CREATE 15, LIST/GET 8, UPDATE 8, PUBLISH 7, edición publicada 6, ARCHIVE 5, DELETE 5, autorización 2, rollback 4), 5 de metadatos, 3 de OpenAPI y 3 de migración. El administrador real y la Template real mantienen todos sus campos; Documents termina con cero filas.
 
 ## Autenticación administrativa
 
-El CMS utiliza usuarios administrativos propios mediante `username + password`. El hashing y la verificación Argon2id están implementados con `PasswordHash.recommended()` de pwdlib, sin parámetros criptográficos manuales. El login HTTP emite un JWT de acceso y `/auth/me` exige un Bearer válido. La protección se aplica únicamente a `/auth/me`; los routers editoriales siguen sin CRUD ni protección global.
+El CMS utiliza usuarios administrativos propios mediante `username + password`. El hashing y la verificación Argon2id están implementados con `PasswordHash.recommended()` de pwdlib, sin parámetros criptográficos manuales. El login HTTP emite un JWT de acceso. `/auth/me` y las cuatro operaciones de Templates requieren Bearer mediante `get_current_admin`; no se modifica el contrato JWT ni se agrega protección global.
 
 `admin_users` contiene exactamente `user_id`, `username`, `password_hash`, `is_active`, `created_at`, `updated_at` y `last_login_at`. El username es único y la base solo almacena `password_hash` como TEXT: las contraseñas originales nunca se persisten. `app/core/security.py` expone `PasswordHasher`, `hash_password()` y `verify_password()`; la verificación incorrecta o de un hash inválido devuelve `False`. No se retornan hashes mediante HTTP ni mediante el resultado del bootstrap.
 
@@ -272,7 +272,7 @@ El username se guarda sin espacios exteriores y no puede estar vacío. Como deci
 
 `AdminBootstrapService` y el repositorio SQLAlchemy usan la Session existente y una transacción: crean únicamente el primer administrador activo, con `last_login_at = NULL`. Si existe el username o cualquier administrador, incluso inactivo, el bootstrap se rechaza sin modificarlo. Los intentos concurrentes se serializan mediante un bloqueo transaccional PostgreSQL; se requiere el aislamiento habitual `READ COMMITTED`. La CLI confirma el éxito sin mostrar contraseña ni hash, y SQLAlchemy oculta los parámetros de consultas en logs y errores.
 
-La validación anterior de bootstrap y configuración finalizó con **89 passed, 0 failed, 0 skipped**; la suite completa actual es la de 163 pruebas descrita arriba. Los datos de bootstrap son exclusivamente ficticios, se aíslan en tablas temporales y se revierten; el administrador real permanece intacto. Se comprobó la carga local en procesos nuevos sin `DATABASE_URL` heredada, SQLAlchemy conectado a `cms_core` como `cms_user` y Alembic en `0002_add_admin_users (head)`. El esquema persistente y las migraciones permanecen intactos.
+La validación histórica de bootstrap y configuración finalizó con 89/0/0. Sigue pasando dentro de las 289 pruebas actuales. Settings funciona sin DATABASE_URL heredada, conectado a cms_core como cms_user. HEAD actual: `0003_simplify_documents`; no se modificó el administrador real.
 
 `cms-admin` será una aplicación privada separada del sitio público Quarto. Todavía no se crea su carpeta ni se añade a navegación, sitemap o `docs/`. Los futuros endpoints editoriales deberán incorporar su autorización explícita; el login y `/auth/me` ya están disponibles.
 
@@ -284,7 +284,7 @@ La validación anterior de bootstrap y configuración finalizó con **89 passed,
 | `app/core/` | Configuración, hashing Argon2id, JWT y excepciones |
 | `app/domain/` | Modelos preliminares y estados del dominio |
 | `app/schemas/` | Contratos de autenticación y schemas editoriales preliminares |
-| `app/services/` | AuthService, bootstrap administrativo y futuros casos de uso |
+| `app/services/` | AuthService, TemplateService, bootstrap y futuros casos de uso |
 | `app/repositories/` | Abstracciones para persistencia |
 | `app/infrastructure/database/` | Base, sesiones, ORM, repositorio y entrada explícita al bootstrap |
 | `app/cli/` | Bootstrap interactivo del primer administrador |
@@ -293,7 +293,7 @@ La validación anterior de bootstrap y configuración finalizó con **89 passed,
 | `postman/` | Preparación de pruebas manuales |
 | `api-docs/` | Plan técnico |
 
-El contrato de persistencia ya define los campos de Template, Document, CanvasBlock y ReviewReport y exige UUIDv7. Los modelos de dominio y schemas HTTP editoriales continúan preliminares y no se conectan a endpoints en esta fase. Aún deben precisarse los cuerpos Create, Update y Response por operación, sus reglas y catálogos pendientes. Los contratos HTTP de autenticación ya están implementados.
+Templates y Documents tienen schemas, repositorios, servicios y rutas protegidas. Document usa contenido Markdown como string; frozen_template, CanvasBlock y ReviewReport se conservan físicamente por compatibilidad, sin exponerlos en este contrato ni ampliar sus operaciones. No se modifican los contratos HTTP de autenticación.
 
 ## Postman y próximos contratos
 
@@ -312,8 +312,157 @@ Usa `base_url=http://127.0.0.1:8000`, con la API en ejecución y un administrado
 3. Crea una petición **GET** a `http://127.0.0.1:8000/api/v1/auth/me`. En **Authorization → Bearer Token**, pega el token recibido; Postman enviará `Authorization: Bearer TU_ACCESS_TOKEN`. No necesita body.
 4. Comprueba `200` y que la respuesta contiene únicamente `user_id`, `username` e `is_active`. Para comprobar errores, usa un password ficticio incorrecto en login (`401`) o elimina el Bearer de `/auth/me` (`401`).
 
-Los valores `TU_USUARIO`, `TU_PASSWORD` y `TU_ACCESS_TOKEN` son marcadores, no credenciales. No guardes contraseñas ni tokens reales en colecciones exportadas, ejemplos o archivos del repositorio. Esta fase no incorpora una colección Postman. Las operaciones editoriales GET, POST, PUT y DELETE siguen pendientes.
+Los valores `TU_USUARIO`, `TU_PASSWORD` y `TU_ACCESS_TOKEN` son marcadores, no credenciales. No guardes contraseñas ni tokens reales en colecciones exportadas, ejemplos o archivos del repositorio. Esta fase documenta la configuración manual de Postman; no incorpora una colección exportada.
+
+### Templates simplificadas del Blog Personal
+
+Una Template define metadatos y un objeto JSON de estructura reutilizable. `POST` corresponde a publicaciones del blog y `LANDING` a la página profesional. Los tipos de metadatos admitidos son exclusivamente `STRING`, `INTEGER`, `BOOLEAN`, `DATE`. `metadata_contract` necesita al menos un elemento, claves no vacías y sin duplicados; cada elemento contiene solo `field_key`, `expected_type`, `is_required`. Se recortan espacios exteriores de `name` y `field_key`; los nombres son únicos y distinguen mayúsculas. Los booleanos deben ser booleanos JSON. `layout_structure` admite cualquier objeto JSON, incluso vacío: no hay motor de layouts.
+
+Es una adaptación académica del ejemplo docente: no incluye Idempotency-Key, timeout HTTP explícito de 10 segundos, cursor, limit, fallback, reasignación de Documents ni autenticación de servicios Preview. No se agregan ReviewReport, métricas, WebSockets ni pipelines. El esquema ya existente se conserva.
+
+| Operación | Resultado | Reglas principales |
+| --- | --- | --- |
+| POST `/api/v1/templates` | `201`, Template completa | Primera default obligatoria; name duplicado `409`; validación `422` |
+| GET `/api/v1/templates` | `200`, `{"items": [...]}` | Todas, filtro opcional target_type; orden created_at ASC y UUID ASC para empates |
+| PUT `/api/v1/templates/{template_id}` | `200`, Template completa | Reemplaza los cuatro campos editables; inexistente `404`, name duplicado `409`, dejar cero defaults `422` |
+| DELETE `/api/v1/templates/{template_id}` | `200`, `{"deleted_template_id": "UUID"}` | Inexistente `404`; última o referenciada por cualquier Document `409` |
+
+Las cuatro rutas requieren Bearer: ausente/inválido `401`, administrador inactivo `403`. Los errores operativos de persistencia devuelven un `503` genérico. Las respuestas de Template contienen los ocho campos públicos, con UUIDv7 y `created_at` UTC. PUT admite exclusivamente `name`, `is_default`, `metadata_contract`, `layout_structure`: enviar identidad, fecha, target_type, allow_published_edit u otros campos produce `422` por `extra="forbid"`.
+
+Crear o actualizar otra Template con `is_default=true` transfiere el default atómicamente. Eliminar la default selecciona la restante más antigua; los empates se resuelven por UUID ASC. Si hay Documents asociados, se rechaza sin cambiar ninguna fila, sin importar su estado; `ON DELETE RESTRICT` sigue siendo la protección final. Se recomienda `allow_published_edit=false` para POST y `true` para LANDING, pero la API acepta el booleano enviado y lo conserva inmutable.
+
+### Postman: carpeta 02 - Templates
+
+Crea una colección `Blog-personal` con carpetas `01 - Auth` (POST Login, GET Current Admin) y `02 - Templates`. Configura estas variables localmente:
+
+| Variable | Valor |
+| --- | --- |
+| `base_url` | `http://127.0.0.1:8000` |
+| `access_token` | Token que obtengas manualmente mediante login; no exportarlo |
+| `template_id` | UUID devuelto por POST o GET |
+
+En `02 - Templates`, selecciona **Authorization → Bearer Token → `{{access_token}}`**. En las cuatro peticiones selecciona **Inherit auth from parent**. No configures Idempotency-Key. Los ejemplos siguientes son ficticios; no se ejecutan automáticamente.
+
+**POST Create Template:** `{{base_url}}/api/v1/templates`, **Body → raw → JSON**. Para inicializar un catálogo vacío:
+
+```json
+{
+  "name": "Plantilla Post",
+  "target_type": "POST",
+  "is_default": true,
+  "allow_published_edit": false,
+  "metadata_contract": [
+    {"field_key": "category", "expected_type": "STRING", "is_required": true},
+    {"field_key": "reading_time", "expected_type": "INTEGER", "is_required": false}
+  ],
+  "layout_structure": {"sections": ["header", "content"]}
+}
+```
+
+Espera `201`. Para crear una segunda Template LANDING sin cambiar el default, usa:
+
+```json
+{
+  "name": "Plantilla Landing",
+  "target_type": "LANDING",
+  "is_default": false,
+  "allow_published_edit": true,
+  "metadata_contract": [
+    {"field_key": "title", "expected_type": "STRING", "is_required": true}
+  ],
+  "layout_structure": {"sections": ["hero", "about", "projects", "certifications"]}
+}
+```
+
+Guarda el UUID de esa segunda respuesta como `template_id` para practicar PUT y DELETE conservando la primera.
+
+**GET List Templates:** `{{base_url}}/api/v1/templates`, sin body. Espera `200` con `items`; prueba también `?target_type=POST` o `?target_type=LANDING`. No envíes cursor ni limit.
+
+**PUT Update Template:** `{{base_url}}/api/v1/templates/{{template_id}}`, **Body → raw → JSON**:
+
+```json
+{
+  "name": "Plantilla Landing Principal",
+  "is_default": true,
+  "metadata_contract": [
+    {"field_key": "title", "expected_type": "STRING", "is_required": true},
+    {"field_key": "updated_on", "expected_type": "DATE", "is_required": false},
+    {"field_key": "show_projects", "expected_type": "BOOLEAN", "is_required": false}
+  ],
+  "layout_structure": {"sections": ["hero", "about", "projects"]}
+}
+```
+
+Espera `200`; GET debe mostrar exactamente una default, ahora la LANDING. Los cuatro campos editables son obligatorios en PUT.
+
+**DELETE Template:** `{{base_url}}/api/v1/templates/{{template_id}}`, sin body. Si quedan al menos dos Templates y la seleccionada no tiene Documents, espera `200` con `deleted_template_id`; si es la última o está utilizada, espera `409`. Ya existe una Template creada manualmente por el usuario y se conserva intacta.
 
 PATCH permanece `CONTRACT_PENDING`. Live Preview requiere WebSocket y no se implementa todavía. Tampoco se integran un servicio analítico ni un agente de revisión.
+
+### Documents y publicación local
+
+Document contiene once campos públicos: `document_id`, `title`, `slug`, `content_type`, `status`, `template_id`, `metadata_values`, `content`, `created_at`, `updated_at`, `published_at`. Los UUID son v7 y las fechas UTC. `content` guarda Markdown como string; no genera HTML ni QMD. Los estados activos son BORRADOR/PUBLICADO/ARCHIVADO y los tipos POST/LANDING.
+
+Al crear, el título no puede estar vacío, el slug es único global y debe cumplir `^[a-z0-9]+(?:-[a-z0-9]+)*$`. La Template debe existir y coincidir con content_type. El borrador puede tener contenido vacío y omitir metadatos requeridos; cada metadato presente debe existir en el contrato y cumplir su tipo. INTEGER no acepta bool ni números decimales; BOOLEAN requiere booleanos JSON; DATE requiere una fecha válida YYYY-MM-DD. Publicar exige contenido no vacío y todos los campos requeridos.
+
+POST PUBLICADO es **inmutable incluso con allow_published_edit=true**. LANDING PUBLICADO admite PUT cuando su Template permite edición; si cambia de Template, tanto la actual como la nueva deben permitirla. Esta decisión evita eludir la restricción mediante un cambio de Template. La edición publicada debe conservar contenido y metadatos válidos, y mantiene published_at. ARCHIVADO es terminal, no editable. Solo BORRADOR admite DELETE físico.
+
+Errores: sin Bearer/inválido 401, cuenta inactiva 403, Document/Template inexistente 404, slug duplicado o estado incompatible 409, datos inválidos 422 y persistencia indisponible 503 genérico. Cada mutación es transaccional. Publicar establece published_at/updated_at; archivar solo cambia status/updated_at.
+
+### Postman: carpeta 03 - Documents
+
+Dentro de `Blog-personal`, crea **03 - Documents**. Configura **Authorization → Bearer Token → `{{access_token}}`** en la carpeta y **Inherit auth from parent** en las siete peticiones. Variables locales: `base_url=http://127.0.0.1:8000`, `access_token`, `document_id`, `post_template_id`, `landing_template_id`. Obtén los UUID de Templates mediante GET `/api/v1/templates`; deben corresponder al tipo indicado. La LANDING de prueba debe tener allow_published_edit=true. Los ejemplos siguientes presuponen los contratos category/reading_time y title de la sección Templates; adapta sus metadatos si tus contratos difieren.
+
+| Petición | URL | Body | Resultado |
+| --- | --- | --- | --- |
+| POST Create Document | `{{base_url}}/api/v1/documents` | JSON POST o LANDING de abajo | 201 |
+| GET List Documents | `{{base_url}}/api/v1/documents` | Ninguno | 200, items |
+| GET Get Document | `{{base_url}}/api/v1/documents/{{document_id}}` | Ninguno | 200 |
+| PUT Update Document | `{{base_url}}/api/v1/documents/{{document_id}}` | Los cinco campos editables | 200 |
+| POST Publish Document | `{{base_url}}/api/v1/documents/{{document_id}}/publish` | Ninguno | 200 |
+| POST Archive Document | `{{base_url}}/api/v1/documents/{{document_id}}/archive` | Ninguno | 200 |
+| DELETE Document | `{{base_url}}/api/v1/documents/{{document_id}}` | Ninguno | 204 vacío, solo borrador |
+
+GET List acepta `?content_type=POST&status=PUBLICADO` o cualquiera de los filtros por separado; sin paginación. Orden: created_at ASC y document_id ASC para empates.
+
+En **Scripts → Post-response** de POST Create Document:
+
+```javascript
+if (pm.response.code === 201) {
+  pm.collectionVariables.set("document_id", pm.response.json().document_id);
+}
+```
+
+**Body → raw → JSON**, ejemplo POST ficticio:
+
+```json
+{
+  "title": "Post de prueba manual",
+  "slug": "post-prueba-manual",
+  "content_type": "POST",
+  "template_id": "{{post_template_id}}",
+  "metadata_values": {"category": "Pruebas", "reading_time": 3},
+  "content": "# Post de prueba\n\nContenido ficticio de validación."
+}
+```
+
+Ejemplo LANDING ficticio:
+
+```json
+{
+  "title": "Landing de prueba manual",
+  "slug": "landing-prueba-manual",
+  "content_type": "LANDING",
+  "template_id": "{{landing_template_id}}",
+  "metadata_values": {"title": "Página de prueba"},
+  "content": "# Página de prueba\n\nContenido ficticio editable."
+}
+```
+
+Para PUT envía el mismo JSON del Document elegido **sin content_type**, conservando los otros cinco campos: title, slug, template_id, metadata_values, content. Cambia title/content para comprobar la edición. No envíes status, fechas ni document_id: producen 422. No uses el ejemplo completo de POST como body de PUT.
+
+Flujo manual: crea POST → PUT de borrador (200) → publish (200) → PUT (409) → archive (200) → PUT/publish/DELETE (409). Crea LANDING → publish → PUT (200 si allow_published_edit=true, conservando published_at) → archive → PUT (409). Para probar DELETE 204, crea otro borrador con slug diferente y elimínalo antes de publicar. Las pruebas manuales de publicación dejan registros deliberadamente persistidos, que luego solo pueden archivarse por esta API.
+
+**Publicar todavía no modifica Quarto.** No se importan artículos históricos, no se escriben QMD, no se ejecuta `quarto render` ni se despliega. La futura integración podrá mapear LANDING inicio a `/` y sobre-mi a `/sobre-mi`; Contenido será el listado de POST PUBLICADO, no otro Document. QUARTO_SYNC, LEGACY_POST_IMPORT, Public content API y cms-admin siguen pendientes. PATCH continúa CONTRACT_PENDING.
 
 Consulta [el plan de implementación](api-docs/implementation-plan.md) y [las convenciones de Postman](postman/README.md).

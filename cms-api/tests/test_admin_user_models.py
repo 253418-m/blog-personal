@@ -115,7 +115,8 @@ class AdminUserMigrationTests(unittest.TestCase):
 
     def test_alembic_has_one_head_and_preserves_the_initial_revision(self):
         script = ScriptDirectory.from_config(Config(str(self.backend_root / "alembic.ini")))
-        self.assertEqual(script.get_heads(), ["0002_add_admin_users"])
+        self.assertEqual(script.get_heads(), ["0003_simplify_documents"])
+        self.assertEqual(script.get_revision("0003_simplify_documents").down_revision, "0002_add_admin_users")
         self.assertEqual(
             script.get_revision("0002_add_admin_users").down_revision,
             "0001_initial_cms_schema",

@@ -19,8 +19,9 @@ class AuthContractTests(unittest.TestCase):
         response = TokenResponse(access_token="fictitious-schema-token", expires_in=1800)
         self.assertTrue("fictitious-schema-token" not in repr(response))
 
-    def test_openapi_contains_only_the_two_auth_paths(self):
-        self.assertEqual(set(app.openapi()["paths"]), {"/api/v1/auth/login", "/api/v1/auth/me"})
+    def test_openapi_preserves_the_two_auth_paths(self):
+        auth_paths = {path for path in app.openapi()["paths"] if path.startswith("/api/v1/auth/")}
+        self.assertEqual(auth_paths, {"/api/v1/auth/login", "/api/v1/auth/me"})
 
     def test_login_is_public_json_and_me_has_http_bearer_security(self):
         specification = app.openapi()

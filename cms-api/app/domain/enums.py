@@ -5,9 +5,22 @@ from enum import Enum
 
 class DocumentStatus(str, Enum):
     BORRADOR = "BORRADOR"
-    EN_REVISION = "EN_REVISION"
     PUBLICADO = "PUBLICADO"
     ARCHIVADO = "ARCHIVADO"
 
 
-# TODO(CONTRACT_PENDING): valores completos de target_type; no crear un enum aún.
+class DocumentContentType(str, Enum):
+    POST = "POST"
+    LANDING = "LANDING"
+
+
+class TemplateTargetType(str, Enum):
+    POST = "POST"
+    LANDING = "LANDING"
+
+
+class MetadataExpectedType(str, Enum):
+    STRING = "STRING"
+    INTEGER = "INTEGER"
+    BOOLEAN = "BOOLEAN"
+    DATE = "DATE"

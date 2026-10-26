@@ -60,6 +60,8 @@ class PostgreSQLPersistenceTests(PostgreSQLTestCase):
             template=template,
             frozen_template=None,
             metadata_values=None,
+            content="",
+            created_at=TIMESTAMP,
             updated_at=TIMESTAMP,
             published_at=None,
         )
@@ -117,6 +119,8 @@ class PostgreSQLPersistenceTests(PostgreSQLTestCase):
             content_type="DEV_BLOG",
             status=DocumentStatus.BORRADOR,
             template_id=MISSING_ID,
+            content="",
+            created_at=TIMESTAMP,
             updated_at=TIMESTAMP,
         ))
         self._assert_flush_rejected("23503")

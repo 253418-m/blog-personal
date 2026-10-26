@@ -13,12 +13,12 @@ from sqlalchemy import (
     Index,
     PrimaryKeyConstraint,
     String,
+    Text,
     UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID as PostgreSQLUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.domain.enums import DocumentStatus
 from app.infrastructure.database.base import Base
 
 if TYPE_CHECKING:
@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
 
 class DocumentModel(Base):
-    """El último dictamen se consultará en review_reports por audited_at DESC."""
+    """Texto editorial simplificado; las relaciones históricas se conservan."""
 
     __tablename__ = "documents"
     __table_args__ = (
@@ -43,16 +43,16 @@ class DocumentModel(Base):
     )
     slug: Mapped[str] = mapped_column(String, nullable=False)
     title: Mapped[str] = mapped_column(String, nullable=False)
-    # CONTRACT_PENDING: no cerrar content_type con un catálogo parcial.
+    # POST/LANDING se validan en la aplicación, sin alterar la columna histórica.
     content_type: Mapped[str] = mapped_column(String, nullable=False)
-    status: Mapped[DocumentStatus] = mapped_column(
+    status: Mapped[str] = mapped_column(
         Enum(
-            DocumentStatus,
+            # Compatibilidad con el CHECK de 0001; la API no acepta EN_REVISION.
+            "BORRADOR", "EN_REVISION", "PUBLICADO", "ARCHIVADO",
             name="document_status",
             native_enum=False,
             create_constraint=True,
             validate_strings=True,
-            values_callable=lambda enum: [status.value for status in enum],
         ),
         nullable=False,
     )
@@ -71,6 +71,8 @@ class DocumentModel(Base):
     metadata_values: Mapped[Any | None] = mapped_column(
         JSONB(none_as_null=True), nullable=True
     )
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     published_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
