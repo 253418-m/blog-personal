@@ -1,0 +1,99 @@
+"""Configuración aislada en archivos temporales; nunca modificar el .env real."""
+
+import os
+from pathlib import Path
+from tempfile import TemporaryDirectory
+import unittest
+from unittest.mock import patch
+
+from pydantic import ValidationError
+
+from app.core.config import ENV_FILE, Settings, get_database_url, get_settings
+
+
+class SettingsTests(unittest.TestCase):
+    file_url = "postgresql+psycopg://fixture:file-secret@localhost:5432/fixture_db"
+    environment_url = "postgresql+psycopg://fixture:environment-secret@localhost:5432/fixture_db"
+
+    def setUp(self):
+        self.directory = TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.env_file = Path(self.directory.name) / ".env"
+        self.env_file.write_text("DATABASE_URL=" + self.file_url + "\n", encoding="utf-8")
+        self.environment = patch.dict(os.environ, {}, clear=True)
+        self.environment.start()
+        self.addCleanup(self.environment.stop)
+        self.config = patch.dict(Settings.model_config, {"env_file": self.env_file})
+        self.config.start()
+        self.addCleanup(self.config.stop)
+        get_settings.cache_clear()
+        self.addCleanup(get_settings.cache_clear)
+
+    def test_loads_database_url_from_controlled_env_file(self):
+        settings = Settings()
+        self.assertTrue(settings.database_url.get_secret_value() == self.file_url)
+
+    def test_real_environment_takes_precedence_over_env_file(self):
+        os.environ["DATABASE_URL"] = self.environment_url
+        self.assertTrue(get_database_url() == self.environment_url)
+
+    def test_missing_database_url_raises_clear_error_without_fallback(self):
+        self.env_file.unlink()
+        with self.assertRaisesRegex(RuntimeError, "Define DATABASE_URL.*entorno.*.env"):
+            get_database_url()
+
+    def test_get_database_url_returns_expected_sqlalchemy_string(self):
+        result = get_database_url()
+        self.assertIsInstance(result, str)
+        self.assertTrue(result == self.file_url)
+
+    def test_secret_is_excluded_from_repr_and_serialization(self):
+        settings = get_settings()
+        for rendered in (repr(settings), str(settings), settings.model_dump_json()):
+            self.assertTrue("file-secret" not in rendered)
+            self.assertTrue(self.file_url not in rendered)
+        self.assertNotIn("database_url", settings.model_dump())
+
+    def test_invalid_configuration_errors_do_not_expose_input(self):
+        os.environ["APP_PORT"] = self.environment_url
+        with self.assertRaises(ValidationError) as raised:
+            Settings()
+        self.assertTrue("environment-secret" not in str(raised.exception))
+        self.assertTrue(self.environment_url not in str(raised.exception))
+        with self.assertRaises(RuntimeError) as safe:
+            get_settings()
+        self.assertTrue("environment-secret" not in str(safe.exception))
+
+    def test_invalid_or_blank_url_does_not_fall_back_to_env_file(self):
+        for value in ("", "not-a-url-with-fixture-secret", "sqlite:///fixture.db"):
+            get_settings.cache_clear()
+            os.environ["DATABASE_URL"] = value
+            with self.assertRaisesRegex(RuntimeError, "Configuración inválida"):
+                get_database_url()
+
+    def test_settings_are_cached_until_cache_is_cleared(self):
+        first = get_settings()
+        os.environ["DATABASE_URL"] = self.environment_url
+        self.assertIs(get_settings(), first)
+        self.assertTrue(get_database_url() == self.file_url)
+        get_settings.cache_clear()
+        self.assertTrue(get_database_url() == self.environment_url)
+
+    def test_unknown_dotenv_keys_are_ignored_and_app_options_are_loaded(self):
+        with self.env_file.open("a", encoding="utf-8") as stream:
+            stream.write("POSTGRES_PASSWORD=unused-fixture\nAPP_ENV=test\nAPP_PORT=8012\n")
+        settings = get_settings()
+        self.assertEqual(settings.app_env, "test")
+        self.assertEqual(settings.app_port, 8012)
+        self.assertFalse(hasattr(settings, "postgres_password"))
+
+    def test_default_env_path_is_absolute_and_relative_to_the_backend_module(self):
+        from app.core import config
+
+        self.assertTrue(ENV_FILE.is_absolute())
+        self.assertEqual(ENV_FILE, Path(config.__file__).resolve().parents[2] / ".env")
+
+    def test_settings_are_immutable(self):
+        settings = get_settings()
+        with self.assertRaises(ValidationError):
+            settings.app_port = 9999

@@ -1,0 +1,1 @@
+"""Configuración y excepciones compartidas."""
