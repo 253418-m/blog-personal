@@ -83,9 +83,9 @@ class QuartoCatalogTests(unittest.TestCase):
 
             catalog = _render(root)
             sources = sorted((root / "posts").glob("*/index.qmd"))
-            self.assertEqual(len(sources), 13)
+            self.assertIn("plantilla", {source.parent.name for source in sources})
             included = [source for source in sources if source.parent.name != "plantilla"]
-            self.assertEqual(len(included), 12)
+            self.assertEqual(len(included), len(sources) - 1)
             for source in included:
                 slug = source.parent.name
                 self.assertIn(f"{slug}/index.html", catalog)

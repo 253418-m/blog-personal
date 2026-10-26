@@ -57,7 +57,8 @@ La API implementa login, Templates y Documents con JWT Bearer. Publicar un POST 
 | Publish POST UI | `IMPLEMENTED` | Confirmación, validación visual y estados del render; backend conserva la autoridad |
 | Archive Document UI | `IMPLEMENTED` | Confirmación y aviso de que el sitio público aún no se retira |
 | Delete draft UI | `IMPLEMENTED` | Confirmación y DELETE únicamente en BORRADOR |
-| Templates admin CRUD UI | `PENDING` | Plantillas solo consulta |
+| Templates admin CRUD UI | `IMPLEMENTED` | Lista, detalle, creación, edición y eliminación mediante endpoints existentes |
+| Dynamic metadata editor | `IMPLEMENTED` | Campos adicionales tipados, validación de claves y editor JSON de estructura |
 | LANDING editor | `PENDING` | Sin formulario específico de LANDING |
 | cms-admin deploy | `PENDING` | Sin despliegue del frontend privado |
 | GitHub Pages deployment integration | `PENDING` | Sin commit, push ni deploy |
@@ -241,4 +242,4 @@ Mantener rutas y semántica HTTP. Usar path parameters para identidad, query par
 
 Templates y Documents traducen errores de dominio a 404/409/422 y fallos de persistencia a 503 seguro. Documents devuelve 201 al crear, 200 al consultar/editar/publicar/archivar y 204 vacío al eliminar un borrador.
 
-Siguen pendientes PATCH (`CONTRACT_PENDING`), CRUD visual de Templates, editor LANDING, despliegue de cms-admin, despliegue GitHub Pages, exportación LANDING, sincronización al archivar e importación histórica. cms-admin permite login, sesiones JWT y administración de Documents desde las rutas existentes; permanece fuera de Quarto. La prueba manual de la interfaz se documenta en `cms-admin/README.md` y no se ejecuta en la suite. Los tests no renderizaron el sitio real.
+Siguen pendientes PATCH (`CONTRACT_PENDING`), editor LANDING, despliegue de cms-admin, despliegue GitHub Pages, exportación LANDING, sincronización al archivar e importación histórica. cms-admin permite login, sesiones JWT y administración de Documents y Templates desde las rutas existentes; permanece fuera de Quarto. Las pruebas manuales de la interfaz se documentan en `cms-admin/README.md` y no se ejecutan en la suite. Los tests no renderizan el sitio real.

@@ -1,45 +1,48 @@
 import { useState } from 'react'
 import { buildMetadataValues, SLUG_PATTERN, suggestSlug } from '../utils/documentForm'
+import { metadataLabel } from '../utils/metadataLabel'
 import { Feedback } from './Feedback'
-
-const metadataLabels = {
-  category: 'Categoría',
-  reading_time: 'Tiempo de lectura',
-}
+import { HelpTooltip } from './HelpTooltip'
 
 const metadataHelp = {
   category: 'Tema principal al que pertenece el artículo.',
   reading_time: 'Tiempo aproximado que necesita una persona para leer el artículo.',
 }
 
-function metadataLabel(fieldKey) {
-  return metadataLabels[fieldKey] || fieldKey.replace(/[_-]+/g, ' ').replace(/^./, (letter) => letter.toUpperCase())
-}
-
 function MetadataFields({ contract, values, errors, onChange, isPost }) {
   return <fieldset className="metadata-fields">
-    <legend>{isPost ? 'Datos del artículo' : 'Datos de la página'}</legend>
-    <p className="field-hint metadata-intro">Información adicional utilizada para clasificar y describir el contenido.</p>
+    <legend><span className="field-label-row">{isPost ? 'Datos del artículo' : 'Datos de la página'}
+      <HelpTooltip text="Información adicional utilizada para clasificar y describir el contenido." />
+    </span></legend>
     {contract.map((field) => {
       const id = `metadata-${field.field_key}`
       const hint = field.is_required ? 'Obligatorio al publicar' : 'Opcional'
       const label = metadataLabel(field.field_key)
       const help = field.field_key === 'category' && !isPost
-        ? 'Tema principal al que pertenece la página.' : metadataHelp[field.field_key]
-      const describedBy = [help && `${id}-help`, field.field_key === 'reading_time' && `${id}-unit`,
-        errors[field.field_key] && `${id}-error`]
+        ? 'Tema principal al que pertenece la página.'
+        : metadataHelp[field.field_key] || 'Campo adicional definido por la plantilla seleccionada.'
+      const describedBy = [field.field_key === 'reading_time' && `${id}-unit`, errors[field.field_key] && `${id}-error`]
         .filter(Boolean).join(' ') || undefined
       return <div className="form-field" key={field.field_key}>
         {field.expected_type === 'BOOLEAN' ? (
-          <label className="checkbox-label" htmlFor={id}>
-            <input id={id} type="checkbox" checked={values[field.field_key] === true}
-              onChange={(event) => onChange(field.field_key, event.target.checked)} />
-            <span>{label} <small>{hint}</small></span>
-          </label>
+          <>
+            <div className="field-label-row">
+              <label className="checkbox-label" htmlFor={id}>
+                <input id={id} type="checkbox" checked={values[field.field_key] === true}
+                  onChange={(event) => onChange(field.field_key, event.target.checked)} />
+                <span>{label}</span>
+              </label>
+              <HelpTooltip text={help} />
+            </div>
+            <small className="field-status">{hint}</small>
+          </>
         ) : (
           <>
-            <label htmlFor={id}>{label} <small>{hint}</small></label>
-            {help && <small id={`${id}-help`} className="field-hint">{help}</small>}
+            <div className="field-label-row">
+              <label htmlFor={id}>{label}</label>
+              <HelpTooltip text={help} />
+            </div>
+            <small className="field-status">{hint}</small>
             <div className={field.field_key === 'reading_time' ? 'field-with-unit' : undefined}>
               <input id={id} type={field.expected_type === 'INTEGER' ? 'number' :
                 field.expected_type === 'DATE' ? 'date' : 'text'}
@@ -106,39 +109,42 @@ export function DocumentForm({ templates, initialDocument, onSubmit, saving = fa
     </div>
     <div className="form-grid">
       <div className="form-field">
-        <label htmlFor="document-title">Título</label>
-        <small id="title-help" className="field-hint">Es el nombre principal que verán los visitantes en {isPost ? 'el artículo' : 'la página'}.</small>
+        <div className="field-label-row"><label htmlFor="document-title">Título</label>
+          <HelpTooltip text={`Es el nombre principal que verán los visitantes en ${isPost ? 'el artículo' : 'la página'}.`} />
+        </div>
         <input id="document-title" value={title} aria-invalid={Boolean(errors.title)}
-          aria-describedby={errors.title ? 'title-help title-error' : 'title-help'} onChange={(event) => changeTitle(event.target.value)} />
+          aria-describedby={errors.title ? 'title-error' : undefined} onChange={(event) => changeTitle(event.target.value)} />
         {errors.title && <small id="title-error" className="field-error">{errors.title}</small>}
       </div>
       <div className="form-field">
-        <label htmlFor="document-slug">Identificador URL</label>
-        <small id="slug-help" className="field-hint">Define la dirección web {isPost ? 'del artículo' : 'de la página'}. Se genera automáticamente a partir del título y puedes modificarlo mientras {isPost ? 'el post' : 'la página'} siga siendo un borrador.</small>
+        <div className="field-label-row"><label htmlFor="document-slug">Identificador URL</label>
+          <HelpTooltip text={`Define la dirección web ${isPost ? 'del artículo' : 'de la página'}. Se genera automáticamente a partir del título y puedes modificarlo mientras ${isPost ? 'el post' : 'la página'} siga siendo un borrador.`} />
+        </div>
         <input id="document-slug" value={slug} aria-invalid={Boolean(errors.slug)}
-          aria-describedby={['slug-help', isPost && 'slug-preview', errors.slug && 'slug-error'].filter(Boolean).join(' ')}
+          aria-describedby={[isPost && 'slug-preview', errors.slug && 'slug-error'].filter(Boolean).join(' ') || undefined}
           onChange={(event) => { setSlugEdited(true); setSlug(event.target.value) }} />
         {isPost && <small id="slug-preview" className="field-hint">Dirección: <output htmlFor="document-slug">/posts/{slug || '...'}/</output></small>}
         {errors.slug && <small id="slug-error" className="field-error">{errors.slug}</small>}
       </div>
     </div>
     <div className="form-field">
-      <label htmlFor="document-template">Plantilla</label>
-      <small id="template-help" className="field-hint">La plantilla define qué información adicional debe tener {isPost ? 'este artículo' : 'esta página'}.</small>
+      <div className="field-label-row"><label htmlFor="document-template">Plantilla</label>
+        <HelpTooltip text={`La plantilla define qué información adicional debe tener ${isPost ? 'este artículo' : 'esta página'}. Los campos de abajo cambian según la plantilla seleccionada.`} />
+      </div>
       <select id="document-template" value={templateId} aria-invalid={Boolean(errors.template_id)}
-        aria-describedby={errors.template_id ? 'template-help template-error' : 'template-help'}
+        aria-describedby={errors.template_id ? 'template-error' : undefined}
         onChange={(event) => changeTemplate(event.target.value)}>
         {templates.map((item) => <option key={item.template_id} value={item.template_id}>{item.name}</option>)}
       </select>
-      {selected && <small className="field-hint">Los campos de abajo cambian según la plantilla seleccionada.</small>}
       {errors.template_id && <small id="template-error" className="field-error">{errors.template_id}</small>}
     </div>
     <MetadataFields contract={selected?.metadata_contract || []} values={metadata} errors={errors} isPost={isPost}
       onChange={(key, value) => setMetadata((current) => ({ ...current, [key]: value }))} />
     <div className="form-field">
-      <label htmlFor="document-content">Contenido</label>
-      <small id="content-help" className="field-hint">Escribe el cuerpo {isPost ? 'del artículo' : 'de la página'}. Puedes utilizar Markdown y sintaxis Quarto.</small>
-      <textarea id="document-content" rows="18" value={content} aria-describedby="content-help"
+      <div className="field-label-row"><label htmlFor="document-content">Contenido</label>
+        <HelpTooltip text={`Escribe el cuerpo ${isPost ? 'del artículo' : 'de la página'}. Puedes utilizar Markdown y sintaxis Quarto.`} />
+      </div>
+      <textarea id="document-content" rows="18" value={content}
         onChange={(event) => setContent(event.target.value)} />
     </div>
     <Feedback tone="error">{error}</Feedback>

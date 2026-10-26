@@ -202,7 +202,7 @@ describe('Vistas de solo lectura', () => {
     vi.stubGlobal('fetch', mockApi({ templates: [template('Plantilla POST')] }))
     open('/plantillas')
     expect(await screen.findByText('Plantilla POST')).toBeInTheDocument()
-    expect(screen.getByText('POST')).toBeInTheDocument()
+    expect(screen.getByText('Artículos / Posts')).toBeInTheDocument()
     expect(screen.getByText('No permitida')).toBeInTheDocument()
   })
 })

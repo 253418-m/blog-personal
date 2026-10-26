@@ -156,9 +156,19 @@ describe('Creación y edición', () => {
     expect(screen.getByLabelText(/Featured/)).toHaveAttribute('type', 'checkbox')
     expect(screen.getByLabelText(/Event date/)).toHaveAttribute('type', 'date')
     expect(screen.getByText('minutos')).toBeInTheDocument()
-    expect(screen.getByText('Tema principal al que pertenece el artículo.')).toBeInTheDocument()
-    expect(screen.getByText(/La plantilla define qué información adicional/)).toBeInTheDocument()
-    expect(screen.getByText(/Puedes utilizar Markdown y sintaxis Quarto/)).toBeInTheDocument()
+    for (const field of ['Título', 'Identificador URL', 'Plantilla', 'Contenido']) {
+      expect(within(screen.getByLabelText(field).closest('.form-field'))
+        .getByRole('button', { name: 'Mostrar ayuda' })).toHaveAttribute('type', 'button')
+    }
+    for (const field of [/Categoría/, /Tiempo de lectura/]) {
+      expect(within(screen.getByLabelText(field).closest('.form-field'))
+        .getByRole('button', { name: 'Mostrar ayuda' })).toBeInTheDocument()
+    }
+    expect(within(screen.getByText('Datos del artículo').closest('.field-label-row'))
+      .getByRole('button', { name: 'Mostrar ayuda' })).toBeInTheDocument()
+    expect(screen.queryByText('Tema principal al que pertenece el artículo.')).not.toBeInTheDocument()
+    expect(screen.getByText('Obligatorio al publicar')).toBeInTheDocument()
+    expect(screen.getAllByText('Opcional').length).toBeGreaterThan(0)
     expect(fetchMock.mock.calls.some(([url]) => url.endsWith('/templates?target_type=POST'))).toBe(true)
   })
 
@@ -170,6 +180,11 @@ describe('Creación y edición', () => {
     const fetchMock = mockBackend({ templates: [customTemplate] })
     open('/contenido/nuevo')
     await userEvent.type(await screen.findByLabelText('Título'), 'Post futuro')
+    const help = within(screen.getByLabelText(/Published date/).closest('.form-field'))
+      .getByRole('button', { name: 'Mostrar ayuda' })
+    await userEvent.hover(help)
+    expect(screen.getByRole('tooltip')).toHaveTextContent('Campo adicional definido por la plantilla seleccionada.')
+    await userEvent.unhover(help)
     await userEvent.type(screen.getByLabelText(/Published date/), '2026-10-26')
     await userEvent.click(screen.getByRole('button', { name: 'Guardar borrador' }))
     await screen.findByText('Borrador guardado.')
@@ -198,7 +213,11 @@ describe('Creación y edición', () => {
     await userEvent.type(title, ' ampliado')
     expect(slug).toHaveValue('mi-slug')
     expect(screen.getByText(/Dirección:/)).toHaveTextContent('/posts/mi-slug/')
-    expect(slug).toHaveAccessibleDescription(/Se genera automáticamente a partir del título/)
+    expect(slug).toHaveAccessibleDescription(/Dirección: \/posts\/mi-slug\//)
+    const help = within(slug.closest('.form-field')).getByRole('button', { name: 'Mostrar ayuda' })
+    await userEvent.hover(help)
+    expect(screen.getByRole('tooltip')).toHaveTextContent(/Se genera automáticamente a partir del título/)
+    await userEvent.unhover(help)
   })
 
   it('guarda BORRADOR con payload tipado y redirige al detalle', async () => {
@@ -244,6 +263,8 @@ describe('Creación y edición', () => {
     expect(await screen.findByDisplayValue('Borrador original')).toBeInTheDocument()
     expect(screen.getByLabelText('Identificador URL')).toHaveValue('borrador-original')
     expect(screen.getByText('Artículo / Post')).toBeInTheDocument()
+    expect(within(screen.getByLabelText('Título').closest('.form-field'))
+      .getByRole('button', { name: 'Mostrar ayuda' })).toBeInTheDocument()
     await userEvent.clear(screen.getByLabelText('Título'))
     await userEvent.type(screen.getByLabelText('Título'), 'Título editado')
     await userEvent.click(screen.getByRole('button', { name: 'Guardar borrador' }))

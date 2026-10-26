@@ -164,6 +164,13 @@ tbody tr:last-child td { border-bottom: 0; }
 .form-field { display: grid; gap: 7px; min-width: 0; }
 .form-field label { font-weight: 700; font-size: .9rem; }
 .form-field label small { color: #607386; font-weight: 500; margin-left: 7px; }
+.field-label-row { position: relative; display: flex; align-items: center; gap: 7px; min-width: 0; }
+.field-status { color: #607386; font-size: .8rem; }
+.help-tooltip { display: inline-flex; align-items: center; }
+.help-tooltip__trigger { display: inline-grid; place-items: center; width: 20px; height: 20px; padding: 0; border: 1px solid #607f95; border-radius: 50%; background: #e8f2f8; color: #173c57; font-size: .75rem; font-weight: 800; line-height: 1; cursor: help; }
+.help-tooltip__trigger:hover, .help-tooltip__trigger[aria-expanded='true'] { background: #d0e7f4; border-color: #17577b; }
+.help-tooltip__trigger:focus-visible { outline: 3px solid #2979a4; outline-offset: 2px; }
+.help-tooltip__content { position: absolute; left: 0; bottom: calc(100% + 8px); z-index: 30; width: max-content; max-width: min(260px, calc(100vw - 32px)); padding: 9px 12px; border-radius: 7px; background: #082b4c; color: white; box-shadow: 0 8px 20px #00142340; font-size: .8rem; font-weight: 400; line-height: 1.4; white-space: normal; overflow-wrap: anywhere; }
 .form-field input:not([type='checkbox']), .document-form textarea, .document-form select {
   width: 100%; border: 1px solid #a9bdcc; border-radius: 8px; background: white;
   color: #172b3e; padding: 11px 13px; min-height: 44px;
@@ -202,6 +209,18 @@ tbody tr:last-child td { border-bottom: 0; }
 .dialog-copy { color: #344c5e; line-height: 1.6; }
 .dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 23px; }
 
+/* Editor de plantillas. */
+.field-label { font-weight: 700; font-size: .9rem; }
+.readonly-value { margin: 0; padding: 11px 13px; border: 1px solid #dce7ee; border-radius: 8px; background: #f6f9fb; }
+.readonly-value small { display: block; color: #607386; margin-top: 4px; }
+.template-metadata { grid-template-columns: minmax(0, 1fr); }
+.template-metadata-row { border-top: 1px solid #dce7ee; padding-top: 18px; min-width: 0; }
+.template-metadata-row h3 { color: #082b4c; font-size: .95rem; margin: 0 0 14px; }
+.template-metadata-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) auto; align-items: end; gap: 14px; }
+.template-metadata-grid > .secondary-button { align-self: end; }
+.add-field-button { justify-self: start; }
+.template-table .title-cell { min-width: 190px; }
+
 @media (max-width: 760px) {
   .content-heading { align-items: flex-start; flex-direction: column; }
   .form-grid, .metadata-fields, .detail-grid, .metadata-summary { grid-template-columns: minmax(0, 1fr); }
@@ -212,4 +231,17 @@ tbody tr:last-child td { border-bottom: 0; }
   .document-table td::before { content: attr(data-label); color: #607386; font-size: .78rem; font-weight: 800; text-transform: uppercase; white-space: nowrap; }
   .document-table .title-cell { min-width: 0; text-align: right; }
   .row-actions { justify-content: flex-end; min-width: 0; }
+  .template-table thead { display: none; }
+  .template-table, .template-table tbody, .template-table tr, .template-table td { display: block; width: 100%; }
+  .template-table tr { border-bottom: 8px solid #f4f7fa; padding: 8px 0; }
+  .template-table td { display: flex; justify-content: space-between; gap: 12px; border: 0; padding: 8px 16px; text-align: right; overflow-wrap: anywhere; }
+  .template-table td::before { content: attr(data-label); color: #607386; font-size: .78rem; font-weight: 800; text-transform: uppercase; white-space: nowrap; }
+  .template-table .title-cell { min-width: 0; }
+}
+
+@media (max-width: 940px) {
+  .template-metadata-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .template-metadata-grid { grid-template-columns: minmax(0, 1fr); }
 }
