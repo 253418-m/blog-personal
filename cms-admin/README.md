@@ -1,6 +1,6 @@
 # CMS Admin
 
-Interfaz privada de solo lectura para el CMS personal. Es una aplicación React + Vite separada de Quarto y de `docs/`. Usa las rutas Auth, Documents y Templates ya disponibles en `cms-api`; no crea ni edita contenido en esta fase.
+Interfaz privada para el CMS personal. Es una aplicación React + Vite separada de Quarto y de `docs/`. Usa las rutas Auth, Documents y Templates ya disponibles en `cms-api`. Permite administrar Documents; la gestión visual de Templates continúa pendiente.
 
 ## Desarrollo local
 
@@ -21,7 +21,7 @@ npm install
 npm run dev
 ```
 
-Vite muestra la URL local, normalmente `http://localhost:5173`. El login está en `/login`; `/dashboard`, `/contenido` y `/plantillas` requieren una sesión validada. `VITE_API_BASE_URL` indica el origen del backend (ejemplo: `http://127.0.0.1:8000`). Es configuración pública del build, nunca un lugar para secretos. Las variables reales del entorno o un `.env` local del frontend pueden cambiarla. El backend permite por defecto los orígenes `http://localhost:5173` y `http://127.0.0.1:5173` mediante `CORS_ALLOWED_ORIGINS`.
+Vite muestra la URL local, normalmente `http://localhost:5173`. El login está en `/login`; `/dashboard`, `/contenido`, `/contenido/nuevo`, `/contenido/:documentId`, `/contenido/:documentId/editar` y `/plantillas` requieren una sesión validada. `VITE_API_BASE_URL` indica el origen del backend (ejemplo: `http://127.0.0.1:8000`). Es configuración pública del build, nunca un lugar para secretos. Las variables reales del entorno o un `.env` local del frontend pueden cambiarla. El backend permite por defecto los orígenes `http://localhost:5173` y `http://127.0.0.1:5173` mediante `CORS_ALLOWED_ORIGINS`.
 
 ## Sesión y seguridad
 
@@ -35,10 +35,17 @@ El formulario envía username y password por JSON a `POST /api/v1/auth/login`; g
 | --- | --- |
 | `/login` | Inicio de sesión administrativo |
 | `/dashboard` | Conteos de BORRADOR, PUBLICADO, ARCHIVADO y Templates; hasta cinco Documents recientes |
-| `/contenido` | Tabla de Documents y filtros locales de estado |
+| `/contenido` | Lista de Documents, filtros de estado y tipo, acciones según el estado |
+| `/contenido/nuevo` | Crear un POST en BORRADOR con plantilla POST y metadatos dinámicos |
+| `/contenido/:documentId` | Ver contenido y metadatos; publicar, archivar o eliminar según el estado |
+| `/contenido/:documentId/editar` | Editar únicamente BORRADOR |
 | `/plantillas` | Tabla de Templates y sus propiedades |
 
-Documents y Templates son vistas de consulta. Sus formularios de creación y edición quedan pendientes.
+El listado usa los filtros `status` y `content_type` del backend. Nuevo post carga únicamente Templates POST y preselecciona la marcada como default. El slug se sugiere desde el título hasta que se edita manualmente; debe cumplir `^[a-z0-9]+(?:-[a-z0-9]+)*$`. Los campos del contrato de metadatos se muestran como texto, entero, casilla o fecha. Se puede guardar un borrador con contenido o metadatos obligatorios pendientes; para publicar deben estar completos y el backend vuelve a validarlos. El contenido se edita en un textarea de Markdown/Quarto y se muestra como texto en la vista de detalle.
+
+BORRADOR admite edición, publicación y eliminación; PUBLICADO se muestra en lectura y admite archivado; ARCHIVADO es terminal. Publicar exige confirmación porque un POST queda inmutable y el backend genera QMD y HTML. La interfaz muestra conflictos 409, datos inválidos 422 y fallos de render 500 sin exponer detalles internos. Tras un 500, el borrador se conserva. Archivar **solo cambia el estado administrativo**: el QMD y la página pública permanecen publicados hasta implementar `Archive → Quarto sync`. La gestión visual de LANDING y Templates queda para una fase posterior.
+
+Para una prueba manual, inicia sesión y entra en **Contenido → + Nuevo post**. Selecciona la plantilla POST existente y usa datos ficticios: título `Prueba desde CMS Admin`, slug `prueba-cms-admin`, `category` = `Pruebas`, `reading_time` = `2` si esos campos existen en la plantilla, y contenido `# Prueba desde CMS Admin` seguido de texto de prueba. Guarda el borrador, ábrelo, edítalo y guarda de nuevo. Pulsa **Publicar**, acepta la advertencia de inmutabilidad y espera a que termine el render. Comprueba `posts/prueba-cms-admin/index.qmd`, `docs/posts/prueba-cms-admin/index.html` y la página pública **Contenido**. Utiliza otro slug si ese directorio ya existe. No ejecutes esta prueba si no quieres conservar el post publicado: la API no permite eliminarlo; archivar no lo retira del sitio público.
 
 ## Verificación y build
 

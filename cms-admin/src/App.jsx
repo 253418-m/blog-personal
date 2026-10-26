@@ -4,7 +4,10 @@ import { ProtectedRoute, SessionStatus } from './auth/ProtectedRoute'
 import { AdminLayout } from './components/layout/AdminLayout'
 import { ContentPage } from './pages/ContentPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { DocumentDetailPage } from './pages/DocumentDetailPage'
+import { EditDocumentPage } from './pages/EditDocumentPage'
 import { LoginPage } from './pages/LoginPage'
+import { NewPostPage } from './pages/NewPostPage'
 import { TemplatesPage } from './pages/TemplatesPage'
 
 function HomeRoute() {
@@ -30,6 +33,9 @@ export default function App() {
             <Route element={<AdminLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/contenido" element={<ContentPage />} />
+              <Route path="/contenido/nuevo" element={<NewPostPage />} />
+              <Route path="/contenido/:documentId" element={<DocumentDetailPage />} />
+              <Route path="/contenido/:documentId/editar" element={<EditDocumentPage />} />
               <Route path="/plantillas" element={<TemplatesPage />} />
             </Route>
           </Route>

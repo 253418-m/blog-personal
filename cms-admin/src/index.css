@@ -138,3 +138,78 @@ tbody tr:last-child td { border-bottom: 0; }
   .recent-list li { align-items: flex-start; flex-direction: column; }
   .login-screen { padding: 14px; }
 }
+
+/* Gestión de Documents: formularios, detalle y acciones. */
+.content-heading { display: flex; align-items: end; justify-content: space-between; gap: 18px; }
+.button-link { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; white-space: nowrap; }
+.back-link { display: block; width: fit-content; color: #17577b; font-weight: 700; margin-bottom: 20px; text-decoration: none; }
+.back-link:hover, .row-actions a:hover { text-decoration: underline; }
+.content-filters { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; border-bottom: 1px solid #e6edf2; }
+.content-filters .filter-bar { border-bottom: 0; }
+.type-filter { display: flex; align-items: center; gap: 8px; padding: 12px 20px; font-size: .87rem; font-weight: 700; }
+.type-filter select, .document-form select { border: 1px solid #a9bdcc; border-radius: 8px; background: white; color: #172b3e; padding: 9px 12px; }
+.row-actions { display: flex; flex-wrap: wrap; gap: 8px 13px; min-width: 195px; }
+.row-actions a { color: #17577b; font-size: .84rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.row-actions a.danger-link { color: #9a3030; }
+.feedback { border-radius: 9px; border: 1px solid; padding: 13px 16px; margin: 14px 0 20px; }
+.feedback-success { background: #e5f6ed; border-color: #a4d8bd; color: #15563a; }
+.feedback-info { background: #e8f2f8; border-color: #b9d8e9; color: #164d6c; }
+.feedback-error { background: #fff1f0; border-color: #efb9b4; color: #8f2424; }
+.document-form { padding: clamp(20px, 3vw, 30px); display: grid; gap: 24px; }
+.form-note, .field-hint, .muted { color: #536678; line-height: 1.5; }
+.form-note { margin: 0; padding-bottom: 18px; border-bottom: 1px solid #e6edf2; }
+.form-note p { margin: 0 0 8px; }
+.form-note p:last-child { margin-bottom: 0; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.form-field { display: grid; gap: 7px; min-width: 0; }
+.form-field label { font-weight: 700; font-size: .9rem; }
+.form-field label small { color: #607386; font-weight: 500; margin-left: 7px; }
+.form-field input:not([type='checkbox']), .document-form textarea, .document-form select {
+  width: 100%; border: 1px solid #a9bdcc; border-radius: 8px; background: white;
+  color: #172b3e; padding: 11px 13px; min-height: 44px;
+}
+.document-form textarea { min-height: 300px; resize: vertical; line-height: 1.55; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+.field-hint { margin: -2px 0 3px; font-size: .83rem; }
+.field-with-unit { display: flex; align-items: center; gap: 10px; }
+.field-with-unit input { max-width: 170px; }
+.field-unit { color: #536678; font-size: .88rem; }
+.field-error { color: #9a3030; }
+.form-field [aria-invalid='true'] { border-color: #b33b3b; }
+.metadata-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; border: 1px solid #dce7ee; border-radius: 10px; padding: 18px; }
+.metadata-intro { grid-column: 1 / -1; margin: 0; }
+.metadata-fields legend { color: #082b4c; font-weight: 800; padding: 0 5px; }
+.checkbox-label { display: flex; align-items: start; gap: 9px; padding-top: 12px; }
+.checkbox-label input { width: 18px; height: 18px; accent-color: #082b4c; }
+.checkbox-label span { display: grid; gap: 2px; }
+.checkbox-label small { margin-left: 0 !important; }
+.form-actions { display: flex; justify-content: flex-end; }
+.form-actions .primary-button, .detail-actions .primary-button, .dialog-actions .primary-button { margin-top: 0; }
+.detail-panel { padding: clamp(20px, 3vw, 30px); }
+.detail-panel h2 { font-size: 1.1rem; color: #082b4c; margin: 28px 0 13px; }
+.detail-grid, .metadata-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin: 0; }
+.detail-grid > div, .metadata-summary > div { min-width: 0; }
+.detail-grid dt, .metadata-summary dt { color: #607386; font-size: .77rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+.detail-grid dd, .metadata-summary dd { margin: 5px 0 0; overflow-wrap: anywhere; }
+.metadata-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.content-text { white-space: pre-wrap; overflow-wrap: anywhere; background: #f6f9fb; padding: 18px; border-radius: 8px; font: .9rem/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.detail-actions { display: flex; flex-wrap: wrap; gap: 11px; margin-top: 20px; }
+.danger-button { border: 1px solid #a22e2e; border-radius: 9px; background: #a22e2e; color: white; min-height: 42px; padding: 9px 16px; font-weight: 700; }
+.danger-button:hover:not(:disabled) { background: #822121; }
+.danger-button:disabled { opacity: .65; cursor: wait; }
+.dialog-backdrop { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: #061f36b8; padding: 20px; }
+.confirm-dialog { width: min(100%, 500px); padding: 26px; border-radius: 13px; background: white; box-shadow: 0 24px 70px #00142370; }
+.confirm-dialog h2 { color: #082b4c; margin: 0 0 12px; }
+.dialog-copy { color: #344c5e; line-height: 1.6; }
+.dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 23px; }
+
+@media (max-width: 760px) {
+  .content-heading { align-items: flex-start; flex-direction: column; }
+  .form-grid, .metadata-fields, .detail-grid, .metadata-summary { grid-template-columns: minmax(0, 1fr); }
+  .document-table thead { display: none; }
+  .document-table, .document-table tbody, .document-table tr, .document-table td { display: block; width: 100%; }
+  .document-table tr { border-bottom: 8px solid #f4f7fa; padding: 8px 0; }
+  .document-table td { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; border: 0; padding: 8px 16px; text-align: right; overflow-wrap: anywhere; }
+  .document-table td::before { content: attr(data-label); color: #607386; font-size: .78rem; font-weight: 800; text-transform: uppercase; white-space: nowrap; }
+  .document-table .title-cell { min-width: 0; text-align: right; }
+  .row-actions { justify-content: flex-end; min-width: 0; }
+}

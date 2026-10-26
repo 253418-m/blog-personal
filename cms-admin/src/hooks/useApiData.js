@@ -5,6 +5,7 @@ export function useApiData(loader) {
 
   useEffect(() => {
     let active = true
+    setState({ loading: true, data: null, error: null })
     loader().then(
       (data) => { if (active) setState({ loading: false, data, error: null }) },
       (error) => { if (active) setState({ loading: false, data: null, error }) },
