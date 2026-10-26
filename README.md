@@ -16,8 +16,8 @@ quarto render
 quarto preview
 ```
 
-`quarto render` genera el sitio en `_site/`. `quarto preview` inicia la vista previa local; se detiene con `Ctrl+C`.
-
+`quarto render` genera el sitio en `docs/`.
+- `docs/`: salida generada del sitio para GitHub Pages.
 ## Estructura
 
 - `_quarto.yml`: configuración global, navegación y tema.

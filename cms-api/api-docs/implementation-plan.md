@@ -13,7 +13,7 @@ La API implementa login, Templates y Documents con JWT Bearer. Publicar un POST 
 | PostgreSQL runtime validation | `IMPLEMENTED` | Conexión real SQLAlchemy/psycopg, SELECT 1, identidad de conexión y esquema físico verificados |
 | Migration 0001 online validation | `IMPLEMENTED` | Aplicación online y cuatro tablas editoriales verificadas antes de crear admin_users |
 | Migration 0002 online validation | `IMPLEMENTED` | Creación exclusiva de admin_users y ciclo 0002 → 0001 → 0002 validados; base en HEAD |
-| Integration tests | `IMPLEMENTED` | Suite actual: 324 passed, 0 failed, 0 skipped; baseline de esta fase 322/0/0 |
+| Integration tests | `IMPLEMENTED` | Suite actual: 326 passed, 0 failed, 0 skipped; baseline de esta fase 324/0/0 |
 | Environment configuration | `IMPLEMENTED` | pydantic-settings, variables reales con precedencia y errores seguros sin fallback de base de datos |
 | Automatic local .env loading | `IMPLEMENTED` | Ruta portable relativa al módulo; carga automática sin depender del cwd ni exportar DATABASE_URL manualmente |
 | Centralized Settings | `IMPLEMENTED` | BaseSettings inmutable y en caché; get_settings/get_database_url compartidos por persistencia, Alembic y CLI |
@@ -44,7 +44,8 @@ La API implementa login, Templates y Documents con JWT Bearer. Publicar un POST 
 | Local static output generation | `IMPLEMENTED` | Sustitución completa de docs/ tras render correcto |
 | Quarto backend isolation | `IMPLEMENTED` | `project.render` limita las páginas a raíz, posts y proyectos públicos; `project.resources` limita los recursos |
 | Internal CMS content exclusion | `IMPLEMENTED` | `cms-api/` y staging quedan fuera de HTML, recursos, búsqueda y output; verificado en copias temporales |
-| Automatic Content catalog | `PENDING` | Las tarjetas de `posts/index.qmd` siguen editándose manualmente |
+| Automatic Content catalog | `IMPLEMENTED` | Listing grid nativo de Quarto, ordenado por `date desc`; PuraVida conserva su tarjeta manual |
+| Quarto post discovery | `IMPLEMENTED` | `posts/*/index.qmd` incluye posts históricos y CMS; el scaffold `draft: true` queda fuera |
 | GitHub Pages deployment integration | `PENDING` | Sin commit, push ni deploy |
 | LANDING → Quarto | `PENDING` | Inicio y Sobre mí continúan intactos |
 | Archive → Quarto sync | `PENDING` | ARCHIVE_QUARTO_SYNC pendiente |
@@ -109,7 +110,7 @@ El estado anterior `ADMIN_BOOTSTRAP_PENDING` pasa a `READY_FOR_MANUAL_EXECUTION`
 
 La transacción del servicio usa un bloqueo PostgreSQL para serializar bootstraps bajo `READ COMMITTED`. Cualquier administrador existente, incluso inactivo, impide crear otro; un username duplicado no se modifica. Se generan UUIDv7, timestamps UTC y `is_active = true`, con `last_login_at = NULL`. Los errores hacen rollback y la CLI presenta mensajes seguros; el engine oculta parámetros SQL.
 
-Baselines de autenticación 163/0/0, Templates 218/0/0, Documents 289/0/0 y exportación QMD 306/0/0. Todas las regresiones pasan dentro de la suite actual 324/0/0. Alembic está en `0003_simplify_documents (head)`.
+Baselines de autenticación 163/0/0, Templates 218/0/0, Documents 289/0/0 y exportación QMD 306/0/0. Todas las regresiones pasan dentro de la suite actual 326/0/0. Alembic está en `0003_simplify_documents (head)`.
 
 `POST /api/v1/auth/login` es público y acepta JSON con username/password. AuthService normaliza espacios exteriores del username, verifica Argon2 y el estado activo, actualiza únicamente `last_login_at` con UTC y confirma la transacción antes de emitir un token. La actualización exige que la cuenta siga activa, por si se desactiva durante la verificación. Usuario inexistente ejecuta igualmente una verificación contra un hash Argon2id ficticio. Usuario ausente, contraseña incorrecta y cuenta inactiva reciben el mismo 401 y `WWW-Authenticate: Bearer`. Los errores de persistencia no emiten tokens; los errores de validación HTTP no devuelven el cuerpo de login.
 
@@ -186,7 +187,7 @@ Ambos endpoints requieren Bearer y no necesitan body. Devuelven el Document actu
 
 Publicar requiere título y contenido no vacíos y todos los metadatos requeridos válidos. Establece published_at y updated_at. Archivar conserva published_at y actualiza updated_at. Estado incompatible o transición repetida: 409. Inexistente: 404. Se bloquea la fila durante la operación y cualquier fallo revierte los cambios.
 
-Publicar POST valida contenido/Template/metadatos, reserva un directorio nuevo y escribe QMD. Quarto 1.10.18 renderiza el proyecto completo en staging con `--output-dir`; se verifican `index.html` y el HTML del POST antes de sustituir `docs/`. El backup anterior permanece hasta confirmar PostgreSQL. Errores de CLI, timeout, output incompleto o filesystem devuelven 500 seguro y mantienen BORRADOR. La compensación restaura `docs/` y elimina solo el QMD nuevo; cualquier fallo excepcional se registra y se informa. Publicaciones POST concurrentes se serializan mediante advisory lock transaccional. LANDING no genera archivos ni ejecuta Quarto. Archivar no toca QMD ni docs (`ARCHIVE_QUARTO_SYNC = PENDING`). Los artículos históricos no se modifican ni importan. `posts/index.qmd` es un catálogo manual: el HTML nuevo es accesible por ruta directa pero no aparece como tarjeta automáticamente. No hay deploy.
+Publicar POST valida contenido/Template/metadatos, reserva un directorio nuevo y escribe QMD. Quarto 1.10.18 renderiza el proyecto completo en staging con `--output-dir`; se verifican `index.html` y el HTML del POST antes de sustituir `docs/`. El backup anterior permanece hasta confirmar PostgreSQL. Errores de CLI, timeout, output incompleto o filesystem devuelven 500 seguro y mantienen BORRADOR. La compensación restaura `docs/` y elimina solo el QMD nuevo; cualquier fallo excepcional se registra y se informa. Publicaciones POST concurrentes se serializan mediante advisory lock transaccional. LANDING no genera archivos ni ejecuta Quarto. Archivar no toca QMD ni docs (`ARCHIVE_QUARTO_SYNC = PENDING`). Los artículos históricos no se modifican ni importan. El listing nativo de `posts/index.qmd` descubre automáticamente los QMD en `posts/*/index.qmd` y los ordena por fecha; `plantilla/` queda fuera por `draft: true`. PuraVida conserva una tarjeta manual. No hay deploy.
 
 ## FASE 4 — Live Preview
 
